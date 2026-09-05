@@ -1,0 +1,1 @@
+import type { MetadataRoute } from "next"; export default function sitemap(): MetadataRoute.Sitemap { const base = "https://football-iq.example"; return ["","/today","/predictions","/statistics","/leagues/super-lig","/leagues/champions-league","/teams/fenerbahce"].map((path) => ({ url: `${base}${path}`, lastModified: new Date() })); }

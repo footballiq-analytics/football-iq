@@ -1,0 +1,1 @@
+"use client"; export default function Error({ reset }: { reset: () => void }) { return <section className="page empty"><h1>Veriler yüklenemedi</h1><p>Geçici bir sorun oluştu. Lütfen tekrar deneyin.</p><button onClick={reset}>Tekrar dene</button></section>; }
