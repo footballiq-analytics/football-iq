@@ -2,10 +2,18 @@
   "productName": "FUTBOL IQ",
   "repositoryWorkingName": "futbol-iq-fantasy",
   "tagline": "Strateji. Bilgi. Tutku.",
-  "defaultBudget": 100,
-  "maxPlayersPerClub": 3,
+  "currencyLabel": "K",
+  "defaultBudget": 90,
+  "maxPlayersPerClub": 4,
+  "captainMultiplier": 2,
   "squadSize": 15,
   "startingEleven": 11,
   "benchSize": 4,
-  "formations": ["4-3-3", "4-4-2", "3-4-3", "3-5-2", "4-2-3-1"]
+  "formations": ["4-3-3", "4-4-2", "3-4-3", "3-5-2", "4-2-3-1"],
+  "pricing": {
+    "maxPlayerPrice": 11.5,
+    "premiumThreshold": 9.0,
+    "regularRange": [5.0, 8.9],
+    "budgetRange": [3.5, 4.9]
+  }
 }
