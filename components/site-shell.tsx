@@ -6,11 +6,11 @@ import { useTheme } from "@/components/theme-provider";
 
 const links = [
   ["Ana Sayfa", "/"],
-  ["Takım Kur", "/team"],
+  ["Kadrom", "/team"],
+  ["Transfer", "/transfers"],
+  ["Fikstür / Canlı", "/today"],
   ["Ligler", "/leagues/super-lig"],
-  ["Maçlar", "/today"],
   ["Sıralamalar", "/leaderboard"],
-  ["İstatistikler", "/statistics"],
 ] as const;
 
 export function Header() {
@@ -39,8 +39,8 @@ export function Header() {
           <aside className="drawer" aria-label="Mobil menü" onClick={(event) => event.stopPropagation()}>
             <div className="drawer-top"><span className="brand fantasy-brand">♛ FUTBOL <b>IQ</b></span><button className="icon-button" aria-label="Menüyü kapat" onClick={() => setOpen(false)}>×</button></div>
             {links.map(([label, href]) => <Link key={href} href={href} onClick={() => setOpen(false)}>{label}</Link>)}
-            <Link href="/transfers" onClick={() => setOpen(false)}>Transfer Merkezi</Link>
             <Link href="/rules" onClick={() => setOpen(false)}>Nasıl Oynanır?</Link>
+            <Link href="/statistics" onClick={() => setOpen(false)}>İstatistikler</Link>
           </aside>
         </div>
       )}
@@ -52,10 +52,10 @@ export function BottomNav() {
   return (
     <nav className="bottom-nav" aria-label="Mobil alt navigasyon">
       {[
-        ["⌂", "Ana Sayfa", "/"],
+        ["⚽", "Kadrom", "/team"],
+        ["⇄", "Transfer", "/transfers"],
+        ["●", "Fikstür/Canlı", "/today"],
         ["♜", "Ligler", "/leagues/super-lig"],
-        ["⚽", "Takım Kur", "/team"],
-        ["▥", "Sıralama", "/leaderboard"],
         ["●", "Profil", "/profile"],
       ].map(([icon, label, href]) => <Link key={label} href={href}><span>{icon}</span>{label}</Link>)}
     </nav>
