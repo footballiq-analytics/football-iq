@@ -4,6 +4,7 @@ import "./fantasy.css";
 import "./pro-team.css";
 import "./form-colors.css";
 import "./team-data.css";
+import "./refinements.css";
 import { BottomNav, Footer, Header } from "@/components/site-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 
