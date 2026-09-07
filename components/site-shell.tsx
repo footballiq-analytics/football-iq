@@ -14,7 +14,8 @@ function Icon({name}:{name:string}){
     news:<><path d="M4 5h16v14H4z"/><path d="M7 8h5v4H7z"/><path d="M14 8h3"/><path d="M14 11h3"/><path d="M7 15h10"/></>,
     profile:<><circle cx="12" cy="8" r="4"/><path d="M4 21c.7-5 3.2-7 8-7s7.3 2 8 7"/></>,
     bell:<><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7"/><path d="M10 19a2 2 0 0 0 4 0"/></>,
-    menu:<><path d="M4 7h16M4 12h16M4 17h16"/></>
+    menu:<><path d="M4 7h16M4 12h16M4 17h16"/></>,
+    share:<><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.7 6.8-4.1M8.6 13.3l6.8 4.1"/></>
   };
   return <svg {...common} aria-hidden="true">{paths[name]??paths.home}</svg>;
 }
@@ -25,14 +26,23 @@ const desktopLinks=[["Ana Sayfa","/"],["Kadrom","/team"],["Transfer","/transfers
 
 export function Header(){
   const [open,setOpen]=useState(false);
+  const [shareLabel,setShareLabel]=useState("Siteyi arkadaşına öner");
   const pathname=usePathname();
+  async function shareSite(){
+    const url=window.location.origin;
+    const shareData={title:"FUTBOL IQ Fantasy",text:"FUTBOL IQ Fantasy'ye göz at!",url};
+    try{
+      if(navigator.share){await navigator.share(shareData);return;}
+      await navigator.clipboard.writeText(url);setShareLabel("Bağlantı kopyalandı");setTimeout(()=>setShareLabel("Siteyi arkadaşına öner"),2200);
+    }catch{/* Kullanıcı paylaşım penceresini kapatmış olabilir. */}
+  }
   return <>
     <header className="fiq-header">
       <Link href="/" className="fiq-logo" aria-label="FUTBOL IQ Fantasy ana sayfa"><Crown/><span>FUTBOL <b>IQ</b> <em>Fantasy</em></span></Link>
       <nav className="fiq-desktop-nav" aria-label="Ana navigasyon">{desktopLinks.map(([label,href])=><Link className={pathname===href||pathname.startsWith(href+"/")?"active":""} key={href} href={href}>{label}</Link>)}</nav>
-      <div className="fiq-header-actions"><button className="icon-only" aria-label="Bildirimler"><Icon name="bell"/></button><Link className="profile-dot" href="/profile">DT</Link><button className="icon-only menu-trigger" onClick={()=>setOpen(true)} aria-label="Menüyü aç"><Icon name="menu"/></button></div>
+      <div className="fiq-header-actions"><button className="recommend-button" onClick={shareSite}><Icon name="share"/><span>{shareLabel}</span></button><button className="icon-only" aria-label="Bildirimler"><Icon name="bell"/></button><Link className="profile-dot" href="/profile">DT</Link><button className="icon-only menu-trigger" onClick={()=>setOpen(true)} aria-label="Menüyü aç"><Icon name="menu"/></button></div>
     </header>
-    {open&&<div className="mobile-drawer-backdrop" onClick={()=>setOpen(false)}><aside className="mobile-drawer" onClick={e=>e.stopPropagation()}><div className="drawer-logo"><Crown/><strong>FUTBOL <b>IQ</b> Fantasy</strong></div>{desktopLinks.map(([label,href])=><Link onClick={()=>setOpen(false)} key={href} href={href}>{label}</Link>)}<Link onClick={()=>setOpen(false)} href="/profile">Profil</Link></aside></div>}
+    {open&&<div className="mobile-drawer-backdrop" onClick={()=>setOpen(false)}><aside className="mobile-drawer" onClick={e=>e.stopPropagation()}><div className="drawer-logo"><Crown/><strong>FUTBOL <b>IQ</b> Fantasy</strong></div>{desktopLinks.map(([label,href])=><Link onClick={()=>setOpen(false)} key={href} href={href}>{label}</Link>)}<Link onClick={()=>setOpen(false)} href="/profile">Profil</Link><button className="drawer-share" onClick={shareSite}><Icon name="share"/>{shareLabel}</button></aside></div>}
   </>;
 }
 
