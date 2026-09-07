@@ -21,25 +21,25 @@ function Icon({name}:{name:string}){
 
 function Crown(){return <svg className="brand-crown" viewBox="0 0 32 24" aria-hidden="true"><path d="M3 20 1 6l8 6 7-10 7 10 8-6-2 14H3Z"/><path d="M4 23h24"/></svg>}
 
-const desktopLinks=[["Ana Sayfa","/"],["Takım Kur","/team"],["Ligler","/leagues/super-lig"],["Maçlar","/today"],["Puan Durumu","/leaderboard"],["İstatistikler","/statistics"],["Haberler","/news"]] as const;
+const desktopLinks=[["Ana Sayfa","/"],["Kadrom","/team"],["Transfer","/transfers"],["Ligler","/leagues/super-lig"],["Maçlar","/today"],["Puan Durumu","/leaderboard"],["Haberler","/news"]] as const;
 
 export function Header(){
   const [open,setOpen]=useState(false);
   const pathname=usePathname();
   return <>
     <header className="fiq-header">
-      <Link href="/" className="fiq-logo" aria-label="FUTBOL IQ ana sayfa"><Crown/><span>FUTBOL <b>IQ</b></span></Link>
+      <Link href="/" className="fiq-logo" aria-label="FUTBOL IQ Fantasy ana sayfa"><Crown/><span>FUTBOL <b>IQ</b> <em>Fantasy</em></span></Link>
       <nav className="fiq-desktop-nav" aria-label="Ana navigasyon">{desktopLinks.map(([label,href])=><Link className={pathname===href||pathname.startsWith(href+"/")?"active":""} key={href} href={href}>{label}</Link>)}</nav>
       <div className="fiq-header-actions"><button className="icon-only" aria-label="Bildirimler"><Icon name="bell"/></button><Link className="profile-dot" href="/profile">DT</Link><button className="icon-only menu-trigger" onClick={()=>setOpen(true)} aria-label="Menüyü aç"><Icon name="menu"/></button></div>
     </header>
-    {open&&<div className="mobile-drawer-backdrop" onClick={()=>setOpen(false)}><aside className="mobile-drawer" onClick={e=>e.stopPropagation()}><div className="drawer-logo"><Crown/><strong>FUTBOL <b>IQ</b></strong></div>{desktopLinks.map(([label,href])=><Link onClick={()=>setOpen(false)} key={href} href={href}>{label}</Link>)}<Link onClick={()=>setOpen(false)} href="/profile">Profil</Link></aside></div>}
+    {open&&<div className="mobile-drawer-backdrop" onClick={()=>setOpen(false)}><aside className="mobile-drawer" onClick={e=>e.stopPropagation()}><div className="drawer-logo"><Crown/><strong>FUTBOL <b>IQ</b> Fantasy</strong></div>{desktopLinks.map(([label,href])=><Link onClick={()=>setOpen(false)} key={href} href={href}>{label}</Link>)}<Link onClick={()=>setOpen(false)} href="/profile">Profil</Link></aside></div>}
   </>;
 }
 
 const mobileLinks=[
   ["home","Ana Sayfa","/"],
   ["leagues","Ligler","/leagues/super-lig"],
-  ["team","Takım Kur","/team"],
+  ["team","Kadrom","/team"],
   ["news","Haberler","/news"],
   ["profile","Profil","/profile"],
 ] as const;
@@ -49,4 +49,4 @@ export function BottomNav(){
   return <nav className="fiq-bottom-nav" aria-label="Mobil alt navigasyon">{mobileLinks.map(([icon,label,href])=>{const active=pathname===href||pathname.startsWith(href+"/");return <Link className={active?"active":""} href={href} key={href}><Icon name={icon}/><span>{label}</span></Link>})}</nav>;
 }
 
-export function Footer(){return <footer className="fiq-footer"><div><span className="footer-logo">FUTBOL <b>IQ</b></span><small>Strateji. Bilgi. Tutku.</small></div><p>Gerçek veri bağlantısı olmayan bölümler demo olarak işaretlenir. Tahminler kesin sonuç değildir.</p></footer>}
+export function Footer(){return <footer className="fiq-footer"><div><span className="footer-logo">FUTBOL <b>IQ</b> Fantasy</span><small>Strateji. Bilgi. Tutku.</small></div><p>Gerçek veri bağlantısı olmayan bölümler demo olarak işaretlenir. Tahminler kesin sonuç değildir.</p></footer>}
