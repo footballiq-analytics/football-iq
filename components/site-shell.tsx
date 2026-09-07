@@ -1,8 +1,73 @@
 "use client";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTheme } from "@/components/theme-provider";
-const links = [["Ana Sayfa","/"],["Bugünün Maçları","/today"],["Tahminler","/predictions"],["İstatistikler","/statistics"]] as const;
-export function Header() { const [open, setOpen] = useState(false); const { dark, toggle } = useTheme(); useEffect(() => { const close = (event: KeyboardEvent) => event.key === "Escape" && setOpen(false); addEventListener("keydown", close); return () => removeEventListener("keydown", close); }, []); return <><header className="header"><Link href="/" className="brand">FOOTBALL <b>IQ</b></Link><nav aria-label="Ana navigasyon">{links.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}</nav><button className="icon-button theme" onClick={toggle} aria-label="Tema değiştir">{dark ? "☀" : "◐"}</button><button className="icon-button mobile-only" onClick={() => setOpen(true)} aria-label="Menüyü aç">☰</button></header>{open && <div className="drawer-layer" onClick={() => setOpen(false)}><aside className="drawer" aria-label="Mobil menü" onClick={(event) => event.stopPropagation()}><div className="drawer-top"><span className="brand">FOOTBALL <b>IQ</b></span><button className="icon-button" aria-label="Menüyü kapat" onClick={() => setOpen(false)}>×</button></div>{links.map(([label, href]) => <Link key={href} href={href} onClick={() => setOpen(false)}>{label}</Link>)}<Link href="/leagues/super-lig" onClick={() => setOpen(false)}>Süper Lig</Link><Link href="/leagues/champions-league" onClick={() => setOpen(false)}>Şampiyonlar Ligi</Link></aside></div>}</> }
-export function BottomNav() { return <nav className="bottom-nav" aria-label="Mobil alt navigasyon">{[["⌂","Ana Sayfa","/"],["◫","Maçlar","/today"],["◇","Tahminler","/predictions"],["▥","İstatistik","/statistics"],["☰","Menü","#menu"]].map(([icon,label,href]) => <Link key={label} href={href}><span>{icon}</span>{label}</Link>)}</nav>; }
-export function Footer() { return <footer><div><strong>FOOTBALL IQ</strong><p>Futbolu verilerle oku.</p></div><nav aria-label="Footer"><a href="#">Hakkında</a><a href="#">İletişim</a><a href="#">Gizlilik</a><a href="#">Çerez Politikası</a><a href="#">Kullanım Şartları</a></nav><p className="disclaimer">Bu platformdaki tahminler istatistiksel modellemelere dayanır ve kesin sonuç garantisi vermez.</p></footer>; }
+
+const links = [
+  ["Ana Sayfa", "/"],
+  ["Takım Kur", "/team"],
+  ["Ligler", "/leagues/super-lig"],
+  ["Maçlar", "/today"],
+  ["Sıralamalar", "/leaderboard"],
+  ["İstatistikler", "/statistics"],
+] as const;
+
+export function Header() {
+  const [open, setOpen] = useState(false);
+  const { dark, toggle } = useTheme();
+
+  useEffect(() => {
+    const close = (event: KeyboardEvent) => event.key === "Escape" && setOpen(false);
+    addEventListener("keydown", close);
+    return () => removeEventListener("keydown", close);
+  }, []);
+
+  return (
+    <>
+      <header className="header fantasy-header">
+        <Link href="/" className="brand fantasy-brand"><span>♛</span> FUTBOL <b>IQ</b></Link>
+        <nav aria-label="Ana navigasyon">
+          {links.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}
+        </nav>
+        <button className="icon-button theme" onClick={toggle} aria-label="Tema değiştir">{dark ? "☀" : "◐"}</button>
+        <Link href="/profile" className="profile-chip" aria-label="Profil">DT</Link>
+        <button className="icon-button mobile-only" onClick={() => setOpen(true)} aria-label="Menüyü aç">☰</button>
+      </header>
+      {open && (
+        <div className="drawer-layer" onClick={() => setOpen(false)}>
+          <aside className="drawer" aria-label="Mobil menü" onClick={(event) => event.stopPropagation()}>
+            <div className="drawer-top"><span className="brand fantasy-brand">♛ FUTBOL <b>IQ</b></span><button className="icon-button" aria-label="Menüyü kapat" onClick={() => setOpen(false)}>×</button></div>
+            {links.map(([label, href]) => <Link key={href} href={href} onClick={() => setOpen(false)}>{label}</Link>)}
+            <Link href="/transfers" onClick={() => setOpen(false)}>Transfer Merkezi</Link>
+            <Link href="/rules" onClick={() => setOpen(false)}>Nasıl Oynanır?</Link>
+          </aside>
+        </div>
+      )}
+    </>
+  );
+}
+
+export function BottomNav() {
+  return (
+    <nav className="bottom-nav" aria-label="Mobil alt navigasyon">
+      {[
+        ["⌂", "Ana Sayfa", "/"],
+        ["♜", "Ligler", "/leagues/super-lig"],
+        ["⚽", "Takım Kur", "/team"],
+        ["▥", "Sıralama", "/leaderboard"],
+        ["●", "Profil", "/profile"],
+      ].map(([icon, label, href]) => <Link key={label} href={href}><span>{icon}</span>{label}</Link>)}
+    </nav>
+  );
+}
+
+export function Footer() {
+  return (
+    <footer>
+      <div><strong>FUTBOL IQ</strong><p>Strateji. Bilgi. Tutku.</p></div>
+      <nav aria-label="Footer"><Link href="/rules">Nasıl Oynanır?</Link><Link href="/statistics">İstatistikler</Link><a href="#">Gizlilik</a><a href="#">Kullanım Şartları</a><a href="#">İletişim</a></nav>
+      <p className="disclaimer">FUTBOL IQ özgün bir fantasy football ürünüdür. Gerçek futbol verisi kullanılmadığında ilgili alanlar açıkça demo veya veri bekleniyor olarak işaretlenir.</p>
+    </footer>
+  );
+}
