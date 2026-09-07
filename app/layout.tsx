@@ -6,11 +6,11 @@ import { BottomNav, Footer, Header } from "@/components/site-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
-  title: { default: "FUTBOL IQ — Strateji. Bilgi. Tutku.", template: "%s | FUTBOL IQ" },
-  description: "Gerçek futbol performanslarından beslenen, özgün fantasy football deneyimi. Takımını kur, liglere katıl, puanını yükselt.",
+  title: { default: "FUTBOL IQ Fantasy", template: "%s | FUTBOL IQ Fantasy" },
+  description: "Türkiye odaklı, mobil uyumlu fantasy football deneyimi. Kadronu kur, bütçeni yönet ve liglerde yarış.",
   openGraph: {
-    title: "FUTBOL IQ — Fantasy Football",
-    description: "Takımını kur, gerçek performanslardan puan kazan, arkadaşlarınla ve genel sıralamada yarış.",
+    title: "FUTBOL IQ Fantasy",
+    description: "Kadronu kur, bütçeni yönet ve fantasy liglerinde yarış.",
     type: "website",
   },
 };
@@ -19,8 +19,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "FUTBOL IQ",
-    description: "Web tabanlı özgün fantasy football platformu.",
+    name: "FUTBOL IQ Fantasy",
+    description: "Web tabanlı fantasy football platformu.",
     inLanguage: "tr-TR",
   };
 
