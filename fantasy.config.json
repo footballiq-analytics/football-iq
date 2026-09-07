@@ -1,5 +1,5 @@
 {
-  "productName": "FUTBOL IQ",
+  "productName": "FUTBOL IQ Fantasy",
   "repositoryWorkingName": "futbol-iq-fantasy",
   "tagline": "Strateji. Bilgi. Tutku.",
   "currencyLabel": "M ₺",
@@ -12,33 +12,12 @@
   "startingEleven": 11,
   "benchSize": 4,
   "benchComposition": { "goalkeepers": 1, "outfield": 3 },
-  "formations": ["4-3-3", "4-4-2", "3-4-3", "3-5-2", "4-2-3-1"],
+  "formations": ["4-3-3", "4-4-2", "3-4-3", "3-5-2", "5-3-2", "4-2-3-1"],
   "wildcards": [
-    {
-      "id": "bench-boost",
-      "name": "Yedek Güç",
-      "effect": "Yedek kulübesindeki 4 oyuncunun puanı haftalık toplam puana eklenir."
-    },
-    {
-      "id": "triple-captain",
-      "name": "Kaptan Çiftle",
-      "effect": "Seçilen kaptanın puan çarpanı o hafta 3x olur."
-    },
-    {
-      "id": "wildcard",
-      "name": "Sınırsız Transfer",
-      "effect": "Belirlenen hafta boyunca transfer sayısı sınırı kaldırılır ve transfer cezası uygulanmaz."
-    },
-    {
-      "id": "golden-bench",
-      "name": "Altın Yedek",
-      "effect": "Oynamayan bir asil oyuncunun yerine uygun yedek oyuncu otomatik olarak dahil olur."
-    }
+    {"id":"bench-boost","name":"Yedek Güç","effect":"Yedek kulübesindeki 4 oyuncunun puanı haftalık toplam puana eklenir."},
+    {"id":"triple-captain","name":"Kaptan Çiftle","effect":"Seçilen kaptanın puan çarpanı o hafta 3x olur."},
+    {"id":"wildcard","name":"Sınırsız Transfer","effect":"Belirlenen hafta boyunca transfer sayısı sınırı kaldırılır ve transfer cezası uygulanmaz."},
+    {"id":"golden-bench","name":"Altın Yedek","effect":"Oynamayan bir asil oyuncunun yerine uygun yedek oyuncu otomatik olarak dahil olur."}
   ],
-  "pricing": {
-    "maxPlayerPrice": 11.5,
-    "premiumThreshold": 9.0,
-    "regularRange": [5.0, 8.9],
-    "budgetRange": [3.5, 4.9]
-  }
+  "pricing": {"maxPlayerPrice":11.5,"premiumThreshold":9.0,"regularRange":[5.0,8.9],"budgetRange":[3.5,4.9]}
 }
