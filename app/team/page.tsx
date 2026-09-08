@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { SUPER_LIG_CLUBS_2026_27, SUPER_LIG_DATA_META } from "@/data/superlig-2026";
@@ -10,6 +11,7 @@ type Player = { id:number; name:string; club:string; position:Position; price:nu
 
 const BUDGET = 100;
 const STORAGE_KEY = "futbol-iq-fantasy-squad-v3";
+const FORMATIONS:Formation[]=["4-3-3","3-4-3","3-5-2","5-3-2"];
 
 const players:Player[]=[
 {id:1,name:"Victor Osimhen",club:"Galatasaray",position:"FWD",price:11.5,points:78,selected:64},
@@ -51,6 +53,7 @@ const initialBench:(number|null)[]=[23,24,25,26];
 
 export default function TeamBuilderPage(){
  const [formation,setFormation]=useState<Formation>("4-3-3");
+ const [formationOpen,setFormationOpen]=useState(false);
  const [lineup,setLineup]=useState<(number|null)[]>(initialLineup);
  const [bench,setBench]=useState<(number|null)[]>(initialBench);
  const [captain,setCaptain]=useState<number|null>(1);
@@ -82,18 +85,39 @@ export default function TeamBuilderPage(){
  }
  function role(id:number){if(captain!==id){setCaptain(id);if(vice===id)setVice(null);setMessage(`${players.find(p=>p.id===id)?.name} kaptan seçildi · x2`)}else{setCaptain(null);setVice(id);setMessage(`${players.find(p=>p.id===id)?.name} ikinci kaptan seçildi.`)}}
  function save(){const empty=lineup.filter(x=>x===null).length+bench.filter(x=>x===null).length;if(empty)return setMessage(`Kadroyu kaydetmeden önce ${empty} boş yeri tamamla.`);if(!captain||!vice)return setMessage("Kaptan ve ikinci kaptan seçmelisin.");setMessage("Kadro bu cihazın tarayıcısına kaydedildi.")}
+ function pickFormation(f:Formation){setFormation(f);setFormationOpen(false);setMessage(`${f} dizilişi seçildi.`)}
 
  const rows=formationRows[formation];let cursor=0;
- return <div className="fantasy-page pro-team-page">
-  <section className="team-command-bar"><div><p className="eyebrow">KADROM / SAHA İÇİ</p><h1>FUTBOL IQ <span>Fantasy</span></h1><p>11 asil + 4 yedek · kulüp başına en fazla 3 oyuncu · kaptan x2</p></div><div className="command-kpis"><div><small>Toplam bütçe</small><strong>100 M₺</strong></div><div><small>Kalan</small><strong className="money-text">{remaining.toFixed(1)} M₺</strong></div><div><small>Kadro</small><strong>{selected.length}/15</strong></div><div><small>Diziliş</small><strong>{formation}</strong></div></div></section>
-  <section className="pro-builder-grid">
-   <div className="squad-column">
-    <div className="squad-toolbar"><div className="formation-switch">{(["4-3-3","3-4-3","3-5-2","5-3-2"] as Formation[]).map(f=><button key={f} className={formation===f?"active":""} onClick={()=>setFormation(f)}>{f}</button>)}</div><button className="ghost-action" onClick={()=>setMessage("Otomatik kur özelliği oyuncu puan motoruna bağlandığında aktif olacak.")}>Otomatik Kur</button></div>
-    <div className="stadium-pitch-wrap"><div className="floodlight left"/><div className="floodlight right"/><div className="pro-pitch"><div className="pitch-markings"/>{rows.map((count,rowIndex)=>{const ids=lineup.slice(cursor,cursor+count);cursor+=count;return <div className={`pitch-row row-${rowIndex}`} style={{gridTemplateColumns:`repeat(${count}, minmax(0, 1fr))`}} key={`${formation}-${rowIndex}`}>{ids.map((id,i)=>id?<PlayerCard key={id} id={id} captain={captain===id} vice={vice===id} onRole={()=>role(id)} onRemove={()=>remove(id)}/>:<EmptySlot key={`slot-${rowIndex}-${i}`} label={rowIndex===3?"GK":rowIndex===2?"DEF":rowIndex===1?"MID":"FWD"}/>)}</div>})}</div></div>
-    <div className="bench-zone"><div className="bench-title"><div><p className="eyebrow">YEDEK KULÜBESİ</p><h2>1 Kaleci + 3 Saha Oyuncusu</h2></div><span>{bench.filter(Boolean).length}/4</span></div><div className="pro-bench-grid">{bench.map((id,i)=>id?<BenchPlayer key={id} id={id} order={i+1} onRemove={()=>remove(id)}/>:<div className="bench-empty" key={i}>Yedek {i+1}</div>)}</div></div>
-    <div className="save-row"><div className="status-message">{message}</div><button className="save-squad" onClick={save}>Kadroyu Kaydet</button></div>
+ return <div className="fantasy-page pro-team-page target-team-layout">
+  <section className="team-command-bar target-command-bar"><div><p className="eyebrow">KADROM / SAHA İÇİ</p><h1>Takımını Kur</h1><p>Hayalindeki kadroyu oluştur, puanları topla, zirveye çık!</p></div><div className="command-kpis"><div><small>Toplam bütçe</small><strong>100 M₺</strong></div><div><small>Kalan bütçe</small><strong className="money-text">{remaining.toFixed(1)} M₺</strong></div><div><small>Asil</small><strong>{lineup.filter(Boolean).length}/11</strong></div><div><small>Toplam</small><strong>{selected.length}/15</strong></div></div></section>
+  <section className="target-builder-shell">
+   <aside className="team-side-rail" aria-label="Kadro menüsü">
+    <nav>
+      <Link className="active" href="/team">Kadrom</Link>
+      <Link href="/transfers">Transfer</Link>
+      <Link href="/leagues/super-lig">Ligler</Link>
+      <Link href="/today">Fikstür</Link>
+      <Link href="/statistics">İstatistikler</Link>
+      <Link href="/leaderboard">Ödüller</Link>
+    </nav>
+    <div className="invite-card"><strong>FUTBOL IQ</strong><p>Daha eğlenceli bir lig için arkadaşlarını davet et.</p><button onClick={()=>navigator.share?.({title:"FUTBOL IQ Fantasy",url:window.location.origin})}>Siteyi Arkadaşına Öner</button></div>
+   </aside>
+   <div className="pro-builder-grid target-grid">
+    <div className="squad-column">
+     <div className="squad-toolbar target-squad-toolbar">
+      <div className="formation-dropdown-wrap">
+       <span className="formation-label">Diziliş Seç</span>
+       <button className="formation-trigger" onClick={()=>setFormationOpen(v=>!v)} aria-expanded={formationOpen}>{formation}<span>⌄</span></button>
+       {formationOpen&&<div className="formation-menu">{FORMATIONS.map(f=><button key={f} className={formation===f?"active":""} onClick={()=>pickFormation(f)}>{f}</button>)}</div>}
+      </div>
+      <button className="ghost-action" onClick={()=>setMessage("Otomatik kur özelliği oyuncu puan motoruna bağlandığında aktif olacak.")}>Otomatik Kur</button>
+     </div>
+     <div className="stadium-pitch-wrap"><div className="floodlight left"/><div className="floodlight right"/><div className="pro-pitch"><div className="pitch-markings"/>{rows.map((count,rowIndex)=>{const ids=lineup.slice(cursor,cursor+count);cursor+=count;return <div className={`pitch-row row-${rowIndex}`} style={{gridTemplateColumns:`repeat(${count}, minmax(0, 1fr))`}} key={`${formation}-${rowIndex}`}>{ids.map((id,i)=>id?<PlayerCard key={id} id={id} captain={captain===id} vice={vice===id} onRole={()=>role(id)} onRemove={()=>remove(id)}/>:<EmptySlot key={`slot-${rowIndex}-${i}`} label={rowIndex===3?"GK":rowIndex===2?"DEF":rowIndex===1?"MID":"FWD"}/>)}</div>})}</div></div>
+     <div className="bench-zone"><div className="bench-title"><div><p className="eyebrow">YEDEK KULÜBESİ</p><h2>1 Kaleci + 3 Saha Oyuncusu</h2></div><span>{bench.filter(Boolean).length}/4</span></div><div className="pro-bench-grid">{bench.map((id,i)=>id?<BenchPlayer key={id} id={id} order={i+1} onRemove={()=>remove(id)}/>:<div className="bench-empty" key={i}>Yedek {i+1}</div>)}</div></div>
+     <div className="save-row"><div className="status-message">{message}</div><button className="save-squad" onClick={save}>Kadroyu Kaydet</button></div>
+    </div>
+    <aside className="player-market-pro"><div className="market-heading"><div><p className="eyebrow">OYUNCULAR</p><h2>Oyuncu Listesi</h2></div><span>{SUPER_LIG_DATA_META.clubCount} KULÜP · {SUPER_LIG_DATA_META.season}</span></div><input className="pro-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Oyuncu ara..."/><select className="club-select" value={clubFilter} onChange={e=>setClubFilter(e.target.value)} aria-label="Kulüp filtresi"><option value="ALL">Tüm takımlar</option>{SUPER_LIG_CLUBS_2026_27.map(club=><option value={club} key={club}>{club}</option>)}</select><div className="position-tabs">{(["ALL","GK","DEF","MID","FWD"] as const).map(p=><button className={filter===p?"active":""} onClick={()=>setFilter(p)} key={p}>{p==="ALL"?"Tümü":p}</button>)}</div><div className="market-label-row"><span>Oyuncu</span><span>Fiyat</span><span>Puan</span><span/></div><div className="pro-market-list">{filtered.length?filtered.map(p=><div className={`pro-market-row ${selected.includes(p.id)?"selected":""}`} key={p.id}><div className="market-identity"><Portrait name={p.name}/><div><strong>{p.name}</strong><small>{p.club} · %{p.selected} seçilme</small></div></div><b>{p.price.toFixed(1)}M</b><span>{p.points}</span><button onClick={()=>add(p)} aria-label={`${p.name} ${selected.includes(p.id)?"çıkar":"ekle"}`}>{selected.includes(p.id)?"−":"+"}</button></div>):<div className="roster-pending">Bu kulübün oyuncu kadrosu henüz doğrulanmış veri sağlayıcısından senkronize edilmedi. Sahte oyuncu eklemiyoruz.</div>}</div><div className="formation-analysis"><strong>Diziliş Analizi</strong><span>Forvet <b>{rows[0]}/{rows[0]}</b></span><span>Orta Saha <b>{rows[1]}/{rows[1]}</b></span><span>Defans <b>{rows[2]}/{rows[2]}</b></span><span>Kaleci <b>1/1</b></span></div></aside>
    </div>
-   <aside className="player-market-pro"><div className="market-heading"><div><p className="eyebrow">TRANSFER / OYUNCU LİSTESİ</p><h2>Oyuncular</h2></div><span>{SUPER_LIG_DATA_META.clubCount} KULÜP · {SUPER_LIG_DATA_META.season}</span></div><input className="pro-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Oyuncu veya kulüp ara"/><select className="club-select" value={clubFilter} onChange={e=>setClubFilter(e.target.value)} aria-label="Kulüp filtresi"><option value="ALL">Tüm Süper Lig kulüpleri</option>{SUPER_LIG_CLUBS_2026_27.map(club=><option value={club} key={club}>{club}</option>)}</select><div className="position-tabs">{(["ALL","GK","DEF","MID","FWD"] as const).map(p=><button className={filter===p?"active":""} onClick={()=>setFilter(p)} key={p}>{p==="ALL"?"Tümü":p}</button>)}</div><div className="market-label-row"><span>Oyuncu</span><span>Fiyat</span><span>Puan</span><span/></div><div className="pro-market-list">{filtered.length?filtered.map(p=><div className={`pro-market-row ${selected.includes(p.id)?"selected":""}`} key={p.id}><div className="market-identity"><Portrait name={p.name}/><div><strong>{p.name}</strong><small>{p.club} · %{p.selected} seçilme</small></div></div><b>{p.price.toFixed(1)}M</b><span>{p.points}</span><button onClick={()=>add(p)} aria-label={`${p.name} ${selected.includes(p.id)?"çıkar":"ekle"}`}>{selected.includes(p.id)?"−":"+"}</button></div>):<div className="roster-pending">Bu kulübün oyuncu kadrosu henüz doğrulanmış veri sağlayıcısından senkronize edilmedi. Sahte oyuncu eklemiyoruz.</div>}</div></aside>
   </section>
  </div>
 }
