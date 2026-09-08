@@ -28,6 +28,8 @@ jobs:
         run: npm install
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - name: Build static site
         run: npm run build
       - name: Upload Pages artifact
