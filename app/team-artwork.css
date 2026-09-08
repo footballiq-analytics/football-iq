@@ -1,0 +1,34 @@
+/* Target artwork pass: layered futuristic player shields + matching bench language */
+.target-grid .pro-player-card{position:relative;isolation:isolate;overflow:visible;background:linear-gradient(180deg,rgba(7,32,31,.3) 0%,rgba(3,20,22,.92) 53%,#020c12 100%);clip-path:polygon(12% 0,88% 0,100% 10%,100% 88%,88% 100%,12% 100%,0 88%,0 10%)}
+.target-grid .pro-player-card:before{content:"";position:absolute;z-index:-1;inset:-3px;border-radius:16px;background:radial-gradient(circle at 50% 24%,rgba(34,255,174,.26),transparent 40%),linear-gradient(135deg,rgba(109,255,202,.15),transparent 32% 68%,rgba(0,185,132,.12));filter:blur(7px);opacity:.8}
+.target-grid .pro-player-card:after{content:"";position:absolute;z-index:1;left:8px;right:8px;top:78px;height:1px;background:linear-gradient(90deg,transparent,rgba(86,255,192,.55),transparent);box-shadow:0 0 9px rgba(42,255,177,.32);pointer-events:none}
+.target-grid .pro-player-card>.portrait{position:relative;width:74px;height:78px;margin-top:-4px;overflow:hidden;border:0;border-radius:34px 34px 9px 9px;background:radial-gradient(circle at 50% 22%,rgba(62,139,110,.68),rgba(10,44,39,.82) 44%,#04151a 76%);box-shadow:inset 0 -18px 24px rgba(0,0,0,.38),0 0 18px rgba(17,236,159,.12)}
+.target-grid .pro-player-card>.portrait:before{content:"";position:absolute;inset:0;background:linear-gradient(112deg,transparent 18%,rgba(220,255,239,.13) 38%,transparent 55%);mix-blend-mode:screen;pointer-events:none}
+.target-grid .portrait .head{top:6px;width:27px;height:31px;border-radius:46% 46% 42% 42%;background:linear-gradient(160deg,#244039,#0b1c20 66%);box-shadow:inset -4px -3px 7px rgba(0,0,0,.36),0 2px 8px rgba(0,0,0,.32)}
+.target-grid .portrait .torso{bottom:-3px;width:70px;height:48px;border-radius:50% 50% 10px 10px;background:linear-gradient(135deg,#0e7556 0,#084536 42%,#06252a 100%);box-shadow:inset 0 8px 15px rgba(64,255,185,.08)}
+.target-grid .portrait .torso:before{content:"";position:absolute;left:50%;top:2px;width:18px;height:44px;transform:translateX(-50%);border-left:1px solid rgba(111,255,205,.18);border-right:1px solid rgba(111,255,205,.1)}
+.target-grid .portrait .initial{z-index:4;bottom:5px;font-size:13px;color:rgba(224,255,243,.8);text-shadow:0 0 10px rgba(0,230,160,.55)}
+.target-grid .pro-player-card .player-name{position:relative;z-index:3;margin-top:2px;padding-top:5px;font-size:10px;line-height:1.1;letter-spacing:-.01em;text-shadow:0 1px 5px #000}
+.target-grid .pro-player-card .player-club{position:relative;z-index:3;margin-top:2px;font-size:7px;letter-spacing:.025em;color:#9cb9b4}
+.target-grid .pro-player-card .player-stats{position:relative;z-index:3;margin-top:5px;padding-top:5px;border-top:1px solid rgba(84,225,173,.14);background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.15));font-size:7px}
+.target-grid .pro-player-card .role-badge{z-index:7;top:-8px;right:-8px;width:25px;height:25px;border:2px solid rgba(255,242,170,.75);background:radial-gradient(circle at 36% 30%,#fff0a2,#f2b526 42%,#9e6508 100%);color:#2c1900;box-shadow:0 0 20px rgba(255,199,55,.72),0 4px 10px rgba(0,0,0,.5);font-size:9px}
+.target-grid .pro-player-card.is-captain:before{inset:-12px;background:radial-gradient(circle at 50% 40%,rgba(255,221,80,.55),rgba(255,173,26,.17) 38%,transparent 68%);filter:blur(10px);opacity:1}
+.target-grid .pro-player-card.is-captain:after{background:linear-gradient(90deg,transparent,rgba(255,229,114,.8),transparent);box-shadow:0 0 11px rgba(255,210,72,.58)}
+
+/* Empty slots inherit the same shield silhouette so removing a player never collapses the formation. */
+.target-grid .empty-player-slot{clip-path:polygon(12% 0,88% 0,100% 10%,100% 88%,88% 100%,12% 100%,0 88%,0 10%);background:linear-gradient(180deg,rgba(4,37,33,.36),rgba(2,18,22,.6));border-color:rgba(89,220,174,.32);box-shadow:inset 0 0 20px rgba(0,230,160,.025)}
+
+/* Bench cards now look like horizontal mini versions of the pitch artwork. */
+.target-grid .bench-zone{padding-top:13px;background:linear-gradient(180deg,rgba(3,19,26,.92),rgba(2,13,20,.98))}
+.target-grid .pro-bench-grid{gap:8px}
+.target-grid .bench-player{position:relative;overflow:hidden;min-height:76px;border:1px solid rgba(74,207,161,.22);border-radius:10px;background:radial-gradient(circle at 14% 20%,rgba(25,132,97,.18),transparent 34%),linear-gradient(180deg,#071d23,#031219);box-shadow:0 7px 18px rgba(0,0,0,.25)}
+.target-grid .bench-player:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,transparent,#00e6a0,transparent);opacity:.32}
+.target-grid .bench-player .portrait{width:46px;height:50px;flex:0 0 46px;border-radius:21px 21px 7px 7px;background:radial-gradient(circle at 50% 22%,#285c4c,#0a302b 48%,#06171b 78%);box-shadow:0 0 13px rgba(0,230,160,.1)}
+.target-grid .bench-player .portrait .head{width:18px;height:21px;top:5px}
+.target-grid .bench-player .portrait .torso{width:43px;height:29px;bottom:-1px;background:linear-gradient(135deg,#0b6c50,#07382f 55%,#061d22)}
+.target-grid .bench-player strong{font-size:9px;color:#f0f8f6}
+.target-grid .bench-player small{font-size:7px;color:#87a8a2}
+.target-grid .bench-player button{border-color:rgba(255,255,255,.12);background:rgba(2,12,17,.72)}
+.target-grid .bench-empty{min-height:76px;border-radius:10px;border:1px dashed rgba(84,210,164,.24);background:linear-gradient(180deg,rgba(5,34,31,.3),rgba(2,16,20,.48));color:#6e9690}
+
+@media(max-width:800px){.target-grid .pro-player-card>.portrait{width:52px;height:55px;border-radius:24px 24px 7px 7px}.target-grid .portrait .head{width:20px;height:23px;top:5px}.target-grid .portrait .torso{width:50px;height:34px}.target-grid .pro-player-card:after{top:56px}.target-grid .pro-player-card .role-badge{width:21px;height:21px;top:-6px;right:-6px}.target-grid .bench-player{min-height:68px}.target-grid .bench-player .portrait{width:40px;height:44px;flex-basis:40px}}
