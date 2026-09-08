@@ -1,0 +1,111 @@
+body:has(.target-team-layout){background:#020b12}
+body:has(.target-team-layout) .fiq-header{height:66px;max-width:none;padding:0 22px;border-bottom:1px solid rgba(66,144,150,.22);background:linear-gradient(180deg,rgba(2,18,29,.98),rgba(2,14,23,.96));box-shadow:0 10px 30px rgba(0,0,0,.28);backdrop-filter:blur(18px)}
+body:has(.target-team-layout) .fiq-logo{min-width:260px;gap:8px;font-size:21px;letter-spacing:-.035em}
+body:has(.target-team-layout) .fiq-logo b{color:#13efb1;text-shadow:0 0 18px rgba(19,239,177,.28)}
+body:has(.target-team-layout) .fiq-logo em{font-family:Georgia,"Times New Roman",serif;font-size:.9em;font-weight:700;font-style:italic;color:#efb64a!important;text-shadow:0 0 12px rgba(239,182,74,.18)}
+body:has(.target-team-layout) .brand-crown{color:#f1bf43;filter:drop-shadow(0 0 8px rgba(241,191,67,.26))}
+body:has(.target-team-layout) .fiq-desktop-nav{gap:28px;height:100%;align-items:center}
+body:has(.target-team-layout) .fiq-desktop-nav a{position:relative;display:flex;height:100%;align-items:center;padding:0 2px;color:#aebfc7;font-size:13px;font-weight:750}
+body:has(.target-team-layout) .fiq-desktop-nav a.active{color:#20efb0}
+body:has(.target-team-layout) .fiq-desktop-nav a.active:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px 3px 0 0;background:#12eeb0;box-shadow:0 0 14px rgba(18,238,176,.65)}
+body:has(.target-team-layout) .fiq-header-actions{gap:9px}
+body:has(.target-team-layout) .recommend-button{height:36px;border-color:rgba(41,119,120,.34);background:#071c27;color:#9fb6bf}
+body:has(.target-team-layout) .icon-only,body:has(.target-team-layout) .profile-dot{border-color:rgba(57,129,132,.3);background:#071923}
+
+.target-team-layout{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(180deg,#02101a 0,#03131d 30%,#031018 100%)}
+.target-team-layout:before{content:"";position:absolute;z-index:-2;inset:0;background:radial-gradient(ellipse at 50% 33%,rgba(9,98,74,.17),transparent 38%),radial-gradient(ellipse at 22% 49%,rgba(64,146,186,.08),transparent 28%),radial-gradient(ellipse at 82% 44%,rgba(74,166,128,.08),transparent 26%)}
+.target-team-layout:after{content:"";position:absolute;z-index:-1;left:0;right:0;top:265px;height:430px;opacity:.5;background:radial-gradient(ellipse at 50% 90%,rgba(42,153,91,.18),transparent 54%),linear-gradient(100deg,transparent 0 8%,rgba(214,255,239,.12) 8.2%,transparent 9.2% 90%,rgba(214,255,239,.1) 91%,transparent 92%);pointer-events:none}
+
+.target-command-bar{max-width:1540px;padding-top:18px;padding-bottom:12px;padding-left:238px}
+.target-command-bar .eyebrow{display:none}
+.target-command-bar h1{font-size:31px;font-weight:900;line-height:1.05;letter-spacing:-.035em}
+.target-command-bar>div:first-child>p:last-child{margin-top:6px;font-size:12px;color:#8ea4ae}
+.target-command-bar .command-kpis{min-width:560px;border-radius:11px;box-shadow:none}
+.target-command-bar .command-kpis div{padding:10px 14px}
+.target-command-bar .command-kpis small{font-size:8px;letter-spacing:.08em}
+.target-command-bar .command-kpis strong{font-size:14px}
+
+.target-builder-shell{max-width:1540px;grid-template-columns:205px minmax(0,1fr);gap:13px;padding:0 18px 34px}
+.team-side-rail{min-height:970px;border-radius:13px;padding:10px;background:linear-gradient(180deg,rgba(3,24,36,.98),rgba(2,15,24,.98));border-color:rgba(47,122,128,.26);box-shadow:0 16px 45px rgba(0,0,0,.3)}
+.team-side-rail nav{gap:5px}
+.team-side-rail nav a{position:relative;gap:11px;min-height:43px;padding:0 12px 0 42px;border-radius:8px;font-size:12px;font-weight:760;color:#b8c9d0}
+.team-side-rail nav a:before{content:"";position:absolute;left:13px;top:50%;width:18px;height:18px;transform:translateY(-50%);background-repeat:no-repeat;background-position:center;background-size:18px 18px;opacity:.78;filter:brightness(1.5)}
+.team-side-rail nav a:nth-child(1):before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a8c8ca' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='8' r='3'/%3E%3Ccircle cx='16' cy='8' r='3'/%3E%3Cpath d='M3 20c.3-4 2-6 5-6m13 6c-.3-4-2-6-5-6M8 21c.4-5 1.8-7 4-7s3.6 2 4 7'/%3E%3C/svg%3E")}
+.team-side-rail nav a:nth-child(2):before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a8c8ca' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h13l-3-3m3 3-3 3M20 16H7l3 3m-3-3 3-3'/%3E%3C/svg%3E")}
+.team-side-rail nav a:nth-child(3):before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a8c8ca' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 4h8v4a4 4 0 0 1-8 0V4Z'/%3E%3Cpath d='M6 5H4v2a4 4 0 0 0 4 4m10-6h2v2a4 4 0 0 1-4 4M12 12v5M8 20h8'/%3E%3C/svg%3E")}
+.team-side-rail nav a:nth-child(4):before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a8c8ca' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M7 3v4m10-4v4M3 10h18'/%3E%3C/svg%3E")}
+.team-side-rail nav a:nth-child(5):before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a8c8ca' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20V10m5 10V4m5 16v-7m5 7V7'/%3E%3C/svg%3E")}
+.team-side-rail nav a:nth-child(6):before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a8c8ca' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 4h8v4a4 4 0 0 1-8 0V4Z'/%3E%3Cpath d='M12 12v5M8 20h8'/%3E%3C/svg%3E")}
+.team-side-rail nav a.active:before{filter:none;opacity:1}
+.team-side-rail nav a.active{background:linear-gradient(90deg,rgba(0,229,160,.22),rgba(0,229,160,.08));border-color:rgba(0,229,160,.38);box-shadow:inset 3px 0 0 #00e6a0,0 0 18px rgba(0,230,160,.05)}
+.invite-card{border-radius:10px;padding:15px 13px;background:linear-gradient(180deg,rgba(5,42,52,.92),rgba(3,24,33,.96));box-shadow:inset 0 0 28px rgba(0,230,160,.025)}
+.invite-card:before{content:"";display:block;width:48px;height:48px;margin:0 auto 12px;border-radius:50%;background:radial-gradient(circle,#ffe070 0 18%,#bf851a 20% 40%,transparent 42%),linear-gradient(160deg,transparent 0 38%,#d9a62f 40% 58%,transparent 60%);filter:drop-shadow(0 0 14px rgba(232,180,55,.26))}
+.invite-card strong{display:block;text-align:center;font-size:14px}
+.invite-card p{text-align:center;color:#9bb0b9}
+.invite-card button{height:38px;border-radius:8px;font-size:9px;box-shadow:0 0 18px rgba(0,230,160,.14)}
+
+.target-grid{grid-template-columns:minmax(0,1.5fr) minmax(355px,.72fr);gap:13px}
+.target-grid .squad-column,.target-grid .player-market-pro{border-radius:12px;border-color:rgba(47,124,129,.25);background:linear-gradient(180deg,rgba(4,24,34,.95),rgba(2,14,22,.97));box-shadow:0 18px 50px rgba(0,0,0,.26)}
+.target-squad-toolbar{min-height:68px;padding:10px 13px;border-bottom-color:rgba(58,127,128,.2)}
+.formation-label{font-size:9px;letter-spacing:.03em}
+.formation-trigger{height:37px;border-radius:8px;background:linear-gradient(180deg,#073e3d,#052b31);font-size:12px}
+.formation-menu{top:61px;border-radius:8px}
+.formation-menu button{padding:10px 12px;font-size:11px}
+.target-grid .ghost-action{height:37px;border-radius:8px;font-size:10px}
+
+.target-grid .stadium-pitch-wrap{position:relative;padding:18px 22px 16px;background:radial-gradient(ellipse at 50% 0,rgba(124,236,177,.22),transparent 27%),radial-gradient(circle at 4% 18%,rgba(219,255,237,.22),transparent 9%),radial-gradient(circle at 96% 18%,rgba(219,255,237,.2),transparent 9%),linear-gradient(180deg,#08202a 0,#071b21 18%,#071a18 100%)}
+.target-grid .stadium-pitch-wrap:before,.target-grid .stadium-pitch-wrap:after{content:"";position:absolute;top:10px;width:190px;height:130px;pointer-events:none;opacity:.52;background:repeating-linear-gradient(90deg,rgba(226,255,238,.16) 0 2px,transparent 2px 14px);filter:blur(.3px);mask-image:linear-gradient(180deg,#000,transparent)}
+.target-grid .stadium-pitch-wrap:before{left:-35px;transform:rotate(-14deg)}
+.target-grid .stadium-pitch-wrap:after{right:-35px;transform:rotate(14deg)}
+.target-grid .floodlight{top:-106px;width:270px;height:270px;opacity:.82}
+.target-grid .pro-pitch{height:735px;max-width:720px;margin:0 auto;border-radius:9px;padding:30px 24px;background:linear-gradient(180deg,rgba(31,135,70,.95),rgba(18,112,59,.97) 48%,rgba(9,80,42,.98)),repeating-linear-gradient(90deg,rgba(255,255,255,.055) 0 72px,rgba(0,0,0,.025) 72px 144px),repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 26px,transparent 26px 52px);border:2px solid rgba(164,231,173,.36);box-shadow:0 0 0 5px rgba(157,183,91,.08),0 18px 35px rgba(0,0,0,.46),inset 0 0 80px rgba(0,34,16,.63)}
+.target-grid .pro-pitch:before{inset:14px;border-color:rgba(242,255,239,.58);box-shadow:0 0 10px rgba(229,255,231,.08)}
+.target-grid .pro-pitch:after{width:126px;height:126px;border-color:rgba(242,255,239,.48)}
+.target-grid .pitch-markings{left:14px;right:14px;border-color:rgba(242,255,239,.46)}
+.target-grid .pitch-markings:before,.target-grid .pitch-markings:after{width:180px;height:75px;border-color:rgba(242,255,239,.46)}
+.target-grid .pitch-markings:before{top:-342px}.target-grid .pitch-markings:after{top:265px}
+.target-grid .pitch-row{gap:10px}
+
+.target-grid .pro-player-card{width:min(100%,112px);min-height:136px;padding:6px 6px 8px;border-radius:10px;border:1px solid rgba(96,255,165,.65);background:linear-gradient(180deg,rgba(8,31,29,.42) 0,rgba(2,14,17,.92) 58%,rgba(1,8,13,.98) 100%);box-shadow:0 7px 16px rgba(0,0,0,.58),0 0 17px rgba(0,239,150,.16),inset 0 0 18px rgba(0,230,160,.04)}
+.target-grid .pro-player-card:hover{border-color:#57ffc0;box-shadow:0 11px 24px rgba(0,0,0,.68),0 0 28px rgba(24,242,143,.28)}
+.target-grid .pro-player-card.is-captain{border-color:#ffd84a;box-shadow:0 10px 24px rgba(0,0,0,.62),0 0 34px rgba(255,216,74,.5),0 -10px 40px rgba(255,180,22,.22)}
+.target-grid .pro-player-card>.portrait{width:66px;height:72px;border-radius:27px 27px 8px 8px;background:radial-gradient(circle at 50% 20%,#21493e 0,#0e2d29 38%,#06171b 72%)}
+.target-grid .portrait .head{top:7px;width:25px;height:29px;background:linear-gradient(180deg,#162a2a,#07161a)}
+.target-grid .portrait .torso{width:60px;height:40px;background:linear-gradient(180deg,#153d36,#051d22)}
+.target-grid .pro-player-card strong{font-size:9px;font-weight:900;margin-top:3px}
+.target-grid .pro-player-card small{font-size:7px;color:#6f8790}
+.target-grid .card-stats{margin-top:4px;padding-top:4px;border-color:rgba(255,255,255,.06)}
+.target-grid .card-stats b{font-size:7.5px;color:#ffd65e}.target-grid .card-stats span,.target-grid .card-stats em{font-size:7px}
+.target-grid .role-button{left:5px;top:5px;min-width:23px;height:21px;border-radius:50%;font-size:7px}
+.target-grid .role-button.captain-badge{background:linear-gradient(180deg,#ffdf51,#c9900d);box-shadow:0 0 16px rgba(255,206,53,.68)}
+.target-grid .remove-mini{right:5px;top:auto;bottom:6px;width:19px;height:19px;font-size:10px}
+.target-grid .empty-player-slot{width:min(100%,100px);min-height:125px;border-radius:10px}
+
+.target-grid .bench-zone{padding:13px 15px 14px;background:linear-gradient(180deg,rgba(3,20,26,.9),rgba(3,14,21,.96))}
+.target-grid .bench-title{margin-bottom:9px}.target-grid .bench-title h2{font-size:13px}.target-grid .bench-title .eyebrow{font-size:8px!important}
+.target-grid .pro-bench-grid{gap:8px}
+.target-grid .pro-bench-card{grid-template-columns:18px 38px 1fr auto 18px;min-height:64px;padding:7px;border-radius:9px;background:linear-gradient(180deg,rgba(16,39,35,.88),rgba(4,20,24,.94));border-color:rgba(117,202,157,.2)}
+.target-grid .pro-bench-card .portrait{width:36px;height:44px}
+.target-grid .save-row{padding:0 15px 14px;background:#031019}
+.target-grid .save-squad{height:43px;border-radius:8px;font-size:11px;box-shadow:0 0 20px rgba(0,230,160,.14)}
+
+.target-grid .player-market-pro{min-height:970px}
+.target-grid .market-heading{padding:12px 14px 10px;border-bottom:1px solid rgba(55,126,128,.18)}
+.target-grid .market-heading .eyebrow{display:none}
+.target-grid .market-heading h2{margin:0;font-size:17px}
+.target-grid .market-heading>span{font-size:7.5px;padding:4px 6px}
+.target-grid .pro-search{height:39px;margin:11px 12px 8px;border-radius:7px;background:#061923;border-color:rgba(70,136,140,.32);font-size:11px}
+.target-grid .club-select{height:37px;margin:0 12px 8px;width:calc(100% - 24px);padding:0 10px;border-radius:7px;font-size:10px}
+.target-grid .position-tabs{gap:5px;padding:0 12px 9px}
+.target-grid .position-tabs button{min-width:50px;height:31px;padding:0 8px;border-radius:7px;font-size:8.5px}
+.target-grid .market-label-row{grid-template-columns:1fr 48px 38px 28px;padding:7px 12px;font-size:7px}
+.target-grid .pro-market-list{padding:0 10px 8px;max-height:650px}
+.target-grid .pro-market-row{grid-template-columns:1fr 48px 38px 28px;min-height:51px;padding:6px 2px}
+.target-grid .market-identity{gap:7px}.target-grid .market-identity .portrait{width:32px;height:37px;border-radius:16px 16px 7px 7px}
+.target-grid .market-identity strong{font-size:9px}.target-grid .market-identity small{font-size:6.8px}
+.target-grid .pro-market-row>b,.target-grid .pro-market-row>span{font-size:8.5px}
+.target-grid .pro-market-row>button{width:25px;height:25px;font-size:15px;box-shadow:0 0 12px rgba(0,230,160,.12)}
+.formation-analysis{margin:10px;border-radius:9px;padding:10px;gap:7px}.formation-analysis>strong{font-size:11px}.formation-analysis span{font-size:9px;padding:2px 0}.formation-analysis b{font-size:10px}
+
+@media(max-width:1180px){body:has(.target-team-layout) .fiq-logo{min-width:auto}.target-command-bar{padding-left:20px}.team-side-rail nav a{padding-left:42px}.target-grid .pro-pitch{max-width:760px}}
+@media(max-width:800px){body:has(.target-team-layout) .fiq-header{height:58px;padding:0 12px}body:has(.target-team-layout) .fiq-logo{font-size:17px}.target-command-bar{padding-top:14px}.target-command-bar h1{font-size:26px}.target-command-bar .command-kpis{min-width:0}.target-grid .stadium-pitch-wrap{padding:8px 5px 10px}.target-grid .pro-pitch{height:600px;padding:22px 4px;border-radius:7px}.target-grid .pro-player-card{width:min(100%,82px);min-height:102px}.target-grid .pro-player-card>.portrait{width:43px;height:49px}.target-grid .pro-player-card strong{font-size:7.5px}.target-grid .pro-player-card small{display:none}.target-grid .pitch-markings:before{top:-277px}.target-grid .pitch-markings:after{top:204px}.target-grid .player-market-pro{min-height:0}.target-grid .pro-market-list{max-height:410px}}
