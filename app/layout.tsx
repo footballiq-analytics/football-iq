@@ -8,6 +8,7 @@ import "./refinements.css";
 import "./team-target.css";
 import "./team-polish.css";
 import "./team-card-precision.css";
+import "./team-artwork.css";
 import { BottomNav, Footer, Header } from "@/components/site-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 
