@@ -6,6 +6,7 @@ import "./form-colors.css";
 import "./team-data.css";
 import "./refinements.css";
 import "./team-target.css";
+import "./team-polish.css";
 import { BottomNav, Footer, Header } from "@/components/site-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 
