@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { dataProvider } from "@/lib/data-provider";
 import { FormDots, TeamMark } from "@/components/ui";
 
+export function generateStaticParams(){return [{musabaka:"fenerbahce-galatasaray"},{musabaka:"besiktas-trabzonspor"},{musabaka:"real-madrid-manchester-city"}];}
+
 export default async function MatchPage({params}:{params:Promise<{musabaka:string}>}){
  const match=await dataProvider.getMatch((await params).musabaka);if(!match)notFound();const p=match.prediction;
  return <div className="ref-match-page"><div className="match-topbar"><Link href="/today">←</Link><h1>Maç Detayı</h1><span className="demo-chip">DEMO VERİ</span></div>
