@@ -1,0 +1,12 @@
+/* FUTBOL IQ Fantasy — realistic pitch + compact player cards */
+.target-grid .stadium-pitch-wrap{padding:12px;background:linear-gradient(rgba(1,15,12,.22),rgba(1,15,12,.38)),url('https://images.unsplash.com/photo-1575361204480-aadea25e6e68?auto=format&fit=crop&w=1800&q=88') center/cover no-repeat!important}
+.target-grid .pro-pitch{height:690px!important;max-width:760px!important;background:linear-gradient(180deg,rgba(17,119,55,.48),rgba(5,72,34,.58)),repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 70px,rgba(0,0,0,.035) 70px 140px)!important;box-shadow:inset 0 0 70px rgba(0,25,10,.45),0 18px 38px rgba(0,0,0,.5)!important;backdrop-filter:saturate(1.18)}
+.target-grid .pro-player-card{max-width:92px!important;min-height:108px!important;padding:4px 5px 6px!important;cursor:pointer}
+.target-grid .pro-player-card>.portrait{width:55px!important;height:59px!important;margin-top:0!important;background:radial-gradient(circle at 50% 24%,#52776b 0,#173c34 45%,#07191a 78%)!important}
+.target-grid .pro-player-card strong{font-size:8.5px!important}.target-grid .pro-player-card small{font-size:6.3px!important}.target-grid .card-stats{margin-top:3px!important;padding-top:3px!important}.target-grid .card-stats b,.target-grid .card-stats span,.target-grid .card-stats em{font-size:6.2px!important}
+.target-grid .portrait .head{width:24px!important;height:29px!important;background:linear-gradient(155deg,#c99973,#8b6047)!important;box-shadow:inset -4px -2px 0 rgba(0,0,0,.12)}
+.target-grid .portrait .head:before{content:"";position:absolute;left:3px;right:3px;top:8px;height:3px;background:radial-gradient(circle at 25% 50%,#18201f 0 1px,transparent 1.5px),radial-gradient(circle at 75% 50%,#18201f 0 1px,transparent 1.5px)}
+.target-grid .portrait .head:after{content:"";position:absolute;left:7px;right:7px;bottom:5px;height:1px;background:#714b3d;border-radius:50%}
+.target-grid .portrait .torso{width:48px!important;height:33px!important;background:linear-gradient(180deg,#175c49,#082c28)!important}
+.target-grid .role-button{left:auto!important;right:-6px!important;top:-7px!important}.target-grid .remove-mini{display:none!important}
+@media(max-width:800px){.target-grid .stadium-pitch-wrap{padding:4px}.target-grid .pro-pitch{height:560px!important;padding:18px 3px!important}.target-grid .pro-player-card{max-width:66px!important;min-height:82px!important}.target-grid .pro-player-card>.portrait{width:38px!important;height:42px!important}.target-grid .pro-player-card strong{font-size:6.5px!important}.target-grid .card-stats{display:none!important}}
