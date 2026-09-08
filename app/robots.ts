@@ -1,1 +1,10 @@
-import type { MetadataRoute } from "next"; export default function robots(): MetadataRoute.Robots { return { rules: { userAgent: "*", allow: "/" }, sitemap: "https://football-iq.example/sitemap.xml" }; }
+import type { MetadataRoute } from "next";
+
+export const dynamic = "force-static";
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: { userAgent: "*", allow: "/" },
+    sitemap: "https://footballiq-analytics.github.io/football-iq/sitemap.xml",
+  };
+}
