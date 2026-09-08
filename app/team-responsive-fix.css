@@ -1,0 +1,162 @@
+/* Final responsive guard for Kadrom / Saha İçi. Loaded last on purpose. */
+body:has(.target-team-layout),
+body:has(.target-team-layout) main,
+.target-team-layout {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.target-team-layout {
+  overflow-x: clip;
+}
+
+.target-command-bar,
+.target-builder-shell {
+  width: min(100%, 1540px);
+  min-width: 0;
+}
+
+.target-builder-shell > *,
+.target-grid,
+.target-grid > *,
+.squad-column,
+.player-market-pro,
+.stadium-pitch-wrap,
+.pro-pitch {
+  min-width: 0;
+}
+
+.target-grid {
+  width: 100%;
+}
+
+.squad-column,
+.player-market-pro {
+  width: 100%;
+}
+
+@media (max-width: 1180px) {
+  .target-command-bar {
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .target-command-bar .command-kpis {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .target-builder-shell {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .team-side-rail {
+    display: none;
+  }
+
+  .target-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .target-grid .pro-pitch {
+    width: 100%;
+    max-width: 860px;
+  }
+}
+
+@media (max-width: 800px) {
+  .target-command-bar {
+    display: block;
+    padding: 14px 10px 10px;
+  }
+
+  .target-command-bar > div:first-child,
+  .target-command-bar .command-kpis {
+    width: 100%;
+    max-width: none;
+  }
+
+  .target-command-bar .command-kpis {
+    margin-top: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .target-builder-shell {
+    display: block;
+    padding: 0 6px 18px;
+  }
+
+  .target-grid {
+    display: block;
+    width: 100%;
+  }
+
+  .squad-column,
+  .player-market-pro {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .target-squad-toolbar {
+    width: 100%;
+  }
+
+  .target-grid .stadium-pitch-wrap {
+    width: 100%;
+    padding: 7px 5px;
+  }
+
+  .target-grid .pro-pitch {
+    width: 100%;
+    max-width: none;
+    height: 560px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .target-grid .pitch-row {
+    width: 100%;
+    gap: 4px;
+  }
+
+  .target-grid .pro-player-card,
+  .target-grid .empty-player-slot {
+    max-width: 76px;
+  }
+
+  .pro-bench-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pro-bench-card {
+    min-width: 0;
+  }
+
+  .save-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 430px) {
+  .target-command-bar h1 {
+    font-size: 28px;
+  }
+
+  .target-grid .pro-pitch {
+    height: 545px;
+  }
+
+  .formation-dropdown-wrap {
+    width: 142px;
+  }
+
+  .target-grid .pro-player-card,
+  .target-grid .empty-player-slot {
+    max-width: 70px;
+  }
+}
