@@ -28,6 +28,7 @@ type TeamStore = {
   hydrateTeam: (players: Player[], formation: Formation, startingIds: (string | null)[], benchIds: (string | null)[]) => void;
   setFormation: (formation: Formation) => boolean;
   setToast: (message: string | null) => void;
+  autoArrangeSquad: (candidates: Player[], budget: number) => boolean;
   swapStartingAndBench: (startingPlayerId: string, benchPlayerId: string) => boolean;
   swapFieldPositions: (player1Id: string, player2Id: string) => boolean;
   swapBenchPlayers: (player1Id: string, player2Id: string) => boolean;
@@ -69,11 +70,55 @@ export const useTeamStore = create<TeamStore>((set, get) => ({
     const { startingSlots, players } = get();
     const nextSlots = buildStartingSlots(formation, startingSlots.map((slot) => slot.playerId));
     const invalidCount = nextSlots.filter((slot) => slot.playerId && players[slot.playerId]?.position !== slot.position).length;
-    set({ formation, startingSlots: nextSlots, toast: invalidCount ? `${formation} uygulandı. ${invalidCount} oyuncu kendi mevkisi dışında kaldı; kırmızı oyuncuları düzeltmeden kadro kaydedilemez.` : `${formation} dizilişi uygulandı.` });
+    set({ formation, startingSlots: nextSlots, toast: invalidCount ? `${formation} uygulandı. ${invalidCount} oyuncu kendi mevkisi dışında kaldı; Otomatik Tamamla ile kadroyu bu dizilişe göre düzenleyebilirsin.` : `${formation} dizilişi uygulandı.` });
     return true;
   },
 
   setToast: (message) => set({ toast: message }),
+
+  autoArrangeSquad: (candidates, budget) => {
+    const { formation, startingSlots, benchSlots, players } = get();
+    const allPlayers = { ...players, ...Object.fromEntries(candidates.map((player) => [player.id, player])) };
+    const currentIds = [...startingSlots, ...benchSlots].map((slot) => slot.playerId).filter((id): id is string => Boolean(id));
+    const current = currentIds.map((id) => allPlayers[id]).filter(Boolean);
+    const desiredPositions = [...FORMATION_POSITIONS[formation], ...BENCH_POSITIONS];
+    const used = new Set<string>();
+    const clubCounts = new Map<string, number>();
+    let spend = 0;
+    const chosen: (string | null)[] = desiredPositions.map(() => null);
+
+    const canUse = (player: Player) => !used.has(player.id) && (clubCounts.get(player.club) ?? 0) < 3 && spend + player.price <= budget;
+    const place = (player: Player, index: number) => {
+      chosen[index] = player.id;
+      used.add(player.id);
+      clubCounts.set(player.club, (clubCounts.get(player.club) ?? 0) + 1);
+      spend += player.price;
+    };
+
+    desiredPositions.forEach((position, index) => {
+      const preserved = current.find((player) => player.position === position && canUse(player));
+      if (preserved) place(preserved, index);
+    });
+
+    desiredPositions.forEach((position, index) => {
+      if (chosen[index]) return;
+      const replacement = candidates
+        .filter((player) => player.position === position && canUse(player))
+        .sort((a, b) => a.price - b.price || b.points - a.points)[0];
+      if (replacement) place(replacement, index);
+    });
+
+    const missing = chosen.filter((id) => !id).length;
+    const startingIds = chosen.slice(0, 11);
+    const benchIds = chosen.slice(11);
+    set({
+      players: allPlayers,
+      startingSlots: buildStartingSlots(formation, startingIds),
+      benchSlots: buildBenchSlots(benchIds),
+      toast: missing ? `${formation} için kadro düzenlendi ancak ${missing} pozisyon uygun oyuncu/bütçe nedeniyle boş kaldı.` : `${formation} dizilişine göre kadro otomatik düzenlendi.`,
+    });
+    return missing === 0;
+  },
 
   swapStartingAndBench: (startingPlayerId, benchPlayerId) => {
     const { startingSlots, benchSlots, players } = get();
@@ -116,7 +161,7 @@ export const useTeamStore = create<TeamStore>((set, get) => ({
     const firstPlayer = players[player1Id];
     const secondPlayer = players[player2Id];
     if (!firstPlayer || !secondPlayer) return false;
-    if (!benchAccepts(benchSlots[firstIndex], secondPlayer) || !benchAccepts(benchSlots[secondIndex], firstPlayer)) { set({ toast: "Yedek koltukları mevkiye özeldir: GK, DF, OT ve F." }); return false; }
+    if (!benchAccepts(benchSlots[firstIndex], secondPlayer) || !benchAccepts(benchSlots[secondIndex], firstPlayer)) { set({ toast: "Yedek koltukları mevkiye özeldir: KL, DEF, ORT ve SNT." }); return false; }
     const next = [...benchSlots];
     next[firstIndex] = { ...next[firstIndex], playerId: player2Id };
     next[secondIndex] = { ...next[secondIndex], playerId: player1Id };
