@@ -11,6 +11,7 @@ import "./team-card-precision.css";
 import "./team-artwork.css";
 import "./team-responsive-fix.css";
 import "./team-realism.css";
+import "./team-dnd.css";
 import { BottomNav, Footer, Header } from "@/components/site-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 
