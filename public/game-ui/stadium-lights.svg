@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="none">
+  <defs>
+    <radialGradient id="l1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".16" stop-color="#c9f5ff" stop-opacity=".7"/><stop offset="1" stop-color="#6ddcff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <g opacity=".72">
+    <circle cx="120" cy="70" r="150" fill="url(#l1)"/>
+    <circle cx="1480" cy="70" r="150" fill="url(#l1)"/>
+    <circle cx="800" cy="30" r="190" fill="url(#l1)" opacity=".45"/>
+  </g>
+  <path d="M120 30 L520 1000 L0 1000 Z" fill="url(#beam)" opacity=".24"/>
+  <path d="M1480 30 L1080 1000 L1600 1000 Z" fill="url(#beam)" opacity=".24"/>
+  <path d="M800 0 L1030 1000 L570 1000 Z" fill="url(#beam)" opacity=".10"/>
+</svg>
