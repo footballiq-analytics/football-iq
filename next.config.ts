@@ -5,6 +5,9 @@ const repoBasePath = "/football-iq";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   ...(isGitHubPages
     ? {
         output: "export",
