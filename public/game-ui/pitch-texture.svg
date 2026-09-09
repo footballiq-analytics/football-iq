@@ -1,20 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="none">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#318f38"/>
-      <stop offset="1" stop-color="#145f25"/>
+    <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f8d43"/><stop offset=".42" stop-color="#217737"/><stop offset="1" stop-color="#115329"/>
     </linearGradient>
-    <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="9"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 0.11"/></feComponentTransfer></filter>
-    <radialGradient id="shine" cx="50%" cy="0%" r="80%"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="depth" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d8ffe5" stop-opacity=".12"/><stop offset=".38" stop-color="#0a301a" stop-opacity="0"/><stop offset="1" stop-color="#04170d" stop-opacity=".35"/></linearGradient>
+    <radialGradient id="light" cx="50%" cy="0%" r="85%"><stop stop-color="#effff2" stop-opacity=".24"/><stop offset=".42" stop-color="#9fffc0" stop-opacity=".05"/><stop offset="1" stop-color="#001008" stop-opacity="0"/></radialGradient>
+    <pattern id="mow" width="320" height="1000" patternUnits="userSpaceOnUse"><rect width="160" height="1000" fill="#e7ffe8" opacity=".038"/><rect x="160" width="160" height="1000" fill="#001d0c" opacity=".035"/></pattern>
+    <pattern id="cross" width="160" height="125" patternUnits="userSpaceOnUse"><path d="M0 0H160V125H0Z" fill="none" stroke="#d7ffe3" stroke-opacity=".022" stroke-width="2"/><path d="M0 125L160 0M-80 125L80 0M80 125L240 0" stroke="#e9fff0" stroke-opacity=".018" stroke-width="2"/></pattern>
+    <filter id="grain" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".42 .78" numOctaves="3" seed="23"/><feColorMatrix values="0 0 0 0 .12 0 0 0 0 .28 0 0 0 0 .12 0 0 0 .16 0"/><feBlend mode="soft-light" in2="SourceGraphic"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="32"/></filter>
   </defs>
-  <rect width="1600" height="1000" fill="url(#g)"/>
-  <g opacity=".28">
-    <rect x="0" width="200" height="1000" fill="#fff" opacity=".05"/>
-    <rect x="400" width="200" height="1000" fill="#fff" opacity=".05"/>
-    <rect x="800" width="200" height="1000" fill="#fff" opacity=".05"/>
-    <rect x="1200" width="200" height="1000" fill="#fff" opacity=".05"/>
-  </g>
-  <rect width="1600" height="1000" filter="url(#noise)"/>
-  <rect width="1600" height="1000" fill="url(#shine)"/>
-  <path d="M0 1000 L1600 1000 L1450 0 L150 0 Z" fill="none" stroke="#dfffe7" stroke-opacity=".18" stroke-width="8"/>
+  <rect width="1600" height="1000" fill="url(#grass)"/>
+  <rect width="1600" height="1000" fill="url(#mow)"/>
+  <rect width="1600" height="1000" fill="url(#cross)"/>
+  <rect width="1600" height="1000" filter="url(#grain)" opacity=".72"/>
+  <path d="M130 1000L1470 1000L1350 0L250 0Z" fill="none" stroke="#caffd8" stroke-opacity=".07" stroke-width="12"/>
+  <path d="M290 1000L1310 1000L1230 0L370 0Z" fill="none" stroke="#001d0c" stroke-opacity=".07" stroke-width="10"/>
+  <ellipse cx="800" cy="-20" rx="610" ry="230" fill="#d9ffe5" opacity=".08" filter="url(#soft)"/>
+  <ellipse cx="250" cy="590" rx="340" ry="500" fill="#00180b" opacity=".12" filter="url(#soft)"/>
+  <ellipse cx="1390" cy="560" rx="300" ry="470" fill="#00180b" opacity=".11" filter="url(#soft)"/>
+  <rect width="1600" height="1000" fill="url(#light)"/>
+  <rect width="1600" height="1000" fill="url(#depth)"/>
 </svg>
