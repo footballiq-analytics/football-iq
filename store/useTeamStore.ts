@@ -2,215 +2,38 @@ import { create } from "zustand";
 
 export type PlayerPosition = "GK" | "DEF" | "MID" | "FWD";
 export type Formation = "4-3-3" | "4-4-2" | "3-4-3" | "3-5-2" | "5-3-2";
+export type JokerKey = "tripleCaptain" | "benchBoost" | "wildcard" | "goldenBench";
+export type Player = { id:string; name:string; club:string; position:PlayerPosition; price:number; points:number; matches?:number; selected?:number; photo?:string; clubLogo?:string; };
+export type StartingSlot={id:string;position:PlayerPosition;playerId:string|null};
+export type BenchSlot={id:string;position:PlayerPosition;playerId:string|null};
 
-export type Player = {
-  id: string;
-  name: string;
-  club: string;
-  position: PlayerPosition;
-  price: number;
-  points: number;
-  matches?: number;
-  selected?: number;
-  photo?: string;
-  clubLogo?: string;
+type TeamStore={
+ formation:Formation;players:Record<string,Player>;startingSlots:StartingSlot[];benchSlots:BenchSlot[];toast:string|null;
+ captainId:string|null;viceCaptainId:string|null;jokers:Record<JokerKey,boolean>;
+ hydrateTeam:(players:Player[],formation:Formation,startingIds:(string|null)[],benchIds:(string|null)[])=>void;
+ setFormation:(formation:Formation)=>boolean;setToast:(message:string|null)=>void;setCaptain:(id:string|null)=>void;setViceCaptain:(id:string|null)=>void;
+ activateJoker:(joker:JokerKey)=>boolean;clearSquad:()=>void;
+ autoArrangeSquad:(candidates:Player[],budget:number)=>boolean;swapStartingAndBench:(startingPlayerId:string,benchPlayerId:string)=>boolean;swapFieldPositions:(player1Id:string,player2Id:string)=>boolean;swapBenchPlayers:(player1Id:string,player2Id:string)=>boolean;movePlayerToEmptySlot:(playerId:string,sourceSlotId:string,targetSlotId:string)=>boolean;addPlayerFromTransfer:(player:Player,targetSlotId:string)=>boolean;removePlayer:(playerId:string)=>void;
 };
-
-export type StartingSlot = { id: string; position: PlayerPosition; playerId: string | null };
-export type BenchSlot = { id: string; position: PlayerPosition; playerId: string | null };
-
-type TeamStore = {
-  formation: Formation;
-  players: Record<string, Player>;
-  startingSlots: StartingSlot[];
-  benchSlots: BenchSlot[];
-  toast: string | null;
-  hydrateTeam: (players: Player[], formation: Formation, startingIds: (string | null)[], benchIds: (string | null)[]) => void;
-  setFormation: (formation: Formation) => boolean;
-  setToast: (message: string | null) => void;
-  autoArrangeSquad: (candidates: Player[], budget: number) => boolean;
-  swapStartingAndBench: (startingPlayerId: string, benchPlayerId: string) => boolean;
-  swapFieldPositions: (player1Id: string, player2Id: string) => boolean;
-  swapBenchPlayers: (player1Id: string, player2Id: string) => boolean;
-  movePlayerToEmptySlot: (playerId: string, sourceSlotId: string, targetSlotId: string) => boolean;
-  addPlayerFromTransfer: (player: Player, targetSlotId: string) => boolean;
-  removePlayer: (playerId: string) => void;
-};
-
-export const FORMATION_POSITIONS: Record<Formation, PlayerPosition[]> = {
-  "4-3-3": ["FWD", "FWD", "FWD", "MID", "MID", "MID", "DEF", "DEF", "DEF", "DEF", "GK"],
-  "4-4-2": ["FWD", "FWD", "MID", "MID", "MID", "MID", "DEF", "DEF", "DEF", "DEF", "GK"],
-  "3-4-3": ["FWD", "FWD", "FWD", "MID", "MID", "MID", "MID", "DEF", "DEF", "DEF", "GK"],
-  "3-5-2": ["FWD", "FWD", "MID", "MID", "MID", "MID", "MID", "DEF", "DEF", "DEF", "GK"],
-  "5-3-2": ["FWD", "FWD", "MID", "MID", "MID", "DEF", "DEF", "DEF", "DEF", "DEF", "GK"],
-};
-
-const BENCH_POSITIONS: PlayerPosition[] = ["GK", "DEF", "MID", "FWD"];
-
-function buildStartingSlots(formation: Formation, ids: (string | null)[]) {
-  return FORMATION_POSITIONS[formation].map((position, index) => ({ id: `start-${index}`, position, playerId: ids[index] ?? null }));
-}
-function buildBenchSlots(ids: (string | null)[]) {
-  return BENCH_POSITIONS.map((position, index) => ({ id: `bench-${index}`, position, playerId: ids[index] ?? null }));
-}
-function benchAccepts(slot: BenchSlot, player: Player) { return slot.position === player.position; }
-
-export const useTeamStore = create<TeamStore>((set, get) => ({
-  formation: "4-3-3",
-  players: {},
-  startingSlots: buildStartingSlots("4-3-3", []),
-  benchSlots: buildBenchSlots([]),
-  toast: null,
-
-  hydrateTeam: (players, formation, startingIds, benchIds) => {
-    set({ players: Object.fromEntries(players.map((player) => [player.id, player])), formation, startingSlots: buildStartingSlots(formation, startingIds), benchSlots: buildBenchSlots(benchIds) });
-  },
-
-  setFormation: (formation) => {
-    const { startingSlots, players } = get();
-    const nextSlots = buildStartingSlots(formation, startingSlots.map((slot) => slot.playerId));
-    const invalidCount = nextSlots.filter((slot) => slot.playerId && players[slot.playerId]?.position !== slot.position).length;
-    set({ formation, startingSlots: nextSlots, toast: invalidCount ? `${formation} uygulandı. ${invalidCount} oyuncu kendi mevkisi dışında kaldı; Otomatik Tamamla ile kadroyu bu dizilişe göre düzenleyebilirsin.` : `${formation} dizilişi uygulandı.` });
-    return true;
-  },
-
-  setToast: (message) => set({ toast: message }),
-
-  autoArrangeSquad: (candidates, budget) => {
-    const { formation, startingSlots, benchSlots, players } = get();
-    const allPlayers = { ...players, ...Object.fromEntries(candidates.map((player) => [player.id, player])) };
-    const currentIds = [...startingSlots, ...benchSlots].map((slot) => slot.playerId).filter((id): id is string => Boolean(id));
-    const current = currentIds.map((id) => allPlayers[id]).filter(Boolean);
-    const desiredPositions = [...FORMATION_POSITIONS[formation], ...BENCH_POSITIONS];
-    const used = new Set<string>();
-    const clubCounts = new Map<string, number>();
-    let spend = 0;
-    const chosen: (string | null)[] = desiredPositions.map(() => null);
-
-    const canUse = (player: Player) => !used.has(player.id) && (clubCounts.get(player.club) ?? 0) < 3 && spend + player.price <= budget;
-    const place = (player: Player, index: number) => {
-      chosen[index] = player.id;
-      used.add(player.id);
-      clubCounts.set(player.club, (clubCounts.get(player.club) ?? 0) + 1);
-      spend += player.price;
-    };
-
-    desiredPositions.forEach((position, index) => {
-      const preserved = current.find((player) => player.position === position && canUse(player));
-      if (preserved) place(preserved, index);
-    });
-
-    desiredPositions.forEach((position, index) => {
-      if (chosen[index]) return;
-      const replacement = candidates
-        .filter((player) => player.position === position && canUse(player))
-        .sort((a, b) => a.price - b.price || b.points - a.points)[0];
-      if (replacement) place(replacement, index);
-    });
-
-    const missing = chosen.filter((id) => !id).length;
-    const startingIds = chosen.slice(0, 11);
-    const benchIds = chosen.slice(11);
-    set({
-      players: allPlayers,
-      startingSlots: buildStartingSlots(formation, startingIds),
-      benchSlots: buildBenchSlots(benchIds),
-      toast: missing ? `${formation} için kadro düzenlendi ancak ${missing} pozisyon uygun oyuncu/bütçe nedeniyle boş kaldı.` : `${formation} dizilişine göre kadro otomatik düzenlendi.`,
-    });
-    return missing === 0;
-  },
-
-  swapStartingAndBench: (startingPlayerId, benchPlayerId) => {
-    const { startingSlots, benchSlots, players } = get();
-    const startIndex = startingSlots.findIndex((slot) => slot.playerId === startingPlayerId);
-    const benchIndex = benchSlots.findIndex((slot) => slot.playerId === benchPlayerId);
-    if (startIndex < 0 || benchIndex < 0) return false;
-    const startingPlayer = players[startingPlayerId];
-    const benchPlayer = players[benchPlayerId];
-    if (!startingPlayer || !benchPlayer) return false;
-    if (startingSlots[startIndex].position !== benchPlayer.position || benchSlots[benchIndex].position !== startingPlayer.position) {
-      set({ toast: "Bu iki oyuncu mevki kuralları nedeniyle yer değiştiremez." }); return false;
-    }
-    const nextStarting = [...startingSlots];
-    const nextBench = [...benchSlots];
-    nextStarting[startIndex] = { ...nextStarting[startIndex], playerId: benchPlayerId };
-    nextBench[benchIndex] = { ...nextBench[benchIndex], playerId: startingPlayerId };
-    set({ startingSlots: nextStarting, benchSlots: nextBench, toast: `${startingPlayer.name} ile ${benchPlayer.name} yer değiştirdi.` });
-    return true;
-  },
-
-  swapFieldPositions: (player1Id, player2Id) => {
-    const { startingSlots, players } = get();
-    const firstIndex = startingSlots.findIndex((slot) => slot.playerId === player1Id);
-    const secondIndex = startingSlots.findIndex((slot) => slot.playerId === player2Id);
-    if (firstIndex < 0 || secondIndex < 0) return false;
-    if (players[player1Id]?.position !== players[player2Id]?.position) { set({ toast: "Saha içi konum takası yalnızca aynı mevki oyuncuları arasında yapılabilir." }); return false; }
-    const next = [...startingSlots];
-    const first = next[firstIndex].playerId;
-    next[firstIndex] = { ...next[firstIndex], playerId: next[secondIndex].playerId };
-    next[secondIndex] = { ...next[secondIndex], playerId: first };
-    set({ startingSlots: next, toast: "Saha içi pozisyonlar değiştirildi." });
-    return true;
-  },
-
-  swapBenchPlayers: (player1Id, player2Id) => {
-    const { benchSlots, players } = get();
-    const firstIndex = benchSlots.findIndex((slot) => slot.playerId === player1Id);
-    const secondIndex = benchSlots.findIndex((slot) => slot.playerId === player2Id);
-    if (firstIndex < 0 || secondIndex < 0) return false;
-    const firstPlayer = players[player1Id];
-    const secondPlayer = players[player2Id];
-    if (!firstPlayer || !secondPlayer) return false;
-    if (!benchAccepts(benchSlots[firstIndex], secondPlayer) || !benchAccepts(benchSlots[secondIndex], firstPlayer)) { set({ toast: "Yedek koltukları mevkiye özeldir: KL, DEF, ORT ve SNT." }); return false; }
-    const next = [...benchSlots];
-    next[firstIndex] = { ...next[firstIndex], playerId: player2Id };
-    next[secondIndex] = { ...next[secondIndex], playerId: player1Id };
-    set({ benchSlots: next, toast: "Yedek oyuncuların sırası değiştirildi." });
-    return true;
-  },
-
-  movePlayerToEmptySlot: (playerId, sourceSlotId, targetSlotId) => {
-    const { startingSlots, benchSlots, players } = get();
-    const player = players[playerId];
-    if (!player) return false;
-    const targetStartingIndex = startingSlots.findIndex((slot) => slot.id === targetSlotId);
-    const targetBenchIndex = benchSlots.findIndex((slot) => slot.id === targetSlotId);
-    if (targetStartingIndex >= 0) {
-      const target = startingSlots[targetStartingIndex];
-      if (target.playerId || target.position !== player.position) { set({ toast: `${player.name} bu saha slotuna taşınamaz.` }); return false; }
-    }
-    if (targetBenchIndex >= 0) {
-      const target = benchSlots[targetBenchIndex];
-      if (target.playerId || !benchAccepts(target, player)) { set({ toast: `${player.name} bu yedek slotuna taşınamaz.` }); return false; }
-    }
-    if (targetStartingIndex < 0 && targetBenchIndex < 0) return false;
-    const nextStarting = startingSlots.map((slot, index) => slot.id === sourceSlotId ? { ...slot, playerId: null } : index === targetStartingIndex ? { ...slot, playerId } : slot);
-    const nextBench = benchSlots.map((slot, index) => slot.id === sourceSlotId ? { ...slot, playerId: null } : index === targetBenchIndex ? { ...slot, playerId } : slot);
-    set({ startingSlots: nextStarting, benchSlots: nextBench, toast: `${player.name} yeni slota taşındı.` });
-    return true;
-  },
-
-  addPlayerFromTransfer: (player, targetSlotId) => {
-    const { startingSlots, benchSlots, players } = get();
-    const nextPlayers = { ...players, [player.id]: player };
-    if (targetSlotId.startsWith("start-")) {
-      const slotIndex = startingSlots.findIndex((slot) => slot.id === targetSlotId);
-      if (slotIndex < 0) return false;
-      const slot = startingSlots[slotIndex];
-      if (slot.playerId || slot.position !== player.position) { set({ toast: `${player.name} bu mevki alanına bırakılamaz.` }); return false; }
-      const next = [...startingSlots]; next[slotIndex] = { ...slot, playerId: player.id };
-      set({ players: nextPlayers, startingSlots: next, toast: `${player.name} ilk 11'e eklendi.` }); return true;
-    }
-    if (targetSlotId.startsWith("bench-")) {
-      const slotIndex = benchSlots.findIndex((slot) => slot.id === targetSlotId);
-      if (slotIndex < 0) return false;
-      const slot = benchSlots[slotIndex];
-      if (slot.playerId || !benchAccepts(slot, player)) { set({ toast: `Bu yedek koltuğu yalnızca ${slot.position} oyuncusu kabul eder.` }); return false; }
-      const next = [...benchSlots]; next[slotIndex] = { ...slot, playerId: player.id };
-      set({ players: nextPlayers, benchSlots: next, toast: `${player.name} yedek kulübesine eklendi.` }); return true;
-    }
-    return false;
-  },
-
-  removePlayer: (playerId) => set((state) => ({ startingSlots: state.startingSlots.map((slot) => slot.playerId === playerId ? { ...slot, playerId: null } : slot), benchSlots: state.benchSlots.map((slot) => slot.playerId === playerId ? { ...slot, playerId: null } : slot), toast: "Oyuncu kadrodan çıkarıldı." })),
+export const FORMATION_POSITIONS:Record<Formation,PlayerPosition[]>={"4-3-3":["FWD","FWD","FWD","MID","MID","MID","DEF","DEF","DEF","DEF","GK"],"4-4-2":["FWD","FWD","MID","MID","MID","MID","DEF","DEF","DEF","DEF","GK"],"3-4-3":["FWD","FWD","FWD","MID","MID","MID","MID","DEF","DEF","DEF","GK"],"3-5-2":["FWD","FWD","MID","MID","MID","MID","MID","DEF","DEF","DEF","GK"],"5-3-2":["FWD","FWD","MID","MID","MID","DEF","DEF","DEF","DEF","DEF","GK"]};
+const BENCH_POSITIONS:PlayerPosition[]=["GK","DEF","MID","FWD"];
+const buildStartingSlots=(formation:Formation,ids:(string|null)[])=>FORMATION_POSITIONS[formation].map((position,index)=>({id:`start-${index}`,position,playerId:ids[index]??null}));
+const buildBenchSlots=(ids:(string|null)[])=>BENCH_POSITIONS.map((position,index)=>({id:`bench-${index}`,position,playerId:ids[index]??null}));
+const benchAccepts=(slot:BenchSlot,player:Player)=>slot.position===player.position;
+export const useTeamStore=create<TeamStore>((set,get)=>({
+ formation:"4-3-3",players:{},startingSlots:buildStartingSlots("4-3-3",[]),benchSlots:buildBenchSlots([]),toast:null,captainId:null,viceCaptainId:null,jokers:{tripleCaptain:false,benchBoost:false,wildcard:false,goldenBench:false},
+ hydrateTeam:(players,formation,startingIds,benchIds)=>set({players:Object.fromEntries(players.map(p=>[p.id,p])),formation,startingSlots:buildStartingSlots(formation,startingIds),benchSlots:buildBenchSlots(benchIds)}),
+ setFormation:(formation)=>{const{startingSlots,players}=get();const nextSlots=buildStartingSlots(formation,startingSlots.map(s=>s.playerId));const invalidCount=nextSlots.filter(s=>s.playerId&&players[s.playerId]?.position!==s.position).length;set({formation,startingSlots:nextSlots,toast:invalidCount?`${formation} uygulandı. ${invalidCount} oyuncu kendi mevkisi dışında kaldı; Otomatik Tamamla ile düzenleyebilirsin.`:`${formation} dizilişi uygulandı.`});return true},
+ setToast:(message)=>set({toast:message}),
+ setCaptain:(id)=>set(state=>({captainId:id,viceCaptainId:state.viceCaptainId===id?null:state.viceCaptainId,toast:id?`${state.players[id]?.name??"Oyuncu"} kaptan seçildi · x2`:"Kaptan seçimi kaldırıldı."})),
+ setViceCaptain:(id)=>set(state=>({viceCaptainId:id===state.captainId?null:id,toast:id===state.captainId?"Kaptan aynı zamanda ikinci kaptan olamaz.":id?`${state.players[id]?.name??"Oyuncu"} ikinci kaptan seçildi.`:"İkinci kaptan seçimi kaldırıldı."})),
+ activateJoker:(joker)=>{const state=get();if(state.jokers[joker]){set({toast:"Bu joker daha önce kullanıldı."});return false}set({jokers:{...state.jokers,[joker]:true},toast:"Joker bu hafta için etkinleştirildi."});return true},
+ clearSquad:()=>set(state=>({startingSlots:buildStartingSlots(state.formation,[]),benchSlots:buildBenchSlots([]),captainId:null,viceCaptainId:null,toast:"Kadro temizlendi. Kullanılabilir bütçe yeniden 100M."})),
+ autoArrangeSquad:(candidates,budget)=>{const{formation,startingSlots,benchSlots,players}=get();const allPlayers={...players,...Object.fromEntries(candidates.map(p=>[p.id,p]))};const currentIds=[...startingSlots,...benchSlots].map(s=>s.playerId).filter((id):id is string=>Boolean(id));const current=currentIds.map(id=>allPlayers[id]).filter(Boolean);const desired=[...FORMATION_POSITIONS[formation],...BENCH_POSITIONS];const used=new Set<string>();const counts=new Map<string,number>();let spend=0;const chosen:(string|null)[]=desired.map(()=>null);const canUse=(p:Player)=>!used.has(p.id)&&(counts.get(p.club)??0)<3&&spend+p.price<=budget;const place=(p:Player,i:number)=>{chosen[i]=p.id;used.add(p.id);counts.set(p.club,(counts.get(p.club)??0)+1);spend+=p.price};desired.forEach((pos,i)=>{const p=current.find(x=>x.position===pos&&canUse(x));if(p)place(p,i)});desired.forEach((pos,i)=>{if(chosen[i])return;const p=candidates.filter(x=>x.position===pos&&canUse(x)).sort((a,b)=>a.price-b.price||b.points-a.points)[0];if(p)place(p,i)});const missing=chosen.filter(id=>!id).length;set({players:allPlayers,startingSlots:buildStartingSlots(formation,chosen.slice(0,11)),benchSlots:buildBenchSlots(chosen.slice(11)),toast:missing?`${formation} için kadro düzenlendi ancak ${missing} pozisyon boş kaldı.`:`${formation} dizilişine göre kadro otomatik düzenlendi.`});return missing===0},
+ swapStartingAndBench:(a,b)=>{const{startingSlots,benchSlots,players}=get();const ai=startingSlots.findIndex(s=>s.playerId===a),bi=benchSlots.findIndex(s=>s.playerId===b);if(ai<0||bi<0)return false;const ap=players[a],bp=players[b];if(!ap||!bp)return false;if(startingSlots[ai].position!==bp.position||benchSlots[bi].position!==ap.position){set({toast:"Geçersiz Değişiklik · mevki kuralları uyuşmuyor."});return false}const ns=[...startingSlots],nb=[...benchSlots];ns[ai]={...ns[ai],playerId:b};nb[bi]={...nb[bi],playerId:a};set({startingSlots:ns,benchSlots:nb,toast:`${ap.name} ile ${bp.name} yer değiştirdi.`});return true},
+ swapFieldPositions:(a,b)=>{const{startingSlots,players}=get();const ai=startingSlots.findIndex(s=>s.playerId===a),bi=startingSlots.findIndex(s=>s.playerId===b);if(ai<0||bi<0)return false;if(players[a]?.position!==players[b]?.position){set({toast:"Geçersiz Değişiklik · saha içi takas aynı mevki arasında yapılabilir."});return false}const n=[...startingSlots],x=n[ai].playerId;n[ai]={...n[ai],playerId:n[bi].playerId};n[bi]={...n[bi],playerId:x};set({startingSlots:n,toast:"Saha içi pozisyonlar değiştirildi."});return true},
+ swapBenchPlayers:(a,b)=>{const{benchSlots,players}=get();const ai=benchSlots.findIndex(s=>s.playerId===a),bi=benchSlots.findIndex(s=>s.playerId===b);if(ai<0||bi<0)return false;const ap=players[a],bp=players[b];if(!ap||!bp)return false;if(!benchAccepts(benchSlots[ai],bp)||!benchAccepts(benchSlots[bi],ap)){set({toast:"Yedek koltukları mevkiye özeldir: KL, DEF, ORT ve FOR."});return false}const n=[...benchSlots];n[ai]={...n[ai],playerId:b};n[bi]={...n[bi],playerId:a};set({benchSlots:n,toast:"Yedek oyuncuların sırası değiştirildi."});return true},
+ movePlayerToEmptySlot:(playerId,sourceSlotId,targetSlotId)=>{const{startingSlots,benchSlots,players}=get();const p=players[playerId];if(!p)return false;const si=startingSlots.findIndex(s=>s.id===targetSlotId),bi=benchSlots.findIndex(s=>s.id===targetSlotId);if(si>=0&&(startingSlots[si].playerId||startingSlots[si].position!==p.position)){set({toast:"Geçersiz Değişiklik · oyuncu bu saha slotuna taşınamaz."});return false}if(bi>=0&&(benchSlots[bi].playerId||!benchAccepts(benchSlots[bi],p))){set({toast:"Geçersiz Değişiklik · oyuncu bu yedek slotuna taşınamaz."});return false}if(si<0&&bi<0)return false;set({startingSlots:startingSlots.map((s,i)=>s.id===sourceSlotId?{...s,playerId:null}:i===si?{...s,playerId}:s),benchSlots:benchSlots.map((s,i)=>s.id===sourceSlotId?{...s,playerId:null}:i===bi?{...s,playerId}:s),toast:`${p.name} yeni slota taşındı.`});return true},
+ addPlayerFromTransfer:(p,target)=>{const{startingSlots,benchSlots,players}=get();const nextPlayers={...players,[p.id]:p};if(target.startsWith("start-")){const i=startingSlots.findIndex(s=>s.id===target);if(i<0)return false;const slot=startingSlots[i];if(slot.playerId||slot.position!==p.position){set({toast:`${p.name} bu mevki alanına bırakılamaz.`});return false}const n=[...startingSlots];n[i]={...slot,playerId:p.id};set({players:nextPlayers,startingSlots:n,toast:`${p.name} ilk 11'e eklendi.`});return true}if(target.startsWith("bench-")){const i=benchSlots.findIndex(s=>s.id===target);if(i<0)return false;const slot=benchSlots[i];if(slot.playerId||!benchAccepts(slot,p)){set({toast:`Bu yedek koltuğu yalnızca ${slot.position} oyuncusu kabul eder.`});return false}const n=[...benchSlots];n[i]={...slot,playerId:p.id};set({players:nextPlayers,benchSlots:n,toast:`${p.name} yedek kulübesine eklendi.`});return true}return false},
+ removePlayer:(id)=>set(state=>({startingSlots:state.startingSlots.map(s=>s.playerId===id?{...s,playerId:null}:s),benchSlots:state.benchSlots.map(s=>s.playerId===id?{...s,playerId:null}:s),captainId:state.captainId===id?null:state.captainId,viceCaptainId:state.viceCaptainId===id?null:state.viceCaptainId,toast:"Oyuncu kadrodan çıkarıldı."}))
 }));
