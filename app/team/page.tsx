@@ -1,16 +1,18 @@
 "use client";
 
-import { DndContext, DragOverlay, PointerSensor, TouchSensor, closestCenter, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
+import { DndContext, DragOverlay, PointerSensor, TouchSensor, pointerWithin, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
 import { useEffect, useMemo, useState } from "react";
 import FootballPitch, { type BenchPitchSlot, type PitchSlot } from "@/components/fantasy/FootballPitch";
 import TransferPanel from "@/components/fantasy/TransferPanel";
 import PlayerCard, { type FantasyPlayer, type PlayerPosition } from "@/components/fantasy/PlayerCard";
 import { SUPER_LIG_CLUBS_2026_27 } from "@/data/superlig-2026";
+import { SUPER_LIG_COACHES_2026_27, type FantasyCoach } from "@/data/superlig-coaches-2026";
 import { useTeamStore, type Formation, type Player as StorePlayer } from "@/store/useTeamStore";
 
 const BUDGET = 100;
 const STORAGE_KEY = "futbol-iq-fantasy-squad-v7";
 const FORMATIONS: Formation[] = ["4-3-3", "4-4-2", "3-4-3", "3-5-2", "5-3-2"];
+const DEFAULT_COACH_ID = "coach-galatasaray";
 
 const players: StorePlayer[] = [
   { id: "1", name: "Victor Osimhen", club: "Galatasaray", position: "FWD", price: 11.5, points: 78, matches: 5, selected: 64 },
@@ -49,27 +51,33 @@ const positionName = (position: PlayerPosition) => position === "FWD" ? "Forvet"
 export default function TeamBuilderPage() {
   const { formation, players: playerMap, startingSlots, benchSlots, toast, hydrateTeam, setFormation, setToast, swapStartingAndBench, swapFieldPositions, swapBenchPlayers, movePlayerToEmptySlot, addPlayerFromTransfer, removePlayer } = useTeamStore();
   const [captain, setCaptain] = useState<string | null>("1");
+  const [selectedCoachId, setSelectedCoachId] = useState<string>(DEFAULT_COACH_ID);
   const [draggingPlayer, setDraggingPlayer] = useState<FantasyPlayer | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<FantasyPlayer | null>(null);
   const [hydrated, setHydrated] = useState(false);
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(TouchSensor, { activationConstraint: { delay: 80, tolerance: 8 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 10 } }),
+  );
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const saved = JSON.parse(raw) as { formation?: Formation; startingIds?: (string | null)[]; benchIds?: (string | null)[]; captain?: string | null };
+        const saved = JSON.parse(raw) as { formation?: Formation; startingIds?: (string | null)[]; benchIds?: (string | null)[]; captain?: string | null; coachId?: string };
         hydrateTeam(players, saved.formation ?? "4-3-3", saved.startingIds ?? initialLineup, saved.benchIds ?? initialBench);
         setCaptain(saved.captain ?? "1");
+        if (saved.coachId && SUPER_LIG_COACHES_2026_27.some((coach) => coach.id === saved.coachId)) setSelectedCoachId(saved.coachId);
       } else hydrateTeam(players, "4-3-3", initialLineup, initialBench);
     } finally { setHydrated(true); }
   }, [hydrateTeam]);
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ formation, startingIds: startingSlots.map((slot) => slot.playerId), benchIds: benchSlots.map((slot) => slot.playerId), captain }));
-  }, [benchSlots, captain, formation, hydrated, startingSlots]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ formation, startingIds: startingSlots.map((slot) => slot.playerId), benchIds: benchSlots.map((slot) => slot.playerId), captain, coachId: selectedCoachId }));
+  }, [benchSlots, captain, formation, hydrated, selectedCoachId, startingSlots]);
 
+  const selectedCoach = SUPER_LIG_COACHES_2026_27.find((coach) => coach.id === selectedCoachId) ?? SUPER_LIG_COACHES_2026_27[0] ?? null;
   const selectedIds = [...startingSlots, ...benchSlots].map((slot) => slot.playerId).filter((id): id is string => Boolean(id));
   const selectedPlayers = selectedIds.map((id) => playerMap[id]).filter(Boolean);
   const spent = selectedPlayers.reduce((total, player) => total + player.price, 0);
@@ -100,6 +108,11 @@ export default function TeamBuilderPage() {
     const emptyBench = benchSlots.find((slot) => !slot.playerId && slot.position === storePlayer.position);
     if (emptyBench) return void addPlayerFromTransfer(storePlayer, emptyBench.id);
     setToast(`${positionName(storePlayer.position)} için uygun boş slot yok.`);
+  }
+
+  function selectCoach(coach: FantasyCoach) {
+    setSelectedCoachId(coach.id);
+    setToast(`${coach.name} teknik direktör olarak seçildi. Bu seçim 15 kişilik futbolcu kadrosuna ve bütçeye dahil değildir.`);
   }
 
   function autoComplete() {
@@ -157,13 +170,13 @@ export default function TeamBuilderPage() {
     if (hasInvalidPositions) return void setToast(`Kadro kaydedilemez: ${invalidStartingSlots.length} oyuncu kendi mevkisi dışında.`);
     if (emptyStarting || emptyBench) return void setToast(`Kadroyu tamamla: ${emptyStarting} ilk 11, ${emptyBench} yedek pozisyonu boş.`);
     if (!captain) return void setToast("Kadroyu kaydetmeden önce bir kaptan seçmelisin.");
-    setToast("Kadro bu cihazın tarayıcısına kaydedildi.");
+    setToast(`Kadro ve ${selectedCoach?.name ?? "teknik direktör"} seçimi bu cihazın tarayıcısına kaydedildi.`);
   }
 
   const fantasyPlayers = players.map(toFantasyPlayer);
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setDraggingPlayer(null)}>
+    <DndContext sensors={sensors} collisionDetection={pointerWithin} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setDraggingPlayer(null)}>
       <div className="relative min-h-screen overflow-x-hidden bg-[#080d1a] pb-20 pt-2 text-white sm:pt-3">
         <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_8%_10%,rgba(74,168,255,.13),transparent_24%),radial-gradient(circle_at_78%_4%,rgba(255,224,120,.10),transparent_19%),radial-gradient(circle_at_50%_35%,rgba(0,230,118,.06),transparent_33%),linear-gradient(180deg,#0b1329_0%,#080d1a_48%,#040812_100%)]" />
 
@@ -173,8 +186,8 @@ export default function TeamBuilderPage() {
         </section>
 
         <section className="relative z-10 mx-auto grid w-[calc(100%-24px)] max-w-[1540px] grid-cols-[minmax(0,1.55fr)_minmax(350px,.68fr)] items-start gap-3 max-[980px]:grid-cols-1 sm:w-[calc(100%-40px)]">
-          <div className="min-w-0"><FootballPitch formationLabel={formation} formations={FORMATIONS} slots={pitchSlots} benchSlots={pitchBenchSlots} captainId={captain} draggingPlayer={draggingPlayer} onFormationChange={(value) => setFormation(value as Formation)} onPlayerClick={setSelectedPlayer} onBenchPlayerClick={setSelectedPlayer} /><div className={["mx-auto mt-2 max-w-[920px] rounded-xl border px-3 py-2 text-[8.5px] font-bold backdrop-blur-xl", hasInvalidPositions ? "border-rose-400/25 bg-rose-950/30 text-rose-200" : "border-white/[.08] bg-[#07151c]/90 text-white/48"].join(" ")}>{toast ?? (hasInvalidPositions ? "Kırmızı oyuncuları düzeltmeden kadro kaydedilemez." : "Kartları sürükleyerek saha ve yedekler arasında yönetebilirsin.")}</div></div>
-          <TransferPanel players={fantasyPlayers} clubs={SUPER_LIG_CLUBS_2026_27} selectedIds={selectedIds} onQuickAdd={quickAdd} onPlayerClick={setSelectedPlayer} />
+          <div className="min-w-0"><FootballPitch formationLabel={formation} formations={FORMATIONS} slots={pitchSlots} benchSlots={pitchBenchSlots} coach={selectedCoach} captainId={captain} draggingPlayer={draggingPlayer} onFormationChange={(value) => setFormation(value as Formation)} onPlayerClick={setSelectedPlayer} onBenchPlayerClick={setSelectedPlayer} /><div className={["mx-auto mt-2 max-w-[920px] rounded-xl border px-3 py-2 text-[8.5px] font-bold backdrop-blur-xl", hasInvalidPositions ? "border-rose-400/25 bg-rose-950/30 text-rose-200" : "border-white/[.08] bg-[#07151c]/90 text-white/48"].join(" ")}>{toast ?? (hasInvalidPositions ? "Kırmızı oyuncuları düzeltmeden kadro kaydedilemez." : "Kartları sürükleyerek saha ve yedekler arasında yönetebilirsin.")}</div></div>
+          <TransferPanel players={fantasyPlayers} coaches={SUPER_LIG_COACHES_2026_27} clubs={SUPER_LIG_CLUBS_2026_27} selectedIds={selectedIds} selectedCoachId={selectedCoachId} onQuickAdd={quickAdd} onSelectCoach={selectCoach} onPlayerClick={setSelectedPlayer} />
         </section>
 
         {selectedPlayer ? <div className="fixed inset-0 z-[100] grid place-items-center bg-black/70 p-4 backdrop-blur-sm" onClick={() => setSelectedPlayer(null)}><div className="w-full max-w-[430px] rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,#0a2028,#061219)] p-4" onClick={(event) => event.stopPropagation()}><div className="flex items-start justify-between gap-3"><div><span className="text-[8px] font-black tracking-[.12em] text-[#f3ca40]">OYUNCU BİLGİLERİ</span><h2 className="mt-1 text-2xl font-black text-white">{selectedPlayer.name}</h2><p className="mt-1 text-[10px] font-bold text-white/45">{selectedPlayer.club} · {positionName(selectedPlayer.position)}</p></div><button type="button" onClick={() => setSelectedPlayer(null)} className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5 text-lg text-white/60">×</button></div><div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">{[["Maç", String(selectedPlayer.matches ?? "—")], ["Puan", `${selectedPlayer.points} P`], ["Fiyat", `${selectedPlayer.price.toFixed(1)}M`], ["Seçilme", selectedPlayer.selected !== undefined ? `%${selectedPlayer.selected}` : "—"]].map(([label, value]) => <div key={label} className="rounded-xl border border-white/[.08] bg-white/[.035] p-2.5"><small className="block text-[7px] font-black text-white/30">{label}</small><strong className="mt-1 block text-[13px] font-black text-white">{value}</strong></div>)}</div><div className="mt-4 grid grid-cols-2 gap-2"><button type="button" onClick={() => { setCaptain(String(selectedPlayer.id)); setToast(`${selectedPlayer.name} kaptan seçildi · x2`); setSelectedPlayer(null); }} className="rounded-xl border border-[#ffe889]/30 bg-[#d39b19]/15 px-3 py-3 text-[9px] font-black text-[#ffe889]">Kaptan Yap</button><button type="button" onClick={() => { setToast(`${selectedPlayer.name} için değiştir modu: kartı uygun slota sürükle.`); setSelectedPlayer(null); }} className="rounded-xl border border-emerald-300/20 bg-emerald-300/10 px-3 py-3 text-[9px] font-black text-emerald-200">Oyuncuyu Değiştir</button><button type="button" onClick={() => { removePlayer(String(selectedPlayer.id)); if (captain === String(selectedPlayer.id)) setCaptain(null); setSelectedPlayer(null); }} className="col-span-2 rounded-xl border border-rose-300/20 bg-rose-400/10 px-3 py-3 text-[9px] font-black text-rose-200">Oyuncuyu Çıkar</button></div></div></div> : null}
