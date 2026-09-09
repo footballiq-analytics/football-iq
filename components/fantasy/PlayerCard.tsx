@@ -6,7 +6,7 @@ export type CardTier = "gold" | "silver" | "bronze";
 export type PlayerPosition = "GK" | "DEF" | "MID" | "FWD";
 
 export type FantasyPlayer = {
-  id: number;
+  id: string | number;
   name: string;
   club: string;
   clubLogo?: string;
@@ -28,6 +28,7 @@ type PlayerCardProps = {
   compact?: boolean;
   onClick?: () => void;
   onDragStart?: (event: React.DragEvent<HTMLElement>) => void;
+  isDragging?: boolean;
 };
 
 const tierStyles: Record<CardTier, string> = {
@@ -49,6 +50,7 @@ export default function PlayerCard({
   compact = false,
   onClick,
   onDragStart,
+  isDragging = false,
 }: PlayerCardProps) {
   const badge = tripleCaptain ? "3x" : captain ? "C" : null;
 
@@ -60,7 +62,8 @@ export default function PlayerCard({
     >
       <motion.article
         layout
-        whileHover={{ y: -5, scale: 1.025 }}
+        animate={{ scale: isDragging ? 1.05 : 1, opacity: isDragging ? 0.82 : 1 }}
+        whileHover={{ y: -5, scale: isDragging ? 1.05 : 1.025 }}
         whileTap={{ scale: 0.985 }}
         transition={{ type: "spring", stiffness: 330, damping: 24 }}
         onClick={onClick}
@@ -72,6 +75,9 @@ export default function PlayerCard({
           tierStyles[tier],
           captain || tripleCaptain
             ? "ring-1 ring-[#ffe889]/80 shadow-[0_15px_35px_rgba(0,0,0,.5),0_0_28px_rgba(255,211,74,.42)]"
+            : "",
+          isDragging
+            ? "ring-2 ring-emerald-300/70 shadow-[0_18px_40px_rgba(0,0,0,.55),0_0_34px_rgba(52,211,153,.38),0_0_24px_rgba(246,213,106,.24)]"
             : "",
           onClick ? "cursor-pointer" : "",
         ].join(" ")}
