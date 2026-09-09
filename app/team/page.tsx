@@ -1,13 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { DragEvent, useEffect, useMemo, useState } from "react";
 import { SUPER_LIG_CLUBS_2026_27, SUPER_LIG_DATA_META } from "@/data/superlig-2026";
 
 type Position = "GK" | "DEF" | "MID" | "FWD";
 type Formation = "4-3-3" | "4-4-2" | "3-4-3" | "3-5-2" | "5-3-2";
 type Player = { id:number; name:string; club:string; position:Position; price:number; points:number; selected:number; };
-
 type DragPayload = { playerId:number; fromIndex?:number };
 
 const BUDGET = 100;
@@ -88,50 +86,29 @@ export default function TeamBuilderPage(){
   current.forEach(p=>{const i=nextSlots.findIndex((pos,index)=>pos===p.position&&rebuilt[index]===null);if(i>=0)rebuilt[i]=p.id});
   setFormation(next);setLineup(rebuilt);setMessage(`${next} dizilişi uygulandı. Oyuncular yalnızca kendi mevki hatlarına yerleştirildi.`)
  }
-
- function startDrag(e:DragEvent, playerId:number, fromIndex?:number){
-  const payload:DragPayload={playerId,fromIndex};e.dataTransfer.setData("application/json",JSON.stringify(payload));e.dataTransfer.effectAllowed="move";setDragging(playerId)
- }
+ function startDrag(e:DragEvent, playerId:number, fromIndex?:number){const payload:DragPayload={playerId,fromIndex};e.dataTransfer.setData("application/json",JSON.stringify(payload));e.dataTransfer.effectAllowed="move";setDragging(playerId)}
  function readDrag(e:DragEvent):DragPayload|null{try{return JSON.parse(e.dataTransfer.getData("application/json")) as DragPayload}catch{return dragging?{playerId:dragging}:null}}
  function dropOnSlot(e:DragEvent,index:number){
   e.preventDefault();const payload=readDrag(e);setDragging(null);if(!payload)return;
   const player=getPlayer(payload.playerId);const required=slots[index];
   if(player.position!==required){setMessage(`${player.name} ${positionName(player.position)} oyuncusu. ${positionName(required)} hattına yerleştirilemez.`);return}
   if(!canAdd(player))return;
-  setLineup(prev=>{
-   const next=[...prev];
-   const existingIndex=next.findIndex(x=>x===player.id);
-   const targetPlayer=next[index];
-   if(existingIndex>=0){next[existingIndex]=targetPlayer??null;next[index]=player.id;return next}
-   if(payload.fromIndex!==undefined&&payload.fromIndex>=0&&payload.fromIndex<next.length){next[payload.fromIndex]=targetPlayer??null}
-   next[index]=player.id;return next
-  });
-  setBench(prev=>prev.map(x=>x===player.id?null:x));
-  setMessage(`${player.name} ${positionName(required)} hattına yerleştirildi.`)
+  setLineup(prev=>{const next=[...prev];const existingIndex=next.findIndex(x=>x===player.id);const targetPlayer=next[index];if(existingIndex>=0){next[existingIndex]=targetPlayer??null;next[index]=player.id;return next}if(payload.fromIndex!==undefined&&payload.fromIndex>=0&&payload.fromIndex<next.length){next[payload.fromIndex]=targetPlayer??null}next[index]=player.id;return next});
+  setBench(prev=>prev.map(x=>x===player.id?null:x));setMessage(`${player.name} ${positionName(required)} hattına yerleştirildi.`)
  }
- function quickAdd(player:Player){
-  if(selected.includes(player.id)){remove(player.id);return}
-  if(!canAdd(player))return;
-  const i=slots.findIndex((pos,index)=>pos===player.position&&lineup[index]===null);
-  if(i<0){setMessage(`${positionName(player.position)} hattında boş yer yok. Oyuncuyu değiştirmek için sürükleyip mevcut kartın üzerine bırak.`);return}
-  setLineup(v=>v.map((x,index)=>index===i?player.id:x));setMessage(`${player.name} ${positionName(player.position)} hattına eklendi.`)
- }
+ function quickAdd(player:Player){if(selected.includes(player.id)){remove(player.id);return}if(!canAdd(player))return;const i=slots.findIndex((pos,index)=>pos===player.position&&lineup[index]===null);if(i<0){setMessage(`${positionName(player.position)} hattında boş yer yok. Oyuncuyu değiştirmek için sürükleyip mevcut kartın üzerine bırak.`);return}setLineup(v=>v.map((x,index)=>index===i?player.id:x));setMessage(`${player.name} ${positionName(player.position)} hattına eklendi.`)}
  function save(){const empty=lineup.filter(x=>x===null).length;if(empty)return setMessage(`İlk 11'de ${empty} boş pozisyon var.`);setMessage("Kadro bu cihazın tarayıcısına kaydedildi.")}
 
  const lines:Position[]=["FWD","MID","DEF","GK"];
  return <div className="fantasy-page pro-team-page target-team-layout dnd-team-page">
   <section className="team-command-bar dnd-command-bar"><div><p className="eyebrow">KADROM / SAHA İÇİ</p><h1>Takımını Kur</h1><p>Oyuncuları sağdan sahaya sürükle. Her futbolcu yalnızca kendi mevki hattına bırakılabilir.</p></div><div className="command-kpis"><div><small>Toplam bütçe</small><strong>100 M₺</strong></div><div><small>Kalan bütçe</small><strong className="money-text">{remaining.toFixed(1)} M₺</strong></div><div><small>İlk 11</small><strong>{lineup.filter(Boolean).length}/11</strong></div><div><small>Toplam</small><strong>{selected.length}/15</strong></div></div></section>
-
   <section className="dnd-workspace">
    <div className="dnd-pitch-panel">
-    <div className="dnd-toolbar"><div><span>Diziliş</span><select value={formation} onChange={e=>reflowFormation(e.target.value as Formation)}>{FORMATIONS.map(f=><option key={f}>{f}</option>)}</select></div><div className="position-legend"><span><i className="fwd"/>Forvet</span><span><i className="mid"/>Orta saha</span><span><i className="def"/>Defans</span><span><i className="gk"/>Kaleci</span></div></div>
-    <div className="stadium-pitch-wrap dnd-stadium"><div className="pro-pitch dnd-pitch"><div className="pitch-markings"/>
-     {lines.map(pos=>{const indices=slots.map((p,i)=>p===pos?i:-1).filter(i=>i>=0);return <div className={`dnd-line line-${pos.toLowerCase()}`} key={pos}>{indices.map(index=>{const id=lineup[index];return <div className={`drop-slot ${dragging&&getPlayer(dragging).position===pos?"can-drop":""}`} key={index} onDragOver={e=>e.preventDefault()} onDrop={e=>dropOnSlot(e,index)}>{id?<DraggableCard player={getPlayer(id)} onDragStart={(e)=>startDrag(e,id,index)} onRemove={()=>remove(id)}/>:<EmptyDropSlot position={pos}/>}</div>})}</div>})}
-    </div></div>
+    <div className="dnd-toolbar"><div><span>Diziliş</span><select value={formation} onChange={e=>reflowFormation(e.target.value as Formation)}>{FORMATIONS.map(f=><option key={f} value={f}>{f}</option>)}</select></div><div className="position-legend"><span><i className="fwd"/>Forvet</span><span><i className="mid"/>Orta saha</span><span><i className="def"/>Defans</span><span><i className="gk"/>Kaleci</span></div></div>
+    <div className="stadium-pitch-wrap dnd-stadium"><div className="pro-pitch dnd-pitch"><div className="pitch-markings"/>{lines.map(pos=>{const indices=slots.map((p,i)=>p===pos?i:-1).filter(i=>i>=0);return <div className={`dnd-line line-${pos.toLowerCase()}`} key={pos}>{indices.map(index=>{const id=lineup[index];return <div className={`drop-slot ${dragging&&getPlayer(dragging).position===pos?"can-drop":""}`} key={index} onDragOver={e=>e.preventDefault()} onDrop={e=>dropOnSlot(e,index)}>{id?<DraggableCard player={getPlayer(id)} onDragStart={e=>startDrag(e,id,index)} onRemove={()=>remove(id)}/>:<EmptyDropSlot position={pos}/>}</div>})}</div>})}</div></div>
     <div className="bench-zone dnd-bench"><div className="bench-title"><div><p className="eyebrow">YEDEK KULÜBESİ</p><h2>Yedekler</h2></div><span>{bench.filter(Boolean).length}/4</span></div><div className="pro-bench-grid">{bench.map((id,i)=>id?<div className="pro-bench-card" key={id} draggable onDragStart={e=>startDrag(e,id)}><span className="bench-order">{i+1}</span><Portrait name={getPlayer(id).name}/><div><strong>{getPlayer(id).name}</strong><small>{getPlayer(id).club} · {getPlayer(id).position}</small></div><b>{getPlayer(id).price.toFixed(1)}M</b><button onClick={()=>remove(id)}>×</button></div>:<div className="bench-empty" key={i}>Yedek {i+1}</div>)}</div></div>
     <div className="save-row"><div className="status-message">{message}</div><button className="save-squad" onClick={save}>Kadroyu Kaydet</button></div>
    </div>
-
    <aside className="player-market-pro dnd-market"><div className="market-heading"><div><p className="eyebrow">TAKIMLAR / OYUNCU BUL</p><h2>Oyuncu Bul</h2></div><span>{SUPER_LIG_DATA_META.clubCount} KULÜP · {SUPER_LIG_DATA_META.season}</span></div>
     <input className="pro-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Oyuncu ara..."/>
     <select className="club-select" value={clubFilter} onChange={e=>setClubFilter(e.target.value)} aria-label="Kulüp filtresi"><option value="ALL">Tüm takımlar</option>{SUPER_LIG_CLUBS_2026_27.map(club=><option value={club} key={club}>{club}</option>)}</select>
@@ -144,5 +121,5 @@ export default function TeamBuilderPage(){
 }
 
 function Portrait({name}:{name:string}){return <div className="portrait"><span className="head"/><span className="torso"/><b>{name.slice(0,1)}</b></div>}
-function DraggableCard({player,onDragStart,onRemove}:{player:Player;onDragStart:(e:DragEvent)=>void;onRemove:()=>void}){return <motion.article whileHover={{y:-4,scale:1.02}} className="pro-player-card dnd-card" draggable onDragStart={onDragStart}><button className="remove-mini" onClick={onRemove} aria-label={`${player.name} çıkar`}>×</button><Portrait name={player.name}/><strong>{player.name}</strong><small>{player.club}</small><div className="card-stats"><b>{player.price.toFixed(1)}M</b><span>{player.points} P</span><em>{player.position}</em></div></motion.article>}
+function DraggableCard({player,onDragStart,onRemove}:{player:Player;onDragStart:(e:DragEvent)=>void;onRemove:()=>void}){return <article className="pro-player-card dnd-card" draggable onDragStart={onDragStart}><button className="remove-mini" onClick={onRemove} aria-label={`${player.name} çıkar`}>×</button><Portrait name={player.name}/><strong>{player.name}</strong><small>{player.club}</small><div className="card-stats"><b>{player.price.toFixed(1)}M</b><span>{player.points} P</span><em>{player.position}</em></div></article>}
 function EmptyDropSlot({position}:{position:Position}){const label=position==="FWD"?"FORVET":position==="MID"?"ORTA SAHA":position==="DEF"?"DEFANS":"KALECİ";return <div className="empty-player-slot dnd-empty"><span>{label}</span><i/><small>Buraya bırak</small></div>}
