@@ -1,9 +1,4 @@
-export type FantasyCoach = {
-  id: string;
-  name: string;
-  club: string;
-  country: string;
-};
+export type FantasyCoach = { id: string; name: string; club: string; country: string };
 
 // 2026-27 sezon başlangıcı teknik direktör listesi. Kaynak: AA, 10 Ağustos 2026.
 export const SUPER_LIG_COACHES_2026_27: FantasyCoach[] = [
@@ -23,6 +18,6 @@ export const SUPER_LIG_COACHES_2026_27: FantasyCoach[] = [
   { id: "coach-kasimpasa", name: "Emre Belözoğlu", club: "Kasımpaşa", country: "Türkiye" },
   { id: "coach-kocaeli", name: "Selçuk İnan", club: "Kocaelispor", country: "Türkiye" },
   { id: "coach-konya", name: "İlhan Palut", club: "Tümosan Konyaspor", country: "Türkiye" },
-  { id: "coach-samsun", name: "Thomas Reis", club: "Samsunspor", country: "Almanya" },
+  { id: "coach-samsun", name: "Thorsten Fink", club: "Samsunspor", country: "Almanya" },
   { id: "coach-trabzon", name: "Fatih Tekke", club: "Trabzonspor", country: "Türkiye" },
 ];
