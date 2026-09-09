@@ -1,7 +1,8 @@
 "use client";
 
-import { Draggable, Droppable } from "@hello-pangea/dnd";
+import { Draggable, Droppable, type DraggableProvided, type DraggableStateSnapshot } from "@hello-pangea/dnd";
 import { motion } from "framer-motion";
+import { createPortal } from "react-dom";
 import PlayerCard, { FantasyPlayer, PlayerPosition } from "./PlayerCard";
 
 export type PitchSlot = { id: string; index: number; position: PlayerPosition; player?: FantasyPlayer | null; invalidPosition?: boolean };
@@ -66,9 +67,11 @@ export default function FootballPitch({ formationLabel, formations, slots, bench
                             {slot.player ? (
                               <Draggable draggableId={`player:${slot.player.id}`} index={0}>
                                 {(dragProvided, dragSnapshot) => (
-                                  <div ref={dragProvided.innerRef} {...dragProvided.draggableProps} {...dragProvided.dragHandleProps} style={dragProvided.draggableProps.style} className={["z-20 cursor-grab active:cursor-grabbing", dragSnapshot.isDragging ? "z-[9999] will-change-transform" : ""].join(" ")}>
-                                    <PlayerCard compact player={slot.player!} captain={slot.player!.id === captainId} tripleCaptain={slot.player!.id === tripleCaptainId} isDragging={dragSnapshot.isDragging} invalidPosition={Boolean(slot.invalidPosition)} onClick={() => onPlayerClick?.(slot.player!)} />
-                                  </div>
+                                  <DragPortal isDragging={dragSnapshot.isDragging}>
+                                    <DragCardFrame provided={dragProvided} snapshot={dragSnapshot}>
+                                      <PlayerCard compact player={slot.player!} captain={slot.player!.id === captainId} tripleCaptain={slot.player!.id === tripleCaptainId} isDragging={dragSnapshot.isDragging} invalidPosition={Boolean(slot.invalidPosition)} onClick={() => onPlayerClick?.(slot.player!)} />
+                                    </DragCardFrame>
+                                  </DragPortal>
                                 )}
                               </Draggable>
                             ) : !draggingPlayer ? <EmptySlot position={position} /> : null}
@@ -83,33 +86,39 @@ export default function FootballPitch({ formationLabel, formations, slots, bench
             })}
           </div>
 
-          <Droppable droppableId="joker-slot" isDropDisabled>
-            {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps} className="absolute bottom-[4.5%] right-[4%] z-30 grid h-[88px] w-[76px] place-items-center rounded-2xl border-2 border-dashed border-[#f7d447]/80 bg-[linear-gradient(180deg,rgba(83,61,5,.28),rgba(29,22,3,.38))] text-center shadow-[0_0_24px_rgba(247,212,71,.16)] backdrop-blur-md">
-                <div><span className="mx-auto grid h-8 w-8 place-items-center text-[24px] text-[#f7d447]">★</span><b className="mt-1 block text-[9px] tracking-[.06em] text-[#f7d447]">JOKER</b></div><div className="hidden">{provided.placeholder}</div>
-              </div>
-            )}
-          </Droppable>
+          <div className="absolute bottom-[4.5%] right-[4%] z-30 grid h-[88px] w-[76px] place-items-center rounded-2xl border-2 border-dashed border-[#f7d447]/80 bg-[linear-gradient(180deg,rgba(83,61,5,.28),rgba(29,22,3,.38))] text-center shadow-[0_0_24px_rgba(247,212,71,.16)] backdrop-blur-md">
+            <div><span className="mx-auto grid h-8 w-8 place-items-center text-[24px] text-[#f7d447]">★</span><b className="mt-1 block text-[9px] tracking-[.06em] text-[#f7d447]">JOKER</b></div>
+          </div>
         </div>
       </div>
 
-      <div className="relative mt-2 overflow-hidden rounded-[22px] border border-white/15 bg-[linear-gradient(180deg,#17232a,#0b1419_36%,#07100c_37%,#0b2d16_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.12),inset_0_-22px_40px_rgba(0,0,0,.42),0_18px_40px_rgba(0,0,0,.42)] before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-[38%] before:bg-[linear-gradient(105deg,rgba(255,255,255,.10),transparent_18%,transparent_78%,rgba(255,255,255,.06))]">
-        <div className="pointer-events-none absolute inset-x-[2%] bottom-2 h-[36%] rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(70,157,74,.42),rgba(16,49,19,.2)_55%,transparent_70%)] blur-sm" />
-        <div className="relative mb-2 flex items-center justify-between"><span className="rounded-full bg-black/25 px-3 py-1 text-[9px] font-black tracking-[.12em] text-white">YEDEK KULÜBESİ</span><span className="text-[8px] font-black text-white/45">{benchSlots.filter((slot) => slot.player).length}/4</span></div>
-        <div className="relative grid grid-cols-4 gap-1.5 sm:gap-3">
+      <div className="relative mt-2 overflow-hidden rounded-[24px] border border-white/15 bg-[linear-gradient(180deg,#1b2931_0%,#0c171d_34%,#0a160f_35%,#123b1b_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.16),inset_0_-28px_50px_rgba(0,0,0,.42),0_18px_40px_rgba(0,0,0,.42)] before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-[42%] before:bg-[linear-gradient(100deg,rgba(255,255,255,.12),transparent_16%,transparent_78%,rgba(255,255,255,.07))]">
+        <div className="pointer-events-none absolute inset-x-[3%] top-[34%] h-px bg-white/10" />
+        <div className="pointer-events-none absolute inset-x-[1.5%] bottom-1 h-[42%] rounded-[45%] bg-[radial-gradient(ellipse_at_center,rgba(104,190,76,.40),rgba(32,76,27,.24)_48%,rgba(8,24,12,.08)_72%)]" />
+        <div className="pointer-events-none absolute left-[2%] right-[2%] top-[36%] h-[64%] rounded-b-[22px] border-x border-b border-white/8" />
+
+        <div className="relative mb-2 flex items-center justify-between gap-3">
+          <span className="rounded-full bg-black/30 px-3 py-1 text-[9px] font-black tracking-[.12em] text-white">YEDEK KULÜBESİ</span>
+          <span className="text-[8px] font-black text-white/45">{benchSlots.filter((slot) => slot.player).length}/4</span>
+        </div>
+
+        <div className="relative grid grid-cols-[88px_repeat(4,minmax(0,1fr))] items-end gap-1.5 max-[620px]:grid-cols-[72px_repeat(4,minmax(0,1fr))] sm:gap-3">
+          <CoachCard />
           {benchSlots.map((slot, index) => {
             const valid = !draggingPlayer || (slot.kind === "GK" ? draggingPlayer.position === "GK" : draggingPlayer.position !== "GK");
             return (
               <Droppable key={slot.id} droppableId={slot.id} isDropDisabled={!valid}>
                 {(provided, snapshot) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps} className={["relative grid h-[116px] min-w-0 place-items-center overflow-visible rounded-xl border border-white/[.05] bg-black/10 transition duration-150", draggingPlayer && valid ? "border-emerald-300/45 bg-emerald-300/[.07]" : "", draggingPlayer && !valid ? "border-rose-300/30 bg-rose-400/[.06]" : "", snapshot.isDraggingOver ? "ring-2 ring-[#f4d35e]/70" : ""].join(" ")}>
+                  <div ref={provided.innerRef} {...provided.droppableProps} className={["relative grid h-[116px] min-w-0 place-items-center overflow-visible rounded-xl border border-white/[.05] bg-black/10 transition duration-150", draggingPlayer && valid ? "border-emerald-300/45 bg-emerald-300/[.07]" : "", draggingPlayer && !valid ? "border-rose-300/30 bg-rose-400/[.06]" : "", snapshot.isDraggingOver ? "ring-2 ring-[#f4d35e]/70 shadow-[0_0_24px_rgba(244,211,94,.16)]" : ""].join(" ")}>
                     {draggingPlayer && valid ? <GhostCard player={draggingPlayer} substitute /> : null}
                     {slot.player ? (
                       <Draggable draggableId={`player:${slot.player.id}`} index={0}>
                         {(dragProvided, dragSnapshot) => (
-                          <div ref={dragProvided.innerRef} {...dragProvided.draggableProps} {...dragProvided.dragHandleProps} style={dragProvided.draggableProps.style} className={["z-20 cursor-grab active:cursor-grabbing", dragSnapshot.isDragging ? "z-[9999] will-change-transform" : ""].join(" ")}>
-                            <PlayerCard compact player={slot.player!} substitute tier="gold" isDragging={dragSnapshot.isDragging} onClick={() => onBenchPlayerClick?.(slot.player!)} />
-                          </div>
+                          <DragPortal isDragging={dragSnapshot.isDragging}>
+                            <DragCardFrame provided={dragProvided} snapshot={dragSnapshot}>
+                              <PlayerCard compact player={slot.player!} substitute tier="gold" isDragging={dragSnapshot.isDragging} onClick={() => onBenchPlayerClick?.(slot.player!)} />
+                            </DragCardFrame>
+                          </DragPortal>
                         )}
                       </Draggable>
                     ) : !draggingPlayer ? <div className="grid h-[102px] w-full max-w-[82px] place-items-center rounded-xl border border-dashed border-white/15 bg-black/10 px-2 text-center text-[7px] font-black tracking-[.08em] text-white/30">{slot.kind === "GK" ? "YEDEK KL" : `Y${index + 1}`}</div> : null}
@@ -125,8 +134,38 @@ export default function FootballPitch({ formationLabel, formations, slots, bench
   );
 }
 
+function DragPortal({ isDragging, children }: { isDragging: boolean; children: React.ReactNode }) {
+  if (!isDragging || typeof document === "undefined") return <>{children}</>;
+  return createPortal(children, document.body);
+}
+
+function DragCardFrame({ provided, snapshot, children }: { provided: DraggableProvided; snapshot: DraggableStateSnapshot; children: React.ReactNode }) {
+  return (
+    <div
+      ref={provided.innerRef}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      style={{ ...provided.draggableProps.style, zIndex: snapshot.isDragging ? 99999 : undefined }}
+      className={["z-20 cursor-grab touch-none active:cursor-grabbing", snapshot.isDragging ? "will-change-transform drop-shadow-[0_22px_28px_rgba(0,0,0,.55)]" : ""].join(" ")}
+    >
+      {children}
+    </div>
+  );
+}
+
+function CoachCard() {
+  return (
+    <div className="relative h-[116px] overflow-hidden rounded-[18px] border border-[#f1d36b]/35 bg-[linear-gradient(160deg,#23303a,#111b21_46%,#402f0d_47%,#1e1709)] shadow-[0_12px_26px_rgba(0,0,0,.42),inset_0_1px_0_rgba(255,255,255,.10)]">
+      <div className="absolute inset-x-0 top-0 h-8 bg-[linear-gradient(180deg,rgba(255,255,255,.12),transparent)]" />
+      <span className="absolute left-2 top-2 rounded-full border border-[#f4d35e]/35 bg-black/35 px-1.5 py-0.5 text-[6px] font-black tracking-[.08em] text-[#f4d35e]">TEKNİK DİREKTÖR</span>
+      <div className="absolute left-1/2 top-[28px] h-[54px] w-[48px] -translate-x-1/2 overflow-hidden rounded-[44%_44%_38%_38%] border border-white/10 bg-[radial-gradient(circle_at_50%_20%,#d0a17f_0_18%,#8f674f_19%_32%,#17222a_33%_67%,#0c1216_68%)]" />
+      <div className="absolute inset-x-2 bottom-2 text-center"><b className="block truncate text-[8px] font-black text-white">Teknik Direktör</b><small className="mt-0.5 block text-[6px] font-bold text-white/40">Yönetim Kartı</small></div>
+    </div>
+  );
+}
+
 function GhostCard({ player, substitute = false }: { player: FantasyPlayer; substitute?: boolean }) {
-  return <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-[106px] w-[82px] -translate-x-1/2 -translate-y-1/2 rounded-[18px] border-2 border-dashed border-[#f4d35e]/75 bg-[linear-gradient(155deg,rgba(255,222,100,.13),rgba(5,40,24,.24))] opacity-70 shadow-[0_0_28px_rgba(244,211,94,.16)]"><div className="grid h-full place-items-center text-center"><div><div className="mx-auto h-12 w-10 rounded-[50%_50%_40%_40%] bg-white/10"/><b className="mt-1 block max-w-[72px] truncate px-1 text-[7px] text-white/60">{substitute ? "YEDEK · " : ""}{player.position}</b></div></div></div>;
+  return <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-[106px] w-[82px] -translate-x-1/2 -translate-y-1/2 rounded-[18px] border-2 border-dashed border-[#f4d35e]/75 bg-[linear-gradient(155deg,rgba(255,222,100,.13),rgba(5,40,24,.24))] opacity-60 shadow-[0_0_28px_rgba(244,211,94,.16)]"><div className="grid h-full place-items-center text-center"><div><div className="mx-auto h-12 w-10 rounded-[50%_50%_40%_40%] bg-white/10"/><b className="mt-1 block max-w-[72px] truncate px-1 text-[7px] text-white/60">{substitute ? "YEDEK · " : ""}{player.position}</b></div></div></div>;
 }
 
 function EmptySlot({ position }: { position: PlayerPosition }) {
