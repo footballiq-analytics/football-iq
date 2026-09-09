@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 360" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9f4ff" stop-opacity=".24"/><stop offset=".42" stop-color="#5a7890" stop-opacity=".08"/><stop offset="1" stop-color="#0c1a24" stop-opacity="0"/></linearGradient>
+    <linearGradient id="metal"><stop offset="0" stop-color="#d7e3ea" stop-opacity=".55"/><stop offset=".5" stop-color="#415566" stop-opacity=".35"/><stop offset="1" stop-color="#d7e3ea" stop-opacity=".5"/></linearGradient>
+  </defs>
+  <path d="M70 320 Q80 55 210 30 H1390 Q1520 55 1530 320" fill="none" stroke="url(#metal)" stroke-width="18"/>
+  <path d="M95 315 Q110 80 225 58 H1375 Q1490 80 1505 315 Z" fill="url(#glass)" stroke="#dff8ff" stroke-opacity=".12" stroke-width="3"/>
+  <g stroke="#dff8ff" stroke-opacity=".10" stroke-width="3">
+    <path d="M330 58 V315"/><path d="M540 58 V315"/><path d="M750 58 V315"/><path d="M960 58 V315"/><path d="M1170 58 V315"/><path d="M1380 58 V315"/>
+  </g>
+  <path d="M115 95 Q800 5 1485 95" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="10"/>
+</svg>
