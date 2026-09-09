@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import type { PointerEvent as ReactPointerEvent } from "react";
+import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
 
 type LongPressOptions = {
   delay?: number;
@@ -21,7 +21,7 @@ export function useLongPress(onLongPress?: () => void, options: LongPressOptions
     startRef.current = null;
   };
 
-  const onPointerDown = (event: ReactPointerEvent) => {
+  const onPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
     if (!onLongPress || event.button !== 0) return;
     triggeredRef.current = false;
     startRef.current = { x: event.clientX, y: event.clientY };
@@ -32,7 +32,7 @@ export function useLongPress(onLongPress?: () => void, options: LongPressOptions
     }, delay);
   };
 
-  const onPointerMove = (event: ReactPointerEvent) => {
+  const onPointerMove = (event: ReactPointerEvent<HTMLElement>) => {
     const start = startRef.current;
     if (!start) return;
     if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > moveTolerance) clear();
@@ -41,7 +41,7 @@ export function useLongPress(onLongPress?: () => void, options: LongPressOptions
   const onPointerUp = () => clear();
   const onPointerCancel = () => clear();
   const onPointerLeave = () => clear();
-  const onClickCapture = (event: ReactPointerEvent) => {
+  const onClickCapture = (event: ReactMouseEvent<HTMLElement>) => {
     if (!triggeredRef.current) return;
     event.preventDefault();
     event.stopPropagation();
