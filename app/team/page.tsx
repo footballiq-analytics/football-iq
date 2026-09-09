@@ -61,9 +61,12 @@ export default function TeamBuilderPage() {
     setToast,
     swapStartingAndBench,
     swapFieldPositions,
+    swapBenchPlayers,
+    movePlayerToEmptySlot,
     addPlayerFromTransfer,
     removePlayer,
   } = useTeamStore();
+
   const [captain, setCaptain] = useState<string | null>("1");
   const [draggingPlayer, setDraggingPlayer] = useState<FantasyPlayer | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<FantasyPlayer | null>(null);
@@ -98,10 +101,7 @@ export default function TeamBuilderPage() {
   const selectedPlayers = selectedIds.map((id) => playerMap[id]).filter(Boolean);
   const spent = selectedPlayers.reduce((total, player) => total + player.price, 0);
   const remaining = BUDGET - spent;
-  const invalidStartingSlots = startingSlots.filter((slot) => {
-    if (!slot.playerId) return false;
-    return playerMap[slot.playerId]?.position !== slot.position;
-  });
+  const invalidStartingSlots = startingSlots.filter((slot) => slot.playerId && playerMap[slot.playerId]?.position !== slot.position);
   const hasInvalidPositions = invalidStartingSlots.length > 0;
 
   const pitchSlots: PitchSlot[] = useMemo(() => startingSlots.map((slot, index) => ({
@@ -145,16 +145,40 @@ export default function TeamBuilderPage() {
     const storePlayer = playerMap[id] ?? players.find((item) => item.id === id);
     if (!storePlayer || !canAddTransfer(storePlayer)) return;
     const emptyStarting = startingSlots.find((slot) => slot.position === storePlayer.position && !slot.playerId);
-    if (emptyStarting) {
-      addPlayerFromTransfer(storePlayer, emptyStarting.id);
-      return;
-    }
+    if (emptyStarting) return void addPlayerFromTransfer(storePlayer, emptyStarting.id);
     const emptyBench = benchSlots.find((slot) => !slot.playerId && (slot.kind === "GK" ? storePlayer.position === "GK" : storePlayer.position !== "GK"));
-    if (emptyBench) {
-      addPlayerFromTransfer(storePlayer, emptyBench.id);
-      return;
-    }
+    if (emptyBench) return void addPlayerFromTransfer(storePlayer, emptyBench.id);
     setToast(`${positionName(storePlayer.position)} için uygun boş slot yok. Sürükle-bırak ile değişim yapabilirsin.`);
+  }
+
+  function autoComplete() {
+    const used = new Set(selectedIds);
+    const counts = new Map<string, number>();
+    selectedPlayers.forEach((player) => counts.set(player.club, (counts.get(player.club) ?? 0) + 1));
+    let runningSpend = spent;
+    let added = 0;
+
+    const pick = (predicate: (player: StorePlayer) => boolean) => players
+      .filter((player) => !used.has(player.id) && predicate(player) && (counts.get(player.club) ?? 0) < 3 && runningSpend + player.price <= BUDGET)
+      .sort((a, b) => a.price - b.price || b.points - a.points)[0];
+
+    startingSlots.filter((slot) => !slot.playerId).forEach((slot) => {
+      const candidate = pick((player) => player.position === slot.position);
+      if (!candidate) return;
+      if (addPlayerFromTransfer(candidate, slot.id)) {
+        used.add(candidate.id); counts.set(candidate.club, (counts.get(candidate.club) ?? 0) + 1); runningSpend += candidate.price; added += 1;
+      }
+    });
+
+    benchSlots.filter((slot) => !slot.playerId).forEach((slot) => {
+      const candidate = pick((player) => slot.kind === "GK" ? player.position === "GK" : player.position !== "GK");
+      if (!candidate) return;
+      if (addPlayerFromTransfer(candidate, slot.id)) {
+        used.add(candidate.id); counts.set(candidate.club, (counts.get(candidate.club) ?? 0) + 1); runningSpend += candidate.price; added += 1;
+      }
+    });
+
+    setToast(added ? `Kadro otomatik tamamlandı: ${added} oyuncu eklendi.` : "Uygun bütçe ve kulüp sınırlarıyla eklenebilecek boş oyuncu bulunamadı.");
   }
 
   function findPlayerByDragId(draggableId: string) {
@@ -170,8 +194,7 @@ export default function TeamBuilderPage() {
   function onDragEnd(result: DropResult) {
     setDraggingPlayer(null);
     const destination = result.destination;
-    if (!destination) return;
-    if (destination.droppableId === result.source.droppableId) return;
+    if (!destination || destination.droppableId === result.source.droppableId) return;
 
     const player = findPlayerByDragId(result.draggableId);
     if (!player) return;
@@ -180,11 +203,8 @@ export default function TeamBuilderPage() {
 
     if (sourceId === "transfer") {
       if (!canAddTransfer(player)) return;
-      const targetOccupied = startingSlots.find((slot) => slot.id === targetId)?.playerId || benchSlots.find((slot) => slot.id === targetId)?.playerId;
-      if (targetOccupied) {
-        setToast("Transfer listesinden oyuncu yalnızca boş bir slota bırakılabilir.");
-        return;
-      }
+      const occupied = startingSlots.find((slot) => slot.id === targetId)?.playerId || benchSlots.find((slot) => slot.id === targetId)?.playerId;
+      if (occupied) return void setToast("Transfer listesinden oyuncu yalnızca boş bir slota bırakılabilir.");
       addPlayerFromTransfer(player, targetId);
       return;
     }
@@ -194,51 +214,37 @@ export default function TeamBuilderPage() {
     const targetStarting = startingSlots.find((slot) => slot.id === targetId);
     const targetBench = benchSlots.find((slot) => slot.id === targetId);
 
-    if (sourceStarting && targetStarting) {
-      if (!sourceStarting.playerId || !targetStarting.playerId) {
-        setToast("Saha içi takas için iki dolu oyuncu slotu kullan.");
-        return;
-      }
+    const targetPlayerId = targetStarting?.playerId ?? targetBench?.playerId ?? null;
+    if (!targetPlayerId) {
+      movePlayerToEmptySlot(player.id, sourceId, targetId);
+      return;
+    }
+
+    if (sourceStarting && targetStarting && sourceStarting.playerId && targetStarting.playerId) {
       swapFieldPositions(sourceStarting.playerId, targetStarting.playerId);
       return;
     }
-
-    if (sourceStarting && targetBench) {
-      if (!sourceStarting.playerId || !targetBench.playerId) {
-        setToast("As kadro ile yedek arasında takas için iki dolu slot gerekli.");
-        return;
-      }
+    if (sourceStarting && targetBench && sourceStarting.playerId && targetBench.playerId) {
       swapStartingAndBench(sourceStarting.playerId, targetBench.playerId);
       return;
     }
-
-    if (sourceBench && targetStarting) {
-      if (!sourceBench.playerId || !targetStarting.playerId) {
-        setToast("Yedek ile as kadro arasında takas için iki dolu slot gerekli.");
-        return;
-      }
+    if (sourceBench && targetStarting && sourceBench.playerId && targetStarting.playerId) {
       swapStartingAndBench(targetStarting.playerId, sourceBench.playerId);
       return;
     }
-
+    if (sourceBench && targetBench && sourceBench.playerId && targetBench.playerId) {
+      swapBenchPlayers(sourceBench.playerId, targetBench.playerId);
+      return;
+    }
     setToast("Bu sürükle-bırak işlemi desteklenmiyor.");
   }
 
   function save() {
     const emptyStarting = startingSlots.filter((slot) => !slot.playerId).length;
     const emptyBench = benchSlots.filter((slot) => !slot.playerId).length;
-    if (hasInvalidPositions) {
-      setToast(`Kadro kaydedilemez: ${invalidStartingSlots.length} oyuncu kendi mevkisi dışında. Kırmızı kartları düzelt.`);
-      return;
-    }
-    if (emptyStarting || emptyBench) {
-      setToast(`Kadroyu tamamla: ${emptyStarting} ilk 11, ${emptyBench} yedek pozisyonu boş.`);
-      return;
-    }
-    if (!captain) {
-      setToast("Kadroyu kaydetmeden önce bir kaptan seçmelisin.");
-      return;
-    }
+    if (hasInvalidPositions) return void setToast(`Kadro kaydedilemez: ${invalidStartingSlots.length} oyuncu kendi mevkisi dışında. Kırmızı kartları düzelt.`);
+    if (emptyStarting || emptyBench) return void setToast(`Kadroyu tamamla: ${emptyStarting} ilk 11, ${emptyBench} yedek pozisyonu boş.`);
+    if (!captain) return void setToast("Kadroyu kaydetmeden önce bir kaptan seçmelisin.");
     setToast("Kadro bu cihazın tarayıcısına kaydedildi.");
   }
 
@@ -248,56 +254,24 @@ export default function TeamBuilderPage() {
     <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
       <div className="min-h-screen bg-[radial-gradient(circle_at_50%_-10%,rgba(0,230,160,.10),transparent_26%),linear-gradient(180deg,#041019,#02090f_74%)] pb-20 pt-2 text-white sm:pt-3">
         <section className="mx-auto mb-2 flex w-[calc(100%-24px)] max-w-[1540px] items-center justify-between gap-2 rounded-xl border border-white/8 bg-[#07151c]/88 px-2.5 py-2 backdrop-blur-xl sm:w-[calc(100%-40px)]">
-          <span className="hidden text-[8px] font-black tracking-[.14em] text-emerald-300 sm:block">KADROM / SAHA İÇİ</span>
-          <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[8px] font-bold text-white/45 sm:text-[9px]">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[8px] font-bold text-white/45 sm:text-[9px]">
             <span>Bütçe <b className="text-white">100 M₺</b></span>
             <span>Kalan <b className="text-emerald-300">{remaining.toFixed(1)} M₺</b></span>
             <span>İlk 11 <b className="text-white">{startingSlots.filter((slot) => slot.playerId).length}/11</b></span>
             <span>Kadro <b className="text-white">{selectedIds.length}/15</b></span>
             {hasInvalidPositions ? <span className="rounded-full bg-rose-500/15 px-2 py-0.5 font-black text-rose-300">{invalidStartingSlots.length} MEVKİ HATASI</span> : null}
           </div>
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+            <button type="button" onClick={autoComplete} className="rounded-lg border border-white/10 bg-white/[.055] px-3 py-2 text-[8px] font-black text-white/75 transition hover:bg-white/10">Kadroyu Otomatik Tamamla</button>
+            <button type="button" onClick={save} className={["rounded-lg border px-3 py-2 text-[8px] font-black transition", hasInvalidPositions ? "border-rose-300/25 bg-rose-500/15 text-rose-200 hover:bg-rose-500/20" : "border-emerald-200/20 bg-emerald-300 text-emerald-950 shadow-[0_0_18px_rgba(52,211,153,.16)] hover:bg-emerald-200"].join(" ")}>{hasInvalidPositions ? "Önce Mevkileri Düzelt" : "Kadroyu Kaydet"}</button>
+          </div>
         </section>
 
         <section className="mx-auto grid w-[calc(100%-24px)] max-w-[1540px] grid-cols-[minmax(0,1.45fr)_minmax(360px,.72fr)] items-start gap-3 max-[980px]:grid-cols-1 sm:w-[calc(100%-40px)]">
           <div className="min-w-0">
-            <FootballPitch
-              formationLabel={formation}
-              formations={FORMATIONS}
-              slots={pitchSlots}
-              benchSlots={pitchBenchSlots}
-              captainId={captain}
-              draggingPlayer={draggingPlayer}
-              onFormationChange={(value) => setFormation(value as Formation)}
-              onPlayerClick={setSelectedPlayer}
-              onBenchPlayerClick={setSelectedPlayer}
-            />
-
-            <div className={[
-              "mx-auto mt-2 grid max-w-[860px] grid-cols-[minmax(0,1fr)_auto] gap-2 rounded-xl border p-2 backdrop-blur-xl max-[560px]:grid-cols-1",
-              hasInvalidPositions ? "border-rose-400/25 bg-rose-950/20" : "border-white/8 bg-[#07151c]/90",
-            ].join(" ")}>
-              <div className={[
-                "rounded-lg px-3 py-2 text-[8.5px] font-bold",
-                hasInvalidPositions ? "bg-rose-500/10 text-rose-200" : "bg-black/15 text-white/48",
-              ].join(" ")}>
-                {toast ?? (hasInvalidPositions ? "Kırmızı oyuncular kendi mevkisi dışında. Kaydetmeden önce dizilişi düzelt." : "Kartları sürükleyerek saha, yedek ve transfer paneli arasında yönetebilirsin.")}
-              </div>
-              <button
-                type="button"
-                onClick={save}
-                aria-disabled={hasInvalidPositions}
-                className={[
-                  "rounded-lg border px-5 py-2 text-[9px] font-black transition",
-                  hasInvalidPositions
-                    ? "border-rose-300/25 bg-rose-500/15 text-rose-200 shadow-none hover:bg-rose-500/20"
-                    : "border-emerald-200/20 bg-emerald-300 text-emerald-950 shadow-[0_0_22px_rgba(52,211,153,.18)] hover:bg-emerald-200",
-                ].join(" ")}
-              >
-                {hasInvalidPositions ? "Önce Mevkileri Düzelt" : "Kadroyu Kaydet"}
-              </button>
-            </div>
+            <FootballPitch formationLabel={formation} formations={FORMATIONS} slots={pitchSlots} benchSlots={pitchBenchSlots} captainId={captain} draggingPlayer={draggingPlayer} onFormationChange={(value) => setFormation(value as Formation)} onPlayerClick={setSelectedPlayer} onBenchPlayerClick={setSelectedPlayer} />
+            <div className={["mx-auto mt-2 max-w-[860px] rounded-xl border px-3 py-2 text-[8.5px] font-bold backdrop-blur-xl", hasInvalidPositions ? "border-rose-400/25 bg-rose-950/20 text-rose-200" : "border-white/8 bg-[#07151c]/90 text-white/48"].join(" ")}>{toast ?? (hasInvalidPositions ? "Kırmızı oyuncuları düzeltmeden kadro kaydedilemez." : "Kartları sürükleyerek saha ve yedekler arasında yönetebilirsin.")}</div>
           </div>
-
           <TransferPanel players={fantasyPlayers} clubs={SUPER_LIG_CLUBS_2026_27} selectedIds={selectedIds} onQuickAdd={quickAdd} onPlayerClick={setSelectedPlayer} />
         </section>
 
@@ -308,7 +282,7 @@ export default function TeamBuilderPage() {
               <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">{[["Maç", String(selectedPlayer.matches ?? "—")], ["Puan", `${selectedPlayer.points} P`], ["Fiyat", `${selectedPlayer.price.toFixed(1)}M`], ["Seçilme", selectedPlayer.selected !== undefined ? `%${selectedPlayer.selected}` : "—"]].map(([label, value]) => <div key={label} className="rounded-xl border border-white/8 bg-white/[.035] p-2.5"><small className="block text-[7px] font-black text-white/30">{label}</small><strong className="mt-1 block text-[13px] font-black text-white">{value}</strong></div>)}</div>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <button type="button" onClick={() => { setCaptain(String(selectedPlayer.id)); setToast(`${selectedPlayer.name} kaptan seçildi · x2`); setSelectedPlayer(null); }} className="rounded-xl border border-[#ffe889]/30 bg-[#d39b19]/15 px-3 py-3 text-[9px] font-black text-[#ffe889]">Kaptan Yap</button>
-                <button type="button" onClick={() => { setToast(`${selectedPlayer.name} için değiştir modu: kartı uygun dolu slotun üzerine sürükle.`); setSelectedPlayer(null); }} className="rounded-xl border border-emerald-300/20 bg-emerald-300/10 px-3 py-3 text-[9px] font-black text-emerald-200">Oyuncuyu Değiştir</button>
+                <button type="button" onClick={() => { setToast(`${selectedPlayer.name} için değiştir modu: kartı uygun slota sürükle.`); setSelectedPlayer(null); }} className="rounded-xl border border-emerald-300/20 bg-emerald-300/10 px-3 py-3 text-[9px] font-black text-emerald-200">Oyuncuyu Değiştir</button>
                 <button type="button" onClick={() => { removePlayer(String(selectedPlayer.id)); if (captain === String(selectedPlayer.id)) setCaptain(null); setSelectedPlayer(null); }} className="col-span-2 rounded-xl border border-rose-300/20 bg-rose-400/10 px-3 py-3 text-[9px] font-black text-rose-200">Oyuncuyu Çıkar</button>
               </div>
             </div>
