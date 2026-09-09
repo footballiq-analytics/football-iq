@@ -49,7 +49,7 @@ const toFantasyPlayer = (player: StorePlayer): FantasyPlayer => player;
 const positionName = (position: PlayerPosition) => position === "FWD" ? "Forvet" : position === "MID" ? "Orta saha" : position === "DEF" ? "Defans" : "Kaleci";
 
 export default function TeamBuilderPage() {
-  const { formation, players: playerMap, startingSlots, benchSlots, toast, hydrateTeam, setFormation, setToast, swapStartingAndBench, swapFieldPositions, swapBenchPlayers, movePlayerToEmptySlot, addPlayerFromTransfer, removePlayer } = useTeamStore();
+  const { formation, players: playerMap, startingSlots, benchSlots, toast, hydrateTeam, setFormation, setToast, autoArrangeSquad, swapStartingAndBench, swapFieldPositions, swapBenchPlayers, movePlayerToEmptySlot, addPlayerFromTransfer, removePlayer } = useTeamStore();
   const [captain, setCaptain] = useState<string | null>("1");
   const [selectedCoachId, setSelectedCoachId] = useState<string>(DEFAULT_COACH_ID);
   const [draggingPlayer, setDraggingPlayer] = useState<FantasyPlayer | null>(null);
@@ -116,6 +116,10 @@ export default function TeamBuilderPage() {
   }
 
   function autoComplete() {
+    if (hasInvalidPositions) {
+      autoArrangeSquad(players, BUDGET);
+      return;
+    }
     const used = new Set(selectedIds);
     const counts = new Map<string, number>();
     selectedPlayers.forEach((player) => counts.set(player.club, (counts.get(player.club) ?? 0) + 1));
@@ -123,7 +127,7 @@ export default function TeamBuilderPage() {
     let added = 0;
     const pick = (position: PlayerPosition) => players.filter((player) => !used.has(player.id) && player.position === position && (counts.get(player.club) ?? 0) < 3 && runningSpend + player.price <= BUDGET).sort((a, b) => a.price - b.price || b.points - a.points)[0];
     [...startingSlots, ...benchSlots].filter((slot) => !slot.playerId).forEach((slot) => { const candidate = pick(slot.position); if (!candidate) return; if (addPlayerFromTransfer(candidate, slot.id)) { used.add(candidate.id); counts.set(candidate.club, (counts.get(candidate.club) ?? 0) + 1); runningSpend += candidate.price; added += 1; } });
-    setToast(added ? `Kadro otomatik tamamlandı: ${added} oyuncu eklendi.` : "Uygun oyuncu bulunamadı.");
+    setToast(added ? `Kadro otomatik tamamlandı: ${added} oyuncu eklendi.` : "Kadro zaten tamamlanmış durumda.");
   }
 
   function findPlayerByDragId(id: string) {
@@ -186,7 +190,7 @@ export default function TeamBuilderPage() {
         </section>
 
         <section className="relative z-10 mx-auto grid w-[calc(100%-24px)] max-w-[1540px] grid-cols-[minmax(0,1.55fr)_minmax(350px,.68fr)] items-start gap-3 max-[980px]:grid-cols-1 sm:w-[calc(100%-40px)]">
-          <div className="min-w-0"><FootballPitch formationLabel={formation} formations={FORMATIONS} slots={pitchSlots} benchSlots={pitchBenchSlots} coach={selectedCoach} captainId={captain} draggingPlayer={draggingPlayer} onFormationChange={(value) => setFormation(value as Formation)} onPlayerClick={setSelectedPlayer} onBenchPlayerClick={setSelectedPlayer} /><div className={["mx-auto mt-2 max-w-[920px] rounded-xl border px-3 py-2 text-[8.5px] font-bold backdrop-blur-xl", hasInvalidPositions ? "border-rose-400/25 bg-rose-950/30 text-rose-200" : "border-white/[.08] bg-[#07151c]/90 text-white/48"].join(" ")}>{toast ?? (hasInvalidPositions ? "Kırmızı oyuncuları düzeltmeden kadro kaydedilemez." : "Kartları sürükleyerek saha ve yedekler arasında yönetebilirsin.")}</div></div>
+          <div className="min-w-0"><FootballPitch formationLabel={formation} formations={FORMATIONS} slots={pitchSlots} benchSlots={pitchBenchSlots} coach={selectedCoach} captainId={captain} draggingPlayer={draggingPlayer} onFormationChange={(value) => setFormation(value as Formation)} onPlayerClick={setSelectedPlayer} onBenchPlayerClick={setSelectedPlayer} /><div className={["mx-auto mt-2 max-w-[920px] rounded-xl border px-3 py-2 text-[8.5px] font-bold backdrop-blur-xl", hasInvalidPositions ? "border-rose-400/25 bg-rose-950/30 text-rose-200" : "border-white/[.08] bg-[#07151c]/90 text-white/48"].join(" ")}>{toast ?? (hasInvalidPositions ? "Kırmızı oyuncular için Otomatik Tamamla'ya bas; kadro seçili dizilişe göre yeniden düzenlenir." : "Kartları sürükleyerek saha ve yedekler arasında yönetebilirsin.")}</div></div>
           <TransferPanel players={fantasyPlayers} coaches={SUPER_LIG_COACHES_2026_27} clubs={SUPER_LIG_CLUBS_2026_27} selectedIds={selectedIds} selectedCoachId={selectedCoachId} onQuickAdd={quickAdd} onSelectCoach={selectCoach} onPlayerClick={setSelectedPlayer} />
         </section>
 
