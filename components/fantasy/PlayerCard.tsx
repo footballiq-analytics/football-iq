@@ -36,6 +36,8 @@ const tierStyles: Record<CardTier, string> = {
   bronze: "border-[#c98957]/88 bg-[linear-gradient(155deg,rgba(145,86,44,.98),rgba(70,38,22,.99)_40%,rgba(16,18,22,.995)_78%)] shadow-[0_18px_38px_rgba(0,0,0,.55),0_0_22px_rgba(201,137,87,.2),inset_0_1px_0_rgba(255,220,191,.28)]",
 };
 
+const positionLabel: Record<PlayerPosition, string> = { GK: "KL", DEF: "DEF", MID: "ORT", FWD: "SNT" };
+
 export default function PlayerCard({ player, tier = "gold", captain = false, tripleCaptain = false, substitute = false, compact = false, isDragging = false, invalidPosition = false, onClick }: PlayerCardProps) {
   const badge = tripleCaptain ? "3x" : captain ? "C" : null;
 
@@ -68,7 +70,7 @@ export default function PlayerCard({ player, tier = "gold", captain = false, tri
       {badge ? <span className="absolute -right-2 -top-2 z-50 grid h-7 min-w-7 place-items-center rounded-full border border-[#fff2a0] bg-[radial-gradient(circle_at_35%_25%,#fff3a1,#d39b19_55%,#6e4506)] px-1 text-[10px] font-black text-[#201500] shadow-[0_0_22px_rgba(255,215,74,.76)]">{badge}</span> : null}
       {substitute ? <span className="absolute right-1.5 top-1.5 z-40 rounded-full border border-[#f3ca40]/30 bg-[#101521]/88 px-1.5 py-0.5 text-[6px] font-black tracking-[.09em] text-[#f7d85e]">YEDEK</span> : null}
 
-      <div className="absolute left-1.5 top-1.5 z-40 rounded-md border border-white/10 bg-[#0b1329]/84 px-1 py-0.5 text-[6.5px] font-black text-[#f7d85e] shadow-[0_3px_8px_rgba(0,0,0,.32)] backdrop-blur-md">{player.position}</div>
+      <div className="absolute left-1.5 top-1.5 z-40 rounded-md border border-white/10 bg-[#0b1329]/84 px-1 py-0.5 text-[6.5px] font-black text-[#f7d85e] shadow-[0_3px_8px_rgba(0,0,0,.32)] backdrop-blur-md">{positionLabel[player.position]}</div>
       <div className="absolute left-1.5 top-7 z-40 grid h-4 w-4 place-items-center rounded-full border border-white/12 bg-[#080d1a]/82 shadow-[0_3px_8px_rgba(0,0,0,.32)] backdrop-blur-md">
         {player.clubLogo ? <img src={player.clubLogo} alt="" className="h-3 w-3 object-contain" draggable={false} /> : <span className="h-2 w-2 rounded-full bg-[#f3ca40]/65" />}
       </div>
@@ -83,9 +85,9 @@ export default function PlayerCard({ player, tier = "gold", captain = false, tri
 
       <div className="relative z-30 -mt-1 min-w-0 text-center [transform:translateZ(18px)]">
         <div className="rounded-md border border-white/10 bg-[#080d1a]/90 px-1 py-0.5 shadow-[0_6px_14px_rgba(0,0,0,.32)] backdrop-blur-md"><strong className="block truncate text-[9px] font-black leading-tight tracking-[-.02em] text-white">{player.name}</strong></div>
-        <div className="mt-1 grid grid-cols-2 gap-1 text-[6.5px] font-black">
-          <span className="rounded border border-[#f3ca40]/12 bg-black/34 px-1 py-0.5 text-[#ffe676]">{player.price.toFixed(1)}M</span>
-          <span className="rounded border border-emerald-300/10 bg-black/34 px-1 py-0.5 text-[#00e676]">{player.points} P</span>
+        <div className="mt-1 grid grid-cols-2 gap-1 text-[7px] font-black leading-none">
+          <span className="rounded border border-[#f3ca40]/12 bg-black/34 px-1 py-[3px] text-[#ffe676]">{player.price.toFixed(1)}M</span>
+          <span className="rounded border border-emerald-300/10 bg-black/34 px-1 py-[3px] text-[#00e676]">{player.points} P</span>
         </div>
       </div>
     </motion.article>
