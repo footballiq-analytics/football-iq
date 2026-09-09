@@ -2,6 +2,7 @@
 
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { motion } from "framer-motion";
+import type { FantasyCoach } from "@/data/superlig-coaches-2026";
 import PlayerCard, { FantasyPlayer, PlayerPosition } from "./PlayerCard";
 
 export type PitchSlot = { id: string; index: number; position: PlayerPosition; player?: FantasyPlayer | null; invalidPosition?: boolean };
@@ -12,6 +13,7 @@ type Props = {
   formations: readonly string[];
   slots: PitchSlot[];
   benchSlots: BenchPitchSlot[];
+  coach?: FantasyCoach | null;
   captainId?: string | number | null;
   tripleCaptainId?: string | number | null;
   draggingPlayer?: FantasyPlayer | null;
@@ -26,7 +28,7 @@ const shortPosition: Record<PlayerPosition, string> = { GK: "GK", DEF: "DF", MID
 const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const asset = (name: string) => `${base}/game-ui/${name}`;
 
-export default function FootballPitch({ formationLabel, formations, slots, benchSlots, captainId, tripleCaptainId, draggingPlayer, onFormationChange, onPlayerClick, onBenchPlayerClick }: Props) {
+export default function FootballPitch({ formationLabel, formations, slots, benchSlots, coach, captainId, tripleCaptainId, draggingPlayer, onFormationChange, onPlayerClick, onBenchPlayerClick }: Props) {
   return (
     <section className="relative mx-auto w-full max-w-[920px] overflow-visible rounded-[30px] border border-cyan-300/15 bg-[linear-gradient(180deg,#0b1329,#080d1a)] p-2 shadow-[0_36px_110px_rgba(0,0,0,.70)] sm:p-2.5">
       <div className="pointer-events-none absolute -inset-x-3 -top-4 h-10 rounded-[50%] border-t border-cyan-200/35 bg-[linear-gradient(90deg,transparent,rgba(38,214,255,.2),rgba(243,202,64,.12),rgba(38,214,255,.2),transparent)] blur-[1px]" />
@@ -74,7 +76,7 @@ export default function FootballPitch({ formationLabel, formations, slots, bench
         <div className="relative mb-2 flex items-center justify-between gap-3"><span className="rounded-full border border-white/10 bg-[#0b1329]/75 px-3 py-1 text-[9px] font-black tracking-[.12em] text-white backdrop-blur-lg">YEDEK KULÜBESİ</span><span className="rounded-full border border-white/8 bg-black/25 px-2 py-1 text-[8px] font-black text-white/45">{benchSlots.filter((slot) => slot.player).length}/4</span></div>
 
         <div className="relative grid grid-cols-[74px_repeat(4,minmax(0,1fr))] items-end gap-1.5 max-[620px]:grid-cols-[58px_repeat(4,minmax(0,1fr))] sm:gap-3">
-          <CoachCard />
+          <CoachCard coach={coach} />
           {benchSlots.map((slot) => <BenchSlot key={slot.id} slot={slot} draggingPlayer={draggingPlayer} onPlayerClick={onBenchPlayerClick} />)}
         </div>
       </div>
@@ -116,12 +118,16 @@ function DraggablePlayer({ player, sourceSlotId, captain = false, tripleCaptain 
   );
 }
 
-function CoachCard() {
+function CoachCard({ coach }: { coach?: FantasyCoach | null }) {
   return (
-    <div className="relative mx-auto h-[94px] w-[68px] overflow-hidden rounded-[16px] border border-violet-300/45 bg-[linear-gradient(160deg,#27224d,#16142f_47%,#083c47)] shadow-[0_12px_26px_rgba(0,0,0,.44),0_0_18px_rgba(125,211,252,.12),inset_0_1px_0_rgba(255,255,255,.12)]">
-      <span className="absolute left-1.5 top-1.5 z-20 rounded-full border border-cyan-200/30 bg-[#0a1221]/80 px-1.5 py-0.5 text-[6px] font-black text-cyan-200">TD</span>
-      <div className="absolute left-1/2 top-[18px] h-[50px] w-[42px] -translate-x-1/2 rounded-t-[46%] bg-[radial-gradient(circle_at_50%_20%,#d0a17f_0_17%,#8f674f_18%_31%,#20334f_32%_66%,#11182d_67%)]" />
-      <div className="absolute inset-x-1.5 bottom-1.5 rounded-md bg-[#080d1a]/88 px-1 py-1 text-center"><b className="block text-[6.5px] font-black text-white">TEKNİK DİREKTÖR</b><small className="block text-[5.5px] font-bold text-cyan-200/70">YÖNETİM</small></div>
+    <div className="relative mx-auto h-[92px] w-[66px] overflow-hidden rounded-[15px] border border-violet-300/50 bg-[linear-gradient(160deg,#31285d,#17142f_48%,#074354)] shadow-[0_12px_26px_rgba(0,0,0,.44),0_0_18px_rgba(125,211,252,.14),inset_0_1px_0_rgba(255,255,255,.12)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-7 bg-[linear-gradient(180deg,rgba(255,255,255,.11),transparent)]" />
+      <span className="absolute left-1.5 top-1.5 z-20 rounded-full border border-cyan-200/35 bg-[#0a1221]/82 px-1.5 py-0.5 text-[6px] font-black text-cyan-200">TD</span>
+      <div className="absolute left-1/2 top-[16px] h-[47px] w-[39px] -translate-x-1/2 rounded-t-[46%] bg-[radial-gradient(circle_at_50%_20%,#d0a17f_0_17%,#8f674f_18%_31%,#20334f_32%_66%,#11182d_67%)]" />
+      <div className="absolute inset-x-1 bottom-1 rounded-md bg-[#080d1a]/90 px-1 py-1 text-center backdrop-blur-md">
+        <b className="block truncate text-[6.5px] font-black text-white">{coach?.name ?? "TEKNİK DİREKTÖR"}</b>
+        <small className="mt-0.5 block truncate text-[5.2px] font-bold text-cyan-200/70">{coach?.club ?? "YÖNETİM"}</small>
+      </div>
     </div>
   );
 }
