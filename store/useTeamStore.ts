@@ -16,17 +16,8 @@ export type Player = {
   clubLogo?: string;
 };
 
-export type StartingSlot = {
-  id: string;
-  position: PlayerPosition;
-  playerId: string | null;
-};
-
-export type BenchSlot = {
-  id: string;
-  kind: "GK" | "OUTFIELD";
-  playerId: string | null;
-};
+export type StartingSlot = { id: string; position: PlayerPosition; playerId: string | null };
+export type BenchSlot = { id: string; kind: "GK" | "OUTFIELD"; playerId: string | null };
 
 type TeamStore = {
   formation: Formation;
@@ -39,6 +30,8 @@ type TeamStore = {
   setToast: (message: string | null) => void;
   swapStartingAndBench: (startingPlayerId: string, benchPlayerId: string) => boolean;
   swapFieldPositions: (player1Id: string, player2Id: string) => boolean;
+  swapBenchPlayers: (player1Id: string, player2Id: string) => boolean;
+  movePlayerToEmptySlot: (playerId: string, sourceSlotId: string, targetSlotId: string) => boolean;
   addPlayerFromTransfer: (player: Player, targetSlotId: string) => boolean;
   removePlayer: (playerId: string) => void;
 };
@@ -54,34 +47,24 @@ export const FORMATION_POSITIONS: Record<Formation, PlayerPosition[]> = {
 const FORMATIONS = Object.keys(FORMATION_POSITIONS) as Formation[];
 
 function buildStartingSlots(formation: Formation, ids: (string | null)[]) {
-  return FORMATION_POSITIONS[formation].map((position, index) => ({
-    id: `start-${index}`,
-    position,
-    playerId: ids[index] ?? null,
-  }));
+  return FORMATION_POSITIONS[formation].map((position, index) => ({ id: `start-${index}`, position, playerId: ids[index] ?? null }));
 }
 
 function getCounts(ids: string[], players: Record<string, Player>) {
-  return ids.reduce(
-    (acc, id) => {
-      const position = players[id]?.position;
-      if (position) acc[position] += 1;
-      return acc;
-    },
-    { GK: 0, DEF: 0, MID: 0, FWD: 0 } as Record<PlayerPosition, number>,
-  );
+  return ids.reduce((acc, id) => {
+    const position = players[id]?.position;
+    if (position) acc[position] += 1;
+    return acc;
+  }, { GK: 0, DEF: 0, MID: 0, FWD: 0 } as Record<PlayerPosition, number>);
 }
 
 function inferFormation(ids: string[], players: Record<string, Player>) {
   const counts = getCounts(ids, players);
   return FORMATIONS.find((formation) => {
-    const required = FORMATION_POSITIONS[formation].reduce(
-      (acc, position) => {
-        acc[position] += 1;
-        return acc;
-      },
-      { GK: 0, DEF: 0, MID: 0, FWD: 0 } as Record<PlayerPosition, number>,
-    );
+    const required = FORMATION_POSITIONS[formation].reduce((acc, position) => {
+      acc[position] += 1;
+      return acc;
+    }, { GK: 0, DEF: 0, MID: 0, FWD: 0 } as Record<PlayerPosition, number>);
     return required.GK === counts.GK && required.DEF === counts.DEF && required.MID === counts.MID && required.FWD === counts.FWD;
   });
 }
@@ -96,6 +79,10 @@ function reflow(ids: string[], formation: Formation, players: Record<string, Pla
     if (index >= 0) result[index] = id;
   });
   return result;
+}
+
+function benchAccepts(slot: BenchSlot, player: Player) {
+  return slot.kind === "GK" ? player.position === "GK" : player.position !== "GK";
 }
 
 export const useTeamStore = create<TeamStore>((set, get) => ({
@@ -129,11 +116,7 @@ export const useTeamStore = create<TeamStore>((set, get) => ({
     const { startingSlots, players } = get();
     const ids = startingSlots.map((slot) => slot.playerId);
     const nextSlots = buildStartingSlots(formation, ids);
-    const invalidCount = nextSlots.filter((slot) => {
-      if (!slot.playerId) return false;
-      return players[slot.playerId]?.position !== slot.position;
-    }).length;
-
+    const invalidCount = nextSlots.filter((slot) => slot.playerId && players[slot.playerId]?.position !== slot.position).length;
     set({
       formation,
       startingSlots: nextSlots,
@@ -151,35 +134,22 @@ export const useTeamStore = create<TeamStore>((set, get) => ({
     const startIndex = startingSlots.findIndex((slot) => slot.playerId === startingPlayerId);
     const benchIndex = benchSlots.findIndex((slot) => slot.playerId === benchPlayerId);
     if (startIndex < 0 || benchIndex < 0) return false;
-
     const startingPlayer = players[startingPlayerId];
     const benchPlayer = players[benchPlayerId];
     if (!startingPlayer || !benchPlayer) return false;
-
-    if (startingPlayer.position === "GK" || benchPlayer.position === "GK") {
-      if (startingPlayer.position !== "GK" || benchPlayer.position !== "GK") {
-        set({ toast: "Kaleci yalnızca yedek kaleci ile değiştirilebilir." });
-        return false;
-      }
+    if ((startingPlayer.position === "GK") !== (benchPlayer.position === "GK")) {
+      set({ toast: "Kaleci yalnızca yedek kaleci ile değiştirilebilir." });
+      return false;
     }
-
-    const candidateIds = startingSlots
-      .map((slot) => (slot.playerId === startingPlayerId ? benchPlayerId : slot.playerId))
-      .filter((id): id is string => Boolean(id));
+    const candidateIds = startingSlots.map((slot) => slot.playerId === startingPlayerId ? benchPlayerId : slot.playerId).filter((id): id is string => Boolean(id));
     const nextFormation = inferFormation(candidateIds, players);
     if (!nextFormation) {
       set({ toast: "Bu değişiklik geçerli bir diziliş oluşturmuyor." });
       return false;
     }
-
     const rebuiltIds = reflow(candidateIds, nextFormation, players);
     const nextBench = benchSlots.map((slot, index) => index === benchIndex ? { ...slot, playerId: startingPlayerId } : slot);
-    set({
-      formation: nextFormation,
-      startingSlots: buildStartingSlots(nextFormation, rebuiltIds),
-      benchSlots: nextBench,
-      toast: `${startingPlayer.name} ile ${benchPlayer.name} yer değiştirdi. Diziliş: ${nextFormation}`,
-    });
+    set({ formation: nextFormation, startingSlots: buildStartingSlots(nextFormation, rebuiltIds), benchSlots: nextBench, toast: `${startingPlayer.name} ile ${benchPlayer.name} yer değiştirdi.` });
     return true;
   },
 
@@ -200,15 +170,68 @@ export const useTeamStore = create<TeamStore>((set, get) => ({
     return true;
   },
 
+  swapBenchPlayers: (player1Id, player2Id) => {
+    const { benchSlots, players } = get();
+    const firstIndex = benchSlots.findIndex((slot) => slot.playerId === player1Id);
+    const secondIndex = benchSlots.findIndex((slot) => slot.playerId === player2Id);
+    if (firstIndex < 0 || secondIndex < 0) return false;
+    const firstPlayer = players[player1Id];
+    const secondPlayer = players[player2Id];
+    if (!firstPlayer || !secondPlayer) return false;
+    if (!benchAccepts(benchSlots[firstIndex], secondPlayer) || !benchAccepts(benchSlots[secondIndex], firstPlayer)) {
+      set({ toast: "Bu iki yedek oyuncu slotları arasında değiştirilemez." });
+      return false;
+    }
+    const next = [...benchSlots];
+    next[firstIndex] = { ...next[firstIndex], playerId: player2Id };
+    next[secondIndex] = { ...next[secondIndex], playerId: player1Id };
+    set({ benchSlots: next, toast: "Yedek oyuncuların sırası değiştirildi." });
+    return true;
+  },
+
+  movePlayerToEmptySlot: (playerId, sourceSlotId, targetSlotId) => {
+    const { startingSlots, benchSlots, players } = get();
+    const player = players[playerId];
+    if (!player) return false;
+    const targetStartingIndex = startingSlots.findIndex((slot) => slot.id === targetSlotId);
+    const targetBenchIndex = benchSlots.findIndex((slot) => slot.id === targetSlotId);
+    if (targetStartingIndex >= 0) {
+      const target = startingSlots[targetStartingIndex];
+      if (target.playerId || target.position !== player.position) {
+        set({ toast: `${player.name} bu saha slotuna taşınamaz.` });
+        return false;
+      }
+    }
+    if (targetBenchIndex >= 0) {
+      const target = benchSlots[targetBenchIndex];
+      if (target.playerId || !benchAccepts(target, player)) {
+        set({ toast: `${player.name} bu yedek slotuna taşınamaz.` });
+        return false;
+      }
+    }
+    if (targetStartingIndex < 0 && targetBenchIndex < 0) return false;
+    const nextStarting = startingSlots.map((slot, index) => {
+      if (slot.id === sourceSlotId) return { ...slot, playerId: null };
+      if (index === targetStartingIndex) return { ...slot, playerId };
+      return slot;
+    });
+    const nextBench = benchSlots.map((slot, index) => {
+      if (slot.id === sourceSlotId) return { ...slot, playerId: null };
+      if (index === targetBenchIndex) return { ...slot, playerId };
+      return slot;
+    });
+    set({ startingSlots: nextStarting, benchSlots: nextBench, toast: `${player.name} yeni slota taşındı.` });
+    return true;
+  },
+
   addPlayerFromTransfer: (player, targetSlotId) => {
     const { startingSlots, benchSlots, players } = get();
     const nextPlayers = { ...players, [player.id]: player };
-
     if (targetSlotId.startsWith("start-")) {
       const slotIndex = startingSlots.findIndex((slot) => slot.id === targetSlotId);
       if (slotIndex < 0) return false;
       const slot = startingSlots[slotIndex];
-      if (slot.position !== player.position) {
+      if (slot.playerId || slot.position !== player.position) {
         set({ toast: `${player.name} bu mevki alanına bırakılamaz.` });
         return false;
       }
@@ -217,14 +240,12 @@ export const useTeamStore = create<TeamStore>((set, get) => ({
       set({ players: nextPlayers, startingSlots: next, toast: `${player.name} ilk 11'e eklendi.` });
       return true;
     }
-
     if (targetSlotId.startsWith("bench-")) {
       const slotIndex = benchSlots.findIndex((slot) => slot.id === targetSlotId);
       if (slotIndex < 0) return false;
       const slot = benchSlots[slotIndex];
-      const valid = slot.kind === "GK" ? player.position === "GK" : player.position !== "GK";
-      if (!valid) {
-        set({ toast: slot.kind === "GK" ? "Bu yedek slotu yalnızca kaleci kabul eder." : "Kaleci saha oyuncusu yedek slotuna bırakılamaz." });
+      if (slot.playerId || !benchAccepts(slot, player)) {
+        set({ toast: slot.kind === "GK" ? "Bu yedek slotu yalnızca kaleci kabul eder." : "Bu oyuncu bu yedek slotuna bırakılamaz." });
         return false;
       }
       const next = [...benchSlots];
@@ -232,7 +253,6 @@ export const useTeamStore = create<TeamStore>((set, get) => ({
       set({ players: nextPlayers, benchSlots: next, toast: `${player.name} yedek kulübesine eklendi.` });
       return true;
     }
-
     return false;
   },
 
