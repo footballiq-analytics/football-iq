@@ -5,7 +5,7 @@ import type { FantasyPlayer, PlayerPosition } from "./PlayerCard";
 
 export type TransferPanelProps = {
   players: FantasyPlayer[];
-  clubs: string[];
+  clubs: readonly string[];
   selectedIds: number[];
   onQuickAdd: (player: FantasyPlayer) => void;
   onDragStart: (event: React.DragEvent<HTMLDivElement>, player: FantasyPlayer) => void;
