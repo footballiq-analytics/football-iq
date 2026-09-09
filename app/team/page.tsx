@@ -5,8 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import FootballPitch, { type BenchPitchSlot, type PitchSlot } from "@/components/fantasy/FootballPitch";
 import TransferPanel from "@/components/fantasy/TransferPanel";
 import type { FantasyPlayer, PlayerPosition } from "@/components/fantasy/PlayerCard";
-import { SUPER_LIG_CLUBS_2026_27, SUPER_LIG_DATA_META } from "@/data/superlig-2026";
-import { FORMATION_POSITIONS, useTeamStore, type Formation, type Player as StorePlayer } from "@/store/useTeamStore";
+import { SUPER_LIG_CLUBS_2026_27 } from "@/data/superlig-2026";
+import { useTeamStore, type Formation, type Player as StorePlayer } from "@/store/useTeamStore";
 
 const BUDGET = 100;
 const STORAGE_KEY = "futbol-iq-fantasy-squad-v6";
@@ -43,7 +43,6 @@ const players: StorePlayer[] = [
 
 const initialLineup: (string | null)[] = ["1", "2", "3", "4", "6", "8", "9", "10", "18", "22", "21"];
 const initialBench: (string | null)[] = ["23", "24", "25", "26"];
-
 const toFantasyPlayer = (player: StorePlayer): FantasyPlayer => player;
 
 function positionName(position: PlayerPosition) {
@@ -99,12 +98,18 @@ export default function TeamBuilderPage() {
   const selectedPlayers = selectedIds.map((id) => playerMap[id]).filter(Boolean);
   const spent = selectedPlayers.reduce((total, player) => total + player.price, 0);
   const remaining = BUDGET - spent;
+  const invalidStartingSlots = startingSlots.filter((slot) => {
+    if (!slot.playerId) return false;
+    return playerMap[slot.playerId]?.position !== slot.position;
+  });
+  const hasInvalidPositions = invalidStartingSlots.length > 0;
 
   const pitchSlots: PitchSlot[] = useMemo(() => startingSlots.map((slot, index) => ({
     id: slot.id,
     index,
     position: slot.position,
     player: slot.playerId ? toFantasyPlayer(playerMap[slot.playerId]) : null,
+    invalidPosition: Boolean(slot.playerId && playerMap[slot.playerId]?.position !== slot.position),
   })), [playerMap, startingSlots]);
 
   const pitchBenchSlots: BenchPitchSlot[] = useMemo(() => benchSlots.map((slot) => ({
@@ -222,6 +227,10 @@ export default function TeamBuilderPage() {
   function save() {
     const emptyStarting = startingSlots.filter((slot) => !slot.playerId).length;
     const emptyBench = benchSlots.filter((slot) => !slot.playerId).length;
+    if (hasInvalidPositions) {
+      setToast(`Kadro kaydedilemez: ${invalidStartingSlots.length} oyuncu kendi mevkisi dışında. Kırmızı kartları düzelt.`);
+      return;
+    }
     if (emptyStarting || emptyBench) {
       setToast(`Kadroyu tamamla: ${emptyStarting} ilk 11, ${emptyBench} yedek pozisyonu boş.`);
       return;
@@ -237,21 +246,19 @@ export default function TeamBuilderPage() {
 
   return (
     <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-      <div className="min-h-screen bg-[radial-gradient(circle_at_50%_-10%,rgba(0,230,160,.10),transparent_26%),linear-gradient(180deg,#041019,#02090f_74%)] pb-24 text-white">
-        <section className="mx-auto grid w-full max-w-[1540px] gap-4 px-3 pb-4 pt-5 sm:px-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-          <div>
-            <span className="text-[9px] font-black tracking-[.18em] text-emerald-300">KADROM / SAHA İÇİ</span>
-            <h1 className="mt-1 text-[clamp(30px,4vw,46px)] font-black tracking-[-.055em] text-white">Takımını Kur</h1>
-            <p className="mt-1 max-w-[720px] text-[11px] text-white/45">Sahayı solda yönet, oyuncuları sağdan sürükle. Diziliş seçimi artık doğrudan sahanın sol üst köşesinde.</p>
-          </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {[["Toplam bütçe", "100 M₺"], ["Kalan bütçe", `${remaining.toFixed(1)} M₺`], ["İlk 11", `${startingSlots.filter((slot) => slot.playerId).length}/11`], ["Toplam", `${selectedIds.length}/15`]].map(([label, value]) => (
-              <div key={label} className="min-w-[112px] rounded-2xl border border-white/8 bg-white/[.035] px-3 py-2.5 backdrop-blur-xl"><small className="block text-[7px] font-black uppercase tracking-[.08em] text-white/30">{label}</small><strong className="mt-0.5 block text-[15px] font-black text-white">{value}</strong></div>
-            ))}
+      <div className="min-h-screen bg-[radial-gradient(circle_at_50%_-10%,rgba(0,230,160,.10),transparent_26%),linear-gradient(180deg,#041019,#02090f_74%)] pb-20 pt-2 text-white sm:pt-3">
+        <section className="mx-auto mb-2 flex w-[calc(100%-24px)] max-w-[1540px] items-center justify-between gap-2 rounded-xl border border-white/8 bg-[#07151c]/88 px-2.5 py-2 backdrop-blur-xl sm:w-[calc(100%-40px)]">
+          <span className="hidden text-[8px] font-black tracking-[.14em] text-emerald-300 sm:block">KADROM / SAHA İÇİ</span>
+          <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[8px] font-bold text-white/45 sm:text-[9px]">
+            <span>Bütçe <b className="text-white">100 M₺</b></span>
+            <span>Kalan <b className="text-emerald-300">{remaining.toFixed(1)} M₺</b></span>
+            <span>İlk 11 <b className="text-white">{startingSlots.filter((slot) => slot.playerId).length}/11</b></span>
+            <span>Kadro <b className="text-white">{selectedIds.length}/15</b></span>
+            {hasInvalidPositions ? <span className="rounded-full bg-rose-500/15 px-2 py-0.5 font-black text-rose-300">{invalidStartingSlots.length} MEVKİ HATASI</span> : null}
           </div>
         </section>
 
-        <section className="mx-auto grid w-[calc(100%-24px)] max-w-[1540px] grid-cols-[minmax(0,1.45fr)_minmax(360px,.72fr)] items-start gap-4 max-[980px]:grid-cols-1 sm:w-[calc(100%-40px)]">
+        <section className="mx-auto grid w-[calc(100%-24px)] max-w-[1540px] grid-cols-[minmax(0,1.45fr)_minmax(360px,.72fr)] items-start gap-3 max-[980px]:grid-cols-1 sm:w-[calc(100%-40px)]">
           <div className="min-w-0">
             <FootballPitch
               formationLabel={formation}
@@ -265,16 +272,34 @@ export default function TeamBuilderPage() {
               onBenchPlayerClick={setSelectedPlayer}
             />
 
-            <div className="mx-auto mt-3 grid max-w-[860px] grid-cols-[minmax(0,1fr)_auto] gap-2 rounded-2xl border border-white/8 bg-[#07151c]/90 p-2.5 backdrop-blur-xl max-[560px]:grid-cols-1">
-              <div className="rounded-xl bg-black/15 px-3 py-2 text-[9px] font-bold text-white/48">{toast ?? "Kartları sürükleyerek saha, yedek ve transfer paneli arasında yönetebilirsin."}</div>
-              <button type="button" onClick={save} className="rounded-xl border border-emerald-200/20 bg-emerald-300 px-5 py-2.5 text-[10px] font-black text-emerald-950 shadow-[0_0_22px_rgba(52,211,153,.18)] transition hover:bg-emerald-200">Kadroyu Kaydet</button>
+            <div className={[
+              "mx-auto mt-2 grid max-w-[860px] grid-cols-[minmax(0,1fr)_auto] gap-2 rounded-xl border p-2 backdrop-blur-xl max-[560px]:grid-cols-1",
+              hasInvalidPositions ? "border-rose-400/25 bg-rose-950/20" : "border-white/8 bg-[#07151c]/90",
+            ].join(" ")}>
+              <div className={[
+                "rounded-lg px-3 py-2 text-[8.5px] font-bold",
+                hasInvalidPositions ? "bg-rose-500/10 text-rose-200" : "bg-black/15 text-white/48",
+              ].join(" ")}>
+                {toast ?? (hasInvalidPositions ? "Kırmızı oyuncular kendi mevkisi dışında. Kaydetmeden önce dizilişi düzelt." : "Kartları sürükleyerek saha, yedek ve transfer paneli arasında yönetebilirsin.")}
+              </div>
+              <button
+                type="button"
+                onClick={save}
+                aria-disabled={hasInvalidPositions}
+                className={[
+                  "rounded-lg border px-5 py-2 text-[9px] font-black transition",
+                  hasInvalidPositions
+                    ? "border-rose-300/25 bg-rose-500/15 text-rose-200 shadow-none hover:bg-rose-500/20"
+                    : "border-emerald-200/20 bg-emerald-300 text-emerald-950 shadow-[0_0_22px_rgba(52,211,153,.18)] hover:bg-emerald-200",
+                ].join(" ")}
+              >
+                {hasInvalidPositions ? "Önce Mevkileri Düzelt" : "Kadroyu Kaydet"}
+              </button>
             </div>
           </div>
 
           <TransferPanel players={fantasyPlayers} clubs={SUPER_LIG_CLUBS_2026_27} selectedIds={selectedIds} onQuickAdd={quickAdd} onPlayerClick={setSelectedPlayer} />
         </section>
-
-        <div className="mx-auto mt-3 w-[calc(100%-24px)] max-w-[1540px] text-right text-[8px] font-bold text-white/20 sm:w-[calc(100%-40px)]">{SUPER_LIG_DATA_META.season} · {SUPER_LIG_DATA_META.clubCount} kulüp · Diziliş: {formation}</div>
 
         {selectedPlayer ? (
           <div className="fixed inset-0 z-[100] grid place-items-center bg-black/70 p-4 backdrop-blur-sm" onClick={() => setSelectedPlayer(null)}>
