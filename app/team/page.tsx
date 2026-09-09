@@ -2,207 +2,35 @@
 
 import { DndContext, DragOverlay, PointerSensor, TouchSensor, pointerWithin, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
 import { useEffect, useMemo, useState } from "react";
-import FootballPitch, { type BenchPitchSlot, type PitchSlot } from "@/components/fantasy/FootballPitch";
+import FootballPitch,{type BenchPitchSlot,type PitchSlot}from"@/components/fantasy/FootballPitch";
 import TransferPanel from "@/components/fantasy/TransferPanel";
-import PlayerCard, { type FantasyPlayer, type PlayerPosition } from "@/components/fantasy/PlayerCard";
-import { SUPER_LIG_CLUBS_2026_27 } from "@/data/superlig-2026";
-import { SUPER_LIG_COACHES_2026_27, type FantasyCoach } from "@/data/superlig-coaches-2026";
-import { useTeamStore, type Formation, type Player as StorePlayer } from "@/store/useTeamStore";
-
-const BUDGET = 100;
-const STORAGE_KEY = "futbol-iq-fantasy-squad-v7";
-const FORMATIONS: Formation[] = ["4-3-3", "4-4-2", "3-4-3", "3-5-2", "5-3-2"];
-const DEFAULT_COACH_ID = "coach-galatasaray";
-
-const players: StorePlayer[] = [
-  { id: "1", name: "Victor Osimhen", club: "Galatasaray", position: "FWD", price: 11.5, points: 78, matches: 5, selected: 64 },
-  { id: "2", name: "Vlahović", club: "Beşiktaş", position: "FWD", price: 11, points: 71, matches: 5, selected: 52 },
-  { id: "3", name: "En-Nesyri", club: "Fenerbahçe", position: "FWD", price: 9.2, points: 67, matches: 5, selected: 47 },
-  { id: "4", name: "Rafa Silva", club: "Beşiktaş", position: "MID", price: 8.6, points: 63, matches: 5, selected: 43 },
-  { id: "5", name: "Talisca", club: "Fenerbahçe", position: "MID", price: 9, points: 61, matches: 5, selected: 41 },
-  { id: "6", name: "Torreira", club: "Galatasaray", position: "MID", price: 7.4, points: 58, matches: 5, selected: 38 },
-  { id: "7", name: "Gedson", club: "Beşiktaş", position: "MID", price: 7.2, points: 56, matches: 5, selected: 36 },
-  { id: "8", name: "Fred", club: "Fenerbahçe", position: "MID", price: 7.8, points: 55, matches: 5, selected: 35 },
-  { id: "9", name: "Davinson Sánchez", club: "Galatasaray", position: "DEF", price: 7.1, points: 52, matches: 5, selected: 34 },
-  { id: "10", name: "Svensson", club: "Beşiktaş", position: "DEF", price: 5.9, points: 49, matches: 5, selected: 29 },
-  { id: "11", name: "Mert Müldür", club: "Fenerbahçe", position: "DEF", price: 5.2, points: 46, matches: 5, selected: 26 },
-  { id: "12", name: "Abdülkerim Bardakcı", club: "Galatasaray", position: "DEF", price: 6.5, points: 50, matches: 5, selected: 31 },
-  { id: "13", name: "Uğurcan Çakır", club: "Galatasaray", position: "GK", price: 6.3, points: 48, matches: 5, selected: 33 },
-  { id: "14", name: "Mert Günok", club: "Beşiktaş", position: "GK", price: 5.8, points: 45, matches: 5, selected: 28 },
-  { id: "15", name: "İrfan Can", club: "Fenerbahçe", position: "GK", price: 5.2, points: 42, matches: 5, selected: 22 },
-  { id: "16", name: "Semih", club: "Beşiktaş", position: "FWD", price: 6, points: 44, matches: 5, selected: 24 },
-  { id: "17", name: "Muçi", club: "Beşiktaş", position: "MID", price: 6.2, points: 43, matches: 5, selected: 23 },
-  { id: "18", name: "Eren", club: "Trabzonspor", position: "DEF", price: 4.8, points: 41, matches: 5, selected: 19 },
-  { id: "19", name: "Okay", club: "Trabzonspor", position: "MID", price: 5.4, points: 39, matches: 5, selected: 18 },
-  { id: "20", name: "Onuachu", club: "Trabzonspor", position: "FWD", price: 8.1, points: 54, matches: 5, selected: 27 },
-  { id: "21", name: "Muhammet", club: "Trabzonspor", position: "GK", price: 5, points: 36, matches: 5, selected: 14 },
-  { id: "22", name: "Ali", club: "Konyaspor", position: "DEF", price: 4.2, points: 34, matches: 5, selected: 12 },
-  { id: "23", name: "Burak", club: "Göztepe", position: "GK", price: 4, points: 33, matches: 5, selected: 11 },
-  { id: "24", name: "Yusuf", club: "Samsunspor", position: "DEF", price: 4.1, points: 35, matches: 5, selected: 13 },
-  { id: "25", name: "Kerem", club: "İstanbul Başakşehir FK", position: "MID", price: 4.3, points: 37, matches: 5, selected: 15 },
-  { id: "26", name: "Deniz", club: "Kasımpaşa", position: "FWD", price: 4.5, points: 38, matches: 5, selected: 16 },
-];
-
-const initialLineup: (string | null)[] = ["1", "2", "3", "4", "6", "8", "9", "10", "18", "22", "21"];
-const initialBench: (string | null)[] = ["23", "24", "25", "26"];
-const toFantasyPlayer = (player: StorePlayer): FantasyPlayer => player;
-const positionName = (position: PlayerPosition) => position === "FWD" ? "Forvet" : position === "MID" ? "Orta saha" : position === "DEF" ? "Defans" : "Kaleci";
-
-export default function TeamBuilderPage() {
-  const { formation, players: playerMap, startingSlots, benchSlots, toast, hydrateTeam, setFormation, setToast, autoArrangeSquad, swapStartingAndBench, swapFieldPositions, swapBenchPlayers, movePlayerToEmptySlot, addPlayerFromTransfer, removePlayer } = useTeamStore();
-  const [captain, setCaptain] = useState<string | null>("1");
-  const [selectedCoachId, setSelectedCoachId] = useState<string>(DEFAULT_COACH_ID);
-  const [draggingPlayer, setDraggingPlayer] = useState<FantasyPlayer | null>(null);
-  const [selectedPlayer, setSelectedPlayer] = useState<FantasyPlayer | null>(null);
-  const [hydrated, setHydrated] = useState(false);
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 10 } }),
-  );
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const saved = JSON.parse(raw) as { formation?: Formation; startingIds?: (string | null)[]; benchIds?: (string | null)[]; captain?: string | null; coachId?: string };
-        hydrateTeam(players, saved.formation ?? "4-3-3", saved.startingIds ?? initialLineup, saved.benchIds ?? initialBench);
-        setCaptain(saved.captain ?? "1");
-        if (saved.coachId && SUPER_LIG_COACHES_2026_27.some((coach) => coach.id === saved.coachId)) setSelectedCoachId(saved.coachId);
-      } else hydrateTeam(players, "4-3-3", initialLineup, initialBench);
-    } finally { setHydrated(true); }
-  }, [hydrateTeam]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ formation, startingIds: startingSlots.map((slot) => slot.playerId), benchIds: benchSlots.map((slot) => slot.playerId), captain, coachId: selectedCoachId }));
-  }, [benchSlots, captain, formation, hydrated, selectedCoachId, startingSlots]);
-
-  const selectedCoach = SUPER_LIG_COACHES_2026_27.find((coach) => coach.id === selectedCoachId) ?? SUPER_LIG_COACHES_2026_27[0] ?? null;
-  const selectedIds = [...startingSlots, ...benchSlots].map((slot) => slot.playerId).filter((id): id is string => Boolean(id));
-  const selectedPlayers = selectedIds.map((id) => playerMap[id]).filter(Boolean);
-  const spent = selectedPlayers.reduce((total, player) => total + player.price, 0);
-  const remaining = BUDGET - spent;
-  const invalidStartingSlots = startingSlots.filter((slot) => slot.playerId && playerMap[slot.playerId]?.position !== slot.position);
-  const hasInvalidPositions = invalidStartingSlots.length > 0;
-  const startersComplete = startingSlots.filter((slot) => slot.playerId).length === 11;
-  const squadComplete = selectedIds.length === 15;
-
-  const pitchSlots: PitchSlot[] = useMemo(() => startingSlots.map((slot, index) => ({ id: slot.id, index, position: slot.position, player: slot.playerId ? toFantasyPlayer(playerMap[slot.playerId]) : null, invalidPosition: Boolean(slot.playerId && playerMap[slot.playerId]?.position !== slot.position) })), [playerMap, startingSlots]);
-  const pitchBenchSlots: BenchPitchSlot[] = useMemo(() => benchSlots.map((slot) => ({ id: slot.id, position: slot.position, player: slot.playerId ? toFantasyPlayer(playerMap[slot.playerId]) : null })), [benchSlots, playerMap]);
-
-  function clubCount(club: string) { return selectedPlayers.filter((player) => player.club === club).length; }
-  function canAddTransfer(player: StorePlayer) {
-    if (selectedIds.includes(player.id)) return false;
-    if (clubCount(player.club) >= 3) { setToast(`${player.club} için 3 oyuncu sınırına ulaştın.`); return false; }
-    if (remaining < player.price) { setToast("Bu oyuncu için kalan bütçe yeterli değil."); return false; }
-    return true;
-  }
-
-  function quickAdd(player: FantasyPlayer) {
-    const id = String(player.id);
-    if (selectedIds.includes(id)) { removePlayer(id); if (captain === id) setCaptain(null); return; }
-    const storePlayer = playerMap[id] ?? players.find((item) => item.id === id);
-    if (!storePlayer || !canAddTransfer(storePlayer)) return;
-    const emptyStarting = startingSlots.find((slot) => slot.position === storePlayer.position && !slot.playerId);
-    if (emptyStarting) return void addPlayerFromTransfer(storePlayer, emptyStarting.id);
-    const emptyBench = benchSlots.find((slot) => !slot.playerId && slot.position === storePlayer.position);
-    if (emptyBench) return void addPlayerFromTransfer(storePlayer, emptyBench.id);
-    setToast(`${positionName(storePlayer.position)} için uygun boş slot yok.`);
-  }
-
-  function selectCoach(coach: FantasyCoach) {
-    setSelectedCoachId(coach.id);
-    setToast(`${coach.name} teknik direktör olarak seçildi. Bu seçim 15 kişilik futbolcu kadrosuna ve bütçeye dahil değildir.`);
-  }
-
-  function autoComplete() {
-    if (hasInvalidPositions) {
-      autoArrangeSquad(players, BUDGET);
-      return;
-    }
-    const used = new Set(selectedIds);
-    const counts = new Map<string, number>();
-    selectedPlayers.forEach((player) => counts.set(player.club, (counts.get(player.club) ?? 0) + 1));
-    let runningSpend = spent;
-    let added = 0;
-    const pick = (position: PlayerPosition) => players.filter((player) => !used.has(player.id) && player.position === position && (counts.get(player.club) ?? 0) < 3 && runningSpend + player.price <= BUDGET).sort((a, b) => a.price - b.price || b.points - a.points)[0];
-    [...startingSlots, ...benchSlots].filter((slot) => !slot.playerId).forEach((slot) => { const candidate = pick(slot.position); if (!candidate) return; if (addPlayerFromTransfer(candidate, slot.id)) { used.add(candidate.id); counts.set(candidate.club, (counts.get(candidate.club) ?? 0) + 1); runningSpend += candidate.price; added += 1; } });
-    setToast(added ? `Kadro otomatik tamamlandı: ${added} oyuncu eklendi.` : "Kadro zaten tamamlanmış durumda.");
-  }
-
-  function findPlayerByDragId(id: string) {
-    const clean = id.replace(/^transfer:/, "").replace(/^player:/, "");
-    return playerMap[clean] ?? players.find((player) => player.id === clean) ?? null;
-  }
-
-  function onDragStart(event: DragStartEvent) {
-    const player = findPlayerByDragId(String(event.active.id));
-    setDraggingPlayer(player ? toFantasyPlayer(player) : null);
-  }
-
-  function onDragEnd(event: DragEndEvent) {
-    const player = findPlayerByDragId(String(event.active.id));
-    const sourceId = String(event.active.data.current?.sourceSlotId ?? "");
-    const targetId = event.over ? String(event.over.id) : "";
-    setDraggingPlayer(null);
-    if (!player || !targetId || sourceId === targetId) return;
-
-    if (sourceId === "transfer") {
-      if (!canAddTransfer(player)) return;
-      const occupied = startingSlots.find((slot) => slot.id === targetId)?.playerId ?? benchSlots.find((slot) => slot.id === targetId)?.playerId;
-      if (occupied) { setToast("Transfer listesinden oyuncu yalnızca boş bir slota bırakılabilir."); return; }
-      addPlayerFromTransfer(player, targetId); return;
-    }
-
-    const sourceStarting = startingSlots.find((slot) => slot.id === sourceId);
-    const sourceBench = benchSlots.find((slot) => slot.id === sourceId);
-    const targetStarting = startingSlots.find((slot) => slot.id === targetId);
-    const targetBench = benchSlots.find((slot) => slot.id === targetId);
-    const targetPlayerId = targetStarting?.playerId ?? targetBench?.playerId ?? null;
-
-    if (!targetPlayerId) { movePlayerToEmptySlot(player.id, sourceId, targetId); return; }
-    if (sourceStarting && targetStarting && sourceStarting.playerId && targetStarting.playerId) { swapFieldPositions(sourceStarting.playerId, targetStarting.playerId); return; }
-    if (sourceStarting && targetBench && sourceStarting.playerId && targetBench.playerId) { swapStartingAndBench(sourceStarting.playerId, targetBench.playerId); return; }
-    if (sourceBench && targetStarting && sourceBench.playerId && targetStarting.playerId) { swapStartingAndBench(targetStarting.playerId, sourceBench.playerId); return; }
-    if (sourceBench && targetBench && sourceBench.playerId && targetBench.playerId) { swapBenchPlayers(sourceBench.playerId, targetBench.playerId); return; }
-    setToast("Bu sürükle-bırak işlemi desteklenmiyor.");
-  }
-
-  function save() {
-    const emptyStarting = startingSlots.filter((slot) => !slot.playerId).length;
-    const emptyBench = benchSlots.filter((slot) => !slot.playerId).length;
-    if (hasInvalidPositions) return void setToast(`Kadro kaydedilemez: ${invalidStartingSlots.length} oyuncu kendi mevkisi dışında.`);
-    if (emptyStarting || emptyBench) return void setToast(`Kadroyu tamamla: ${emptyStarting} ilk 11, ${emptyBench} yedek pozisyonu boş.`);
-    if (!captain) return void setToast("Kadroyu kaydetmeden önce bir kaptan seçmelisin.");
-    setToast(`Kadro ve ${selectedCoach?.name ?? "teknik direktör"} seçimi bu cihazın tarayıcısına kaydedildi.`);
-  }
-
-  const fantasyPlayers = players.map(toFantasyPlayer);
-
-  return (
-    <DndContext sensors={sensors} collisionDetection={pointerWithin} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setDraggingPlayer(null)}>
-      <div className="relative min-h-screen overflow-x-hidden bg-[#080d1a] pb-20 pt-2 text-white sm:pt-3">
-        <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_8%_10%,rgba(74,168,255,.13),transparent_24%),radial-gradient(circle_at_78%_4%,rgba(255,224,120,.10),transparent_19%),radial-gradient(circle_at_50%_35%,rgba(0,230,118,.06),transparent_33%),linear-gradient(180deg,#0b1329_0%,#080d1a_48%,#040812_100%)]" />
-
-        <section className="relative z-10 mx-auto mb-2 grid w-[calc(100%-24px)] max-w-[1540px] grid-cols-[minmax(0,1fr)_auto] items-stretch overflow-hidden rounded-[18px] border border-cyan-300/20 bg-[linear-gradient(180deg,rgba(9,24,39,.96),rgba(4,13,23,.98))] backdrop-blur-2xl max-[760px]:grid-cols-1 sm:w-[calc(100%-40px)]">
-          <div className="grid min-w-0 grid-cols-4 max-[560px]:grid-cols-2"><HudCell label="BÜTÇE" value="100.0M ₺" tone="gold" icon="◉" /><HudCell label="KALAN" value={`${remaining.toFixed(1)}M ₺`} tone="green" icon="◉" /><HudCell label="İLK 11" value={`${startingSlots.filter((slot) => slot.playerId).length}/11`} complete={startersComplete && !hasInvalidPositions} icon="♟" /><HudCell label="KADRO" value={`${selectedIds.length}/15`} complete={squadComplete && !hasInvalidPositions} icon="♟" /></div>
-          <div className="flex items-center gap-2 border-l border-white/[.07] p-2 max-[760px]:border-l-0 max-[760px]:border-t max-[560px]:grid max-[560px]:grid-cols-2"><button type="button" onClick={autoComplete} className="h-12 min-w-[210px] rounded-xl border border-cyan-300/75 bg-cyan-400/10 px-5 text-[9px] font-black text-white max-[560px]:min-w-0">⚡ KADROYU OTOMATİK TAMAMLA</button><button type="button" onClick={save} className={["h-12 min-w-[190px] rounded-xl border px-5 text-[9px] font-black max-[560px]:min-w-0", hasInvalidPositions ? "border-rose-300/35 bg-rose-900/50 text-rose-100" : "border-[#ffe778] bg-[linear-gradient(180deg,#ffe56c,#d9a51f)] text-[#211600]"].join(" ")}>{hasInvalidPositions ? "⚠ MEVKİLERİ DÜZELT" : "▣ KADROYU KAYDET"}</button></div>
-        </section>
-
-        <section className="relative z-10 mx-auto grid w-[calc(100%-24px)] max-w-[1540px] grid-cols-[minmax(0,1.55fr)_minmax(350px,.68fr)] items-start gap-3 max-[980px]:grid-cols-1 sm:w-[calc(100%-40px)]">
-          <div className="min-w-0"><FootballPitch formationLabel={formation} formations={FORMATIONS} slots={pitchSlots} benchSlots={pitchBenchSlots} coach={selectedCoach} captainId={captain} draggingPlayer={draggingPlayer} onFormationChange={(value) => setFormation(value as Formation)} onPlayerClick={setSelectedPlayer} onBenchPlayerClick={setSelectedPlayer} /><div className={["mx-auto mt-2 max-w-[920px] rounded-xl border px-3 py-2 text-[8.5px] font-bold backdrop-blur-xl", hasInvalidPositions ? "border-rose-400/25 bg-rose-950/30 text-rose-200" : "border-white/[.08] bg-[#07151c]/90 text-white/48"].join(" ")}>{toast ?? (hasInvalidPositions ? "Kırmızı oyuncular için Otomatik Tamamla'ya bas; kadro seçili dizilişe göre yeniden düzenlenir." : "Kartları sürükleyerek saha ve yedekler arasında yönetebilirsin.")}</div></div>
-          <TransferPanel players={fantasyPlayers} coaches={SUPER_LIG_COACHES_2026_27} clubs={SUPER_LIG_CLUBS_2026_27} selectedIds={selectedIds} selectedCoachId={selectedCoachId} onQuickAdd={quickAdd} onSelectCoach={selectCoach} onPlayerClick={setSelectedPlayer} />
-        </section>
-
-        {selectedPlayer ? <div className="fixed inset-0 z-[100] grid place-items-center bg-black/70 p-4 backdrop-blur-sm" onClick={() => setSelectedPlayer(null)}><div className="w-full max-w-[430px] rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,#0a2028,#061219)] p-4" onClick={(event) => event.stopPropagation()}><div className="flex items-start justify-between gap-3"><div><span className="text-[8px] font-black tracking-[.12em] text-[#f3ca40]">OYUNCU BİLGİLERİ</span><h2 className="mt-1 text-2xl font-black text-white">{selectedPlayer.name}</h2><p className="mt-1 text-[10px] font-bold text-white/45">{selectedPlayer.club} · {positionName(selectedPlayer.position)}</p></div><button type="button" onClick={() => setSelectedPlayer(null)} className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5 text-lg text-white/60">×</button></div><div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">{[["Maç", String(selectedPlayer.matches ?? "—")], ["Puan", `${selectedPlayer.points} P`], ["Fiyat", `${selectedPlayer.price.toFixed(1)}M`], ["Seçilme", selectedPlayer.selected !== undefined ? `%${selectedPlayer.selected}` : "—"]].map(([label, value]) => <div key={label} className="rounded-xl border border-white/[.08] bg-white/[.035] p-2.5"><small className="block text-[7px] font-black text-white/30">{label}</small><strong className="mt-1 block text-[13px] font-black text-white">{value}</strong></div>)}</div><div className="mt-4 grid grid-cols-2 gap-2"><button type="button" onClick={() => { setCaptain(String(selectedPlayer.id)); setToast(`${selectedPlayer.name} kaptan seçildi · x2`); setSelectedPlayer(null); }} className="rounded-xl border border-[#ffe889]/30 bg-[#d39b19]/15 px-3 py-3 text-[9px] font-black text-[#ffe889]">Kaptan Yap</button><button type="button" onClick={() => { setToast(`${selectedPlayer.name} için değiştir modu: kartı uygun slota sürükle.`); setSelectedPlayer(null); }} className="rounded-xl border border-emerald-300/20 bg-emerald-300/10 px-3 py-3 text-[9px] font-black text-emerald-200">Oyuncuyu Değiştir</button><button type="button" onClick={() => { removePlayer(String(selectedPlayer.id)); if (captain === String(selectedPlayer.id)) setCaptain(null); setSelectedPlayer(null); }} className="col-span-2 rounded-xl border border-rose-300/20 bg-rose-400/10 px-3 py-3 text-[9px] font-black text-rose-200">Oyuncuyu Çıkar</button></div></div></div> : null}
-      </div>
-
-      <DragOverlay dropAnimation={{ duration: 180, easing: "cubic-bezier(.2,.8,.2,1)" }}>{draggingPlayer ? <div className="pointer-events-none scale-[1.04] drop-shadow-[0_24px_36px_rgba(0,0,0,.62)]"><PlayerCard compact player={draggingPlayer} isDragging /></div> : null}</DragOverlay>
-    </DndContext>
-  );
-}
-
-function HudCell({ label, value, tone = "white", complete = false, icon }: { label: string; value: string; tone?: "white" | "gold" | "green"; complete?: boolean; icon: string }) {
-  const valueClass = tone === "gold" ? "text-[#f3ca40]" : tone === "green" ? "text-[#00e676]" : "text-white";
-  return <div className="relative flex min-h-[64px] items-center gap-3 border-r border-white/[.07] px-4 py-2 last:border-r-0 max-[560px]:border-b"><span className="text-xl text-slate-300">{icon}</span><span className="min-w-0"><small className="block text-[7px] font-black tracking-[.08em] text-white/46">{label}</small><strong className={`mt-0.5 block whitespace-nowrap text-[17px] font-black ${valueClass}`}>{value}</strong></span>{complete ? <span className="ml-auto grid h-6 w-6 place-items-center rounded-full bg-[#00e676] text-[11px] font-black text-[#052014]">✓</span> : null}</div>;
-}
+import PlayerCard,{type FantasyPlayer,type PlayerPosition}from"@/components/fantasy/PlayerCard";
+import{SUPER_LIG_CLUBS_2026_27}from"@/data/superlig-2026";
+import{SUPER_LIG_COACHES_2026_27,type FantasyCoach}from"@/data/superlig-coaches-2026";
+import{useTeamStore,type Formation,type Player as StorePlayer}from"@/store/useTeamStore";
+const BUDGET=100;const STORAGE_KEY="futbol-iq-fantasy-squad-v8";const FORMATIONS:Formation[]=["4-3-3","4-4-2","3-4-3","3-5-2","5-3-2"];const DEFAULT_COACH_ID="coach-galatasaray";
+const players:StorePlayer[]=[{id:"1",name:"Victor Osimhen",club:"Galatasaray",position:"FWD",price:11.5,points:78,matches:5,selected:64},{id:"2",name:"Vlahović",club:"Beşiktaş",position:"FWD",price:11,points:71,matches:5,selected:52},{id:"3",name:"En-Nesyri",club:"Fenerbahçe",position:"FWD",price:9.2,points:67,matches:5,selected:47},{id:"4",name:"Rafa Silva",club:"Beşiktaş",position:"MID",price:8.6,points:63,matches:5,selected:43},{id:"5",name:"Talisca",club:"Fenerbahçe",position:"MID",price:9,points:61,matches:5,selected:41},{id:"6",name:"Torreira",club:"Galatasaray",position:"MID",price:7.4,points:58,matches:5,selected:38},{id:"7",name:"Gedson",club:"Beşiktaş",position:"MID",price:7.2,points:56,matches:5,selected:36},{id:"8",name:"Fred",club:"Fenerbahçe",position:"MID",price:7.8,points:55,matches:5,selected:35},{id:"9",name:"Davinson Sánchez",club:"Galatasaray",position:"DEF",price:7.1,points:52,matches:5,selected:34},{id:"10",name:"Svensson",club:"Beşiktaş",position:"DEF",price:5.9,points:49,matches:5,selected:29},{id:"11",name:"Mert Müldür",club:"Fenerbahçe",position:"DEF",price:5.2,points:46,matches:5,selected:26},{id:"12",name:"Abdülkerim Bardakcı",club:"Galatasaray",position:"DEF",price:6.5,points:50,matches:5,selected:31},{id:"13",name:"Uğurcan Çakır",club:"Galatasaray",position:"GK",price:6.3,points:48,matches:5,selected:33},{id:"14",name:"Mert Günok",club:"Beşiktaş",position:"GK",price:5.8,points:45,matches:5,selected:28},{id:"15",name:"İrfan Can",club:"Fenerbahçe",position:"GK",price:5.2,points:42,matches:5,selected:22},{id:"16",name:"Semih",club:"Beşiktaş",position:"FWD",price:6,points:44,matches:5,selected:24},{id:"17",name:"Muçi",club:"Beşiktaş",position:"MID",price:6.2,points:43,matches:5,selected:23},{id:"18",name:"Eren",club:"Trabzonspor",position:"DEF",price:4.8,points:41,matches:5,selected:19},{id:"19",name:"Okay",club:"Trabzonspor",position:"MID",price:5.4,points:39,matches:5,selected:18},{id:"20",name:"Onuachu",club:"Trabzonspor",position:"FWD",price:8.1,points:54,matches:5,selected:27},{id:"21",name:"Muhammet",club:"Trabzonspor",position:"GK",price:5,points:36,matches:5,selected:14},{id:"22",name:"Ali",club:"Konyaspor",position:"DEF",price:4.2,points:34,matches:5,selected:12},{id:"23",name:"Burak",club:"Göztepe",position:"GK",price:4,points:33,matches:5,selected:11},{id:"24",name:"Yusuf",club:"Samsunspor",position:"DEF",price:4.1,points:35,matches:5,selected:13},{id:"25",name:"Kerem",club:"İstanbul Başakşehir FK",position:"MID",price:4.3,points:37,matches:5,selected:15},{id:"26",name:"Deniz",club:"Kasımpaşa",position:"FWD",price:4.5,points:38,matches:5,selected:16}];
+const initialLineup:(string|null)[]=["1","2","3","4","6","8","9","10","18","22","21"];const initialBench:(string|null)[]=["23","24","25","26"];const toFantasyPlayer=(p:StorePlayer):FantasyPlayer=>p;const positionName=(p:PlayerPosition)=>p==="FWD"?"Forvet":p==="MID"?"Orta saha":p==="DEF"?"Defans":"Kaleci";
+export default function TeamBuilderPage(){
+ const{formation,players:playerMap,startingSlots,benchSlots,toast,hydrateTeam,setFormation,setToast,autoArrangeSquad,swapStartingAndBench,swapFieldPositions,swapBenchPlayers,movePlayerToEmptySlot,addPlayerFromTransfer,removePlayer,clearSquad}=useTeamStore();
+ const[captain,setCaptain]=useState<string|null>("1");const[viceCaptain,setViceCaptain]=useState<string|null>(null);const[selectedCoachId,setSelectedCoachId]=useState(DEFAULT_COACH_ID);const[draggingPlayer,setDraggingPlayer]=useState<FantasyPlayer|null>(null);const[actionPlayer,setActionPlayer]=useState<FantasyPlayer|null>(null);const[detailPlayer,setDetailPlayer]=useState<FantasyPlayer|null>(null);const[validationOpen,setValidationOpen]=useState(false);const[hydrated,setHydrated]=useState(false);
+ const sensors=useSensors(useSensor(PointerSensor,{activationConstraint:{distance:5}}),useSensor(TouchSensor,{activationConstraint:{delay:120,tolerance:10}}));
+ useEffect(()=>{try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const s=JSON.parse(raw) as{formation?:Formation;startingIds?:(string|null)[];benchIds?:(string|null)[];captain?:string|null;viceCaptain?:string|null;coachId?:string};hydrateTeam(players,s.formation??"4-3-3",s.startingIds??initialLineup,s.benchIds??initialBench);setCaptain(s.captain??"1");setViceCaptain(s.viceCaptain??null);if(s.coachId&&SUPER_LIG_COACHES_2026_27.some(c=>c.id===s.coachId))setSelectedCoachId(s.coachId)}else hydrateTeam(players,"4-3-3",initialLineup,initialBench)}finally{setHydrated(true)}},[hydrateTeam]);
+ useEffect(()=>{if(!hydrated)return;localStorage.setItem(STORAGE_KEY,JSON.stringify({formation,startingIds:startingSlots.map(s=>s.playerId),benchIds:benchSlots.map(s=>s.playerId),captain,viceCaptain,coachId:selectedCoachId}))},[benchSlots,captain,viceCaptain,formation,hydrated,selectedCoachId,startingSlots]);
+ const selectedCoach=SUPER_LIG_COACHES_2026_27.find(c=>c.id===selectedCoachId)??SUPER_LIG_COACHES_2026_27[0]??null;const selectedIds=[...startingSlots,...benchSlots].map(s=>s.playerId).filter((id):id is string=>Boolean(id));const selectedPlayers=selectedIds.map(id=>playerMap[id]).filter(Boolean);const spent=selectedPlayers.reduce((t,p)=>t+p.price,0);const remaining=BUDGET-spent;const invalidStartingSlots=startingSlots.filter(s=>s.playerId&&playerMap[s.playerId]?.position!==s.position);const hasInvalidPositions=invalidStartingSlots.length>0;const startersComplete=startingSlots.filter(s=>s.playerId).length===11;const squadComplete=selectedIds.length===15;const clubViolations=[...new Set(selectedPlayers.filter(p=>selectedPlayers.filter(x=>x.club===p.club).length>3).map(p=>p.club))];const validationErrors=[!squadComplete?`Kadro eksik: ${selectedIds.length}/15 futbolcu.`:"",hasInvalidPositions?`${invalidStartingSlots.length} oyuncu yanlış mevkide.`:"",remaining<0?`Bütçe ${Math.abs(remaining).toFixed(1)}M aşıldı.`:"",...clubViolations.map(c=>`${c}: 3 oyuncu sınırı aşıldı.`),!captain?"Kaptan seçilmedi.":""].filter(Boolean);const squadValid=validationErrors.length===0;
+ const pitchSlots:PitchSlot[]=useMemo(()=>startingSlots.map((s,index)=>({id:s.id,index,position:s.position,player:s.playerId?toFantasyPlayer(playerMap[s.playerId]):null,invalidPosition:Boolean(s.playerId&&playerMap[s.playerId]?.position!==s.position)})),[playerMap,startingSlots]);const pitchBenchSlots:BenchPitchSlot[]=useMemo(()=>benchSlots.map(s=>({id:s.id,position:s.position,player:s.playerId?toFantasyPlayer(playerMap[s.playerId]):null})),[benchSlots,playerMap]);
+ function clubCount(club:string){return selectedPlayers.filter(p=>p.club===club).length}function canAddTransfer(p:StorePlayer){if(selectedIds.includes(p.id))return false;if(clubCount(p.club)>=3){setToast(`${p.club} için 3 oyuncu sınırına ulaştın.`);return false}if(remaining<p.price){setToast("Bu oyuncu için kalan bütçe yeterli değil.");return false}return true}
+ function haptic(){if(typeof navigator!=="undefined"&&"vibrate"in navigator)navigator.vibrate?.(10)}
+ function quickAdd(p:FantasyPlayer){const id=String(p.id);if(selectedIds.includes(id)){removePlayer(id);if(captain===id)setCaptain(null);if(viceCaptain===id)setViceCaptain(null);return}const sp=playerMap[id]??players.find(x=>x.id===id);if(!sp||!canAddTransfer(sp))return;const a=startingSlots.find(s=>s.position===sp.position&&!s.playerId);if(a){addPlayerFromTransfer(sp,a.id);haptic();return}const b=benchSlots.find(s=>!s.playerId&&s.position===sp.position);if(b){addPlayerFromTransfer(sp,b.id);haptic();return}setToast(`${positionName(sp.position)} için uygun boş slot yok.`)}
+ function selectCoach(c:FantasyCoach){setSelectedCoachId(c.id);setToast(`${c.name} teknik direktör seçildi · 15 kişilik kadro ve bütçeye dahil değildir.`)}
+ function autoComplete(){autoArrangeSquad(players,BUDGET)}function findPlayerByDragId(id:string){const clean=id.replace(/^transfer:/,"").replace(/^player:/,"");return playerMap[clean]??players.find(p=>p.id===clean)??null}function onDragStart(e:DragStartEvent){const p=findPlayerByDragId(String(e.active.id));setDraggingPlayer(p?toFantasyPlayer(p):null)}
+ function onDragEnd(e:DragEndEvent){const p=findPlayerByDragId(String(e.active.id));const source=String(e.active.data.current?.sourceSlotId??"");const target=e.over?String(e.over.id):"";setDraggingPlayer(null);if(!p||!target||source===target)return;if(source==="transfer"){if(!canAddTransfer(p))return;const occupied=startingSlots.find(s=>s.id===target)?.playerId??benchSlots.find(s=>s.id===target)?.playerId;if(occupied){setToast("Transfer listesinden oyuncu yalnızca boş slota bırakılabilir.");return}if(addPlayerFromTransfer(p,target))haptic();return}const ss=startingSlots.find(s=>s.id===source),sb=benchSlots.find(s=>s.id===source),ts=startingSlots.find(s=>s.id===target),tb=benchSlots.find(s=>s.id===target),targetPlayer=ts?.playerId??tb?.playerId??null;if(!targetPlayer){if(movePlayerToEmptySlot(p.id,source,target))haptic();return}let ok=false;if(ss&&ts&&ss.playerId&&ts.playerId)ok=swapFieldPositions(ss.playerId,ts.playerId);else if(ss&&tb&&ss.playerId&&tb.playerId)ok=swapStartingAndBench(ss.playerId,tb.playerId);else if(sb&&ts&&sb.playerId&&ts.playerId)ok=swapStartingAndBench(ts.playerId,sb.playerId);else if(sb&&tb&&sb.playerId&&tb.playerId)ok=swapBenchPlayers(sb.playerId,tb.playerId);if(ok)haptic()}
+ function save(){if(!squadValid){setValidationOpen(true);return}setToast(`Kadro başarıyla kaydedildi · ${selectedCoach?.name??"Teknik direktör"}`);haptic()}function clearAll(){clearSquad();setCaptain(null);setViceCaptain(null)}
+ const fantasyPlayers=players.map(toFantasyPlayer);
+ return <DndContext sensors={sensors} collisionDetection={pointerWithin} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={()=>setDraggingPlayer(null)}><div className="relative min-h-screen overflow-x-hidden bg-[#080d1a] pb-24 pt-2 text-white"><div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_8%_10%,rgba(74,168,255,.13),transparent_24%),radial-gradient(circle_at_78%_4%,rgba(255,224,120,.10),transparent_19%),linear-gradient(180deg,#0b1329_0%,#080d1a_48%,#040812_100%)]"/><section className="relative z-10 mx-auto mb-2 grid w-[calc(100%-24px)] max-w-[1540px] grid-cols-[minmax(0,1fr)_auto] overflow-hidden rounded-[18px] border border-cyan-300/20 bg-[#091827]/95 max-[760px]:grid-cols-1"><div className="grid min-w-0 grid-cols-4 max-[560px]:grid-cols-2"><HudCell label="BÜTÇE" value="100.0M ₺" tone="gold"/><HudCell label="KALAN" value={`${remaining.toFixed(1)}M ₺`} tone="green"/><HudCell label="İLK 11" value={`${startingSlots.filter(s=>s.playerId).length}/11`} status={startersComplete&&!hasInvalidPositions?"ok":"warn"}/><HudCell label="KADRO" value={`${selectedIds.length}/15 +1 TD`} status={squadValid?"ok":"warn"}/></div><div className="flex items-center gap-2 border-l border-white/[.07] p-2 max-[760px]:border-l-0 max-[760px]:border-t max-[560px]:grid max-[560px]:grid-cols-3"><button onClick={autoComplete} className="h-12 rounded-xl border border-cyan-300/60 bg-cyan-400/10 px-3 text-[8px] font-black">OTOMATİK DOLDUR</button><button onClick={clearAll} className="h-12 rounded-xl border border-white/15 bg-white/[.04] px-3 text-[8px] font-black text-white/65">TEMİZLE</button><button onClick={save} className={`h-12 rounded-xl border px-3 text-[8px] font-black ${squadValid?"border-[#ffe778] bg-[#ddb52f] text-[#211600]":"border-rose-300/30 bg-rose-900/30 text-rose-100"}`}>{squadValid?"KADROYU KAYDET":"KADROYU KONTROL ET"}</button></div></section><section className="relative z-10 mx-auto grid w-[calc(100%-24px)] max-w-[1540px] grid-cols-[minmax(0,1.55fr)_minmax(350px,.68fr)] items-start gap-3 max-[980px]:grid-cols-1"><div className="min-w-0"><FootballPitch formationLabel={formation} formations={FORMATIONS} slots={pitchSlots} benchSlots={pitchBenchSlots} coach={selectedCoach} captainId={captain} draggingPlayer={draggingPlayer} onFormationChange={v=>setFormation(v as Formation)} onPlayerClick={setActionPlayer} onBenchPlayerClick={setActionPlayer}/><div className="mx-auto mt-2 max-w-[920px] rounded-xl border border-white/[.08] bg-[#07151c]/90 px-3 py-2 text-[8.5px] font-bold text-white/50">{toast??"Kartı sürükle-bırak; tek dokunarak hızlı aksiyonları aç."}</div></div><TransferPanel players={fantasyPlayers} coaches={SUPER_LIG_COACHES_2026_27} clubs={SUPER_LIG_CLUBS_2026_27} selectedIds={selectedIds} selectedCoachId={selectedCoachId} onQuickAdd={quickAdd} onSelectCoach={selectCoach} onPlayerClick={setActionPlayer}/></section>
+ {actionPlayer?<ActionSheet player={actionPlayer} captain={captain} viceCaptain={viceCaptain} onClose={()=>setActionPlayer(null)} onCaptain={()=>{setCaptain(String(actionPlayer.id));if(viceCaptain===String(actionPlayer.id))setViceCaptain(null);setToast(`${actionPlayer.name} kaptan seçildi · x2`);haptic();setActionPlayer(null)}} onVice={()=>{if(captain===String(actionPlayer.id)){setToast("Kaptan aynı zamanda ikinci kaptan olamaz.");return}setViceCaptain(String(actionPlayer.id));setToast(`${actionPlayer.name} ikinci kaptan seçildi.`);haptic();setActionPlayer(null)}} onSwap={()=>{setToast(`${actionPlayer.name} için değiştir modu: uygun kartı/slotu sürükle.`);setActionPlayer(null)}} onInfo={()=>{setDetailPlayer(actionPlayer);setActionPlayer(null)}} onRemove={()=>{const id=String(actionPlayer.id);removePlayer(id);if(captain===id)setCaptain(null);if(viceCaptain===id)setViceCaptain(null);setActionPlayer(null)}}/>:null}
+ {detailPlayer?<PlayerDetail player={detailPlayer} onClose={()=>setDetailPlayer(null)}/>:null}{validationOpen?<ValidationModal errors={validationErrors} onClose={()=>setValidationOpen(false)}/>:null}</div><DragOverlay dropAnimation={{duration:180,easing:"cubic-bezier(.2,.8,.2,1)"}}>{draggingPlayer?<div className="pointer-events-none scale-[1.04] drop-shadow-[0_24px_36px_rgba(0,0,0,.62)]"><PlayerCard compact player={draggingPlayer} isDragging/></div>:null}</DragOverlay></DndContext>}
+function HudCell({label,value,tone="white",status}:{label:string;value:string;tone?:"white"|"gold"|"green";status?:"ok"|"warn"}){const c=tone==="gold"?"text-[#f3ca40]":tone==="green"?"text-[#00e676]":"text-white";return <div className="flex min-h-[64px] items-center gap-3 border-r border-white/[.07] px-4 py-2"><span><small className="block text-[7px] font-black text-white/45">{label}</small><strong className={`text-[16px] font-black ${c}`}>{value}</strong></span>{status?<span className={`ml-auto grid h-6 w-6 place-items-center rounded-full text-[11px] font-black ${status==="ok"?"bg-[#00e676] text-[#052014]":"bg-rose-500 text-white"}`}>{status==="ok"?"✓":"!"}</span>:null}</div>}
+function ActionSheet({player,captain,viceCaptain,onClose,onCaptain,onVice,onSwap,onInfo,onRemove}:{player:FantasyPlayer;captain:string|null;viceCaptain:string|null;onClose:()=>void;onCaptain:()=>void;onVice:()=>void;onSwap:()=>void;onInfo:()=>void;onRemove:()=>void}){return <div className="fixed inset-0 z-[150] grid place-items-end bg-black/55 p-3 backdrop-blur-sm sm:place-items-center" onClick={onClose}><div className="w-full max-w-[430px] rounded-[24px] border border-white/10 bg-[#071923] p-4" onClick={e=>e.stopPropagation()}><div className="mb-3"><small className="text-[8px] font-black text-[#f3ca40]">HIZLI AKSİYONLAR</small><h3 className="text-xl font-black">{player.name}</h3><p className="text-[9px] text-white/45">{player.club}</p></div><div className="grid grid-cols-2 gap-2"><button onClick={onCaptain} className="rounded-xl border border-[#f3ca40]/25 bg-[#f3ca40]/10 p-3 text-[9px] font-black text-[#ffe57c]">{captain===String(player.id)?"KAPTAN ✓":"(C) KAPTAN YAP"}</button><button onClick={onVice} className="rounded-xl border border-cyan-300/20 bg-cyan-300/[.06] p-3 text-[9px] font-black text-cyan-100">{viceCaptain===String(player.id)?"VC ✓":"(VC) İKİNCİ KAPTAN"}</button><button onClick={onSwap} className="rounded-xl border border-emerald-300/20 bg-emerald-300/[.06] p-3 text-[9px] font-black text-emerald-200">YEDEKLE DEĞİŞTİR</button><button onClick={onInfo} className="rounded-xl border border-white/10 bg-white/[.04] p-3 text-[9px] font-black">OYUNCU BİLGİLERİ</button><button onClick={onRemove} className="col-span-2 rounded-xl border border-rose-300/20 bg-rose-400/[.07] p-3 text-[9px] font-black text-rose-200">KADRODAN ÇIKAR</button></div></div></div>}
+function PlayerDetail({player,onClose}:{player:FantasyPlayer;onClose:()=>void}){return <div className="fixed inset-0 z-[160] grid place-items-center bg-black/70 p-4 backdrop-blur-sm" onClick={onClose}><div className="w-full max-w-[430px] rounded-[26px] border border-white/10 bg-[#071923] p-4" onClick={e=>e.stopPropagation()}><div className="flex justify-between"><div><small className="text-[8px] font-black text-[#f3ca40]">OYUNCU DETAYI</small><h2 className="text-2xl font-black">{player.name}</h2><p className="text-[10px] text-white/45">{player.club} · {positionName(player.position)}</p></div><button onClick={onClose}>×</button></div><div className="mt-4 grid grid-cols-2 gap-2">{[["Fiyat",`${player.price.toFixed(1)}M`],["Fantasy Puanı",`${player.points} P`],["Son 5 Hafta","VERİ BEKLENİYOR"],["Sonraki Rakip","VERİ BEKLENİYOR"],["Form","VERİ BEKLENİYOR"],["Sakatlık / Ceza","VERİ BEKLENİYOR"]].map(([a,b])=><div key={a} className="rounded-xl border border-white/[.08] bg-white/[.03] p-3"><small className="block text-[7px] text-white/35">{a}</small><b className="text-[10px]">{b}</b></div>)}</div></div></div>}
+function ValidationModal({errors,onClose}:{errors:string[];onClose:()=>void}){return <div className="fixed inset-0 z-[170] grid place-items-center bg-black/70 p-4" onClick={onClose}><div className="w-full max-w-[440px] rounded-[24px] border border-rose-300/20 bg-[#190d14] p-4" onClick={e=>e.stopPropagation()}><small className="text-[8px] font-black text-rose-300">KADRO DOĞRULAMA</small><h3 className="mt-1 text-xl font-black">Kaydetmeden önce düzelt</h3><div className="mt-3 space-y-2">{errors.map(x=><div key={x} className="rounded-xl border border-rose-300/10 bg-rose-400/[.05] p-3 text-[9px] text-rose-100">• {x}</div>)}</div><button onClick={onClose} className="mt-3 w-full rounded-xl border border-white/10 py-3 text-[9px] font-black">TAMAM</button></div></div>}
