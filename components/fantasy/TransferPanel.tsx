@@ -28,17 +28,26 @@ export default function TransferPanel({ players, clubs, selectedIds, onQuickAdd,
   }, [club, players, position, query]);
 
   return (
-    <aside className="sticky top-[78px] flex max-h-[calc(100vh-92px)] min-h-[760px] min-w-0 flex-col overflow-hidden rounded-[26px] border border-emerald-200/10 bg-[linear-gradient(180deg,rgba(5,24,31,.98),rgba(2,13,19,.99))] shadow-[0_24px_70px_rgba(0,0,0,.38)] max-[980px]:static max-[980px]:max-h-none max-[980px]:min-h-0">
-      <div className="border-b border-white/8 px-4 pb-3 pt-4">
-        <span className="text-[9px] font-black tracking-[.16em] text-emerald-300">OYUNCU BUL / TRANSFER</span>
-        <div className="mt-1 flex items-end justify-between gap-3">
-          <div><h2 className="m-0 text-xl font-black tracking-[-.04em] text-white">Oyuncu Bul</h2><p className="mt-1 text-[9px] text-white/40">Kartı tutup uygun saha veya yedek slotuna bırak.</p></div>
-          <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[8px] font-black text-white/45">{filtered.length} OYUNCU</span>
-        </div>
-      </div>
-
+    <aside className="sticky top-[78px] flex max-h-[calc(100vh-92px)] min-h-[720px] min-w-0 flex-col overflow-hidden rounded-[24px] border border-emerald-200/10 bg-[linear-gradient(180deg,rgba(5,24,31,.98),rgba(2,13,19,.99))] shadow-[0_24px_70px_rgba(0,0,0,.38)] max-[980px]:static max-[980px]:max-h-none max-[980px]:min-h-0">
       <div className="grid gap-2 border-b border-white/8 p-3">
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Oyuncu ara..." className="h-10 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-[11px] font-bold text-white outline-none placeholder:text-white/25 focus:border-emerald-300/50 focus:ring-2 focus:ring-emerald-300/10" />
+        <div className="relative">
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Oyuncu ara..."
+            className="h-10 w-full rounded-xl border border-white/10 bg-black/25 px-3 pr-10 text-[11px] font-bold text-white outline-none placeholder:text-white/25 focus:border-emerald-300/50 focus:ring-2 focus:ring-emerald-300/10"
+          />
+          {query ? (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label="Aramayı temizle"
+              className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-white/5 text-sm font-black text-white/55 transition hover:bg-white/10 hover:text-white"
+            >
+              ×
+            </button>
+          ) : null}
+        </div>
         <select value={club} onChange={(event) => setClub(event.target.value)} className="h-10 w-full rounded-xl border border-white/10 bg-[#071b22] px-3 text-[10px] font-bold text-white/80 outline-none focus:border-emerald-300/50">
           <option value="ALL">Tüm takımlar</option>{clubs.map((item) => <option key={item} value={item}>{item}</option>)}
         </select>
@@ -48,8 +57,6 @@ export default function TransferPanel({ players, clubs, selectedIds, onQuickAdd,
           ))}
         </div>
       </div>
-
-      <div className="grid grid-cols-[minmax(0,1fr)_52px_44px_32px] gap-2 border-b border-white/8 px-3 py-2 text-[7px] font-black uppercase tracking-[.08em] text-white/25"><span>Oyuncu</span><span>Fiyat</span><span>Puan</span><span /></div>
 
       <Droppable droppableId="transfer" isDropDisabled>
         {(provided) => (
@@ -64,10 +71,15 @@ export default function TransferPanel({ players, clubs, selectedIds, onQuickAdd,
                       {...dragProvided.draggableProps}
                       {...dragProvided.dragHandleProps}
                       onDoubleClick={() => onPlayerClick?.(player)}
+                      style={{
+                        ...dragProvided.draggableProps.style,
+                        transition: dragSnapshot.isDragging ? "none" : "transform 180ms cubic-bezier(.22,.8,.28,1)",
+                        willChange: "transform",
+                      }}
                       className={[
-                        "group grid grid-cols-[minmax(0,1fr)_52px_44px_32px] items-center gap-2 rounded-xl border px-2 py-2 transition",
+                        "group grid grid-cols-[minmax(0,1fr)_52px_44px_32px] items-center gap-2 rounded-xl border px-2 py-2",
                         selected ? "cursor-not-allowed border-emerald-300/25 bg-emerald-300/8 opacity-65" : "cursor-grab border-transparent hover:border-white/8 hover:bg-white/[.035] active:cursor-grabbing",
-                        dragSnapshot.isDragging ? "z-50 scale-[1.03] border-[#f6d56a]/60 bg-[#0b2523] opacity-85 shadow-[0_18px_38px_rgba(0,0,0,.5),0_0_24px_rgba(52,211,153,.25)]" : "",
+                        dragSnapshot.isDragging ? "z-50 scale-[1.035] border-[#f6d56a]/60 bg-[#0b2523] opacity-95 shadow-[0_22px_46px_rgba(0,0,0,.55),0_0_26px_rgba(246,213,106,.22),0_0_34px_rgba(52,211,153,.22)]" : "",
                       ].join(" ")}
                     >
                       <button type="button" onClick={() => onPlayerClick?.(player)} className="flex min-w-0 items-center gap-2 bg-transparent p-0 text-left">
