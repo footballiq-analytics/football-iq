@@ -24,7 +24,7 @@ type Props = {
 
 const lineOrder: PlayerPosition[] = ["FWD", "MID", "DEF", "GK"];
 const lineLabel: Record<PlayerPosition, string> = { FWD: "FORVET", MID: "ORTA SAHA", DEF: "DEFANS", GK: "KALECİ" };
-const shortPosition: Record<PlayerPosition, string> = { GK: "GK", DEF: "DF", MID: "OT", FWD: "F" };
+const shortPosition: Record<PlayerPosition, string> = { GK: "KL", DEF: "DEF", MID: "ORT", FWD: "SNT" };
 const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const asset = (name: string) => `${base}/game-ui/${name}`;
 
@@ -101,7 +101,6 @@ function BenchSlot({ slot, draggingPlayer, onPlayerClick }: { slot: BenchPitchSl
   const code = shortPosition[slot.position];
   return (
     <div ref={setNodeRef} className={["relative grid h-[118px] min-w-0 place-items-center overflow-visible rounded-xl border bg-[#080d1a]/16 transition duration-150 backdrop-blur-sm", draggingPlayer && canDrop ? "border-emerald-300/45 bg-emerald-300/[.07]" : "border-white/[.07]", draggingPlayer && !canDrop ? "border-rose-300/30 bg-rose-400/[.06]" : "", isOver ? "ring-2 ring-[#f3ca40]/75 shadow-[0_0_24px_rgba(243,202,64,.18)]" : ""].join(" ")}>
-      <span className="absolute right-1.5 top-1.5 z-40 grid h-6 min-w-6 place-items-center rounded-md border border-[#f3ca40]/45 bg-[#0a1020]/92 px-1 text-[7px] font-black text-[#ffe26a] shadow-[0_0_12px_rgba(243,202,64,.16)]">{code}</span>
       {draggingPlayer && canDrop ? <GhostCard player={draggingPlayer} substitute active={isOver} /> : null}
       {slot.player ? <DraggablePlayer player={slot.player} sourceSlotId={slot.id} substitute onClick={() => onPlayerClick?.(slot.player!)} /> : !draggingPlayer ? <BenchSeat label={code} /> : null}
     </div>
