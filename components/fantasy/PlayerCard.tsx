@@ -22,6 +22,7 @@ type PlayerCardProps = {
   player: FantasyPlayer;
   tier?: CardTier;
   captain?: boolean;
+  viceCaptain?: boolean;
   tripleCaptain?: boolean;
   substitute?: boolean;
   compact?: boolean;
@@ -36,26 +37,16 @@ const tierStyles: Record<CardTier, string> = {
   bronze: "border-[#c98957]/88 bg-[linear-gradient(155deg,rgba(145,86,44,.98),rgba(70,38,22,.99)_40%,rgba(16,18,22,.995)_78%)] shadow-[0_18px_38px_rgba(0,0,0,.55),0_0_22px_rgba(201,137,87,.2),inset_0_1px_0_rgba(255,220,191,.28)]",
 };
 
-const clubThemes: Record<string,string> = {
-  Galatasaray: "border-[#ffd21c]/95 bg-[linear-gradient(150deg,#f6c800_0%,#c62828_48%,#6f1111_100%)] shadow-[0_18px_38px_rgba(0,0,0,.58),0_0_28px_rgba(255,205,30,.30),inset_0_1px_0_rgba(255,246,181,.40)]",
-  Fenerbahçe: "border-[#ffd51e]/95 bg-[linear-gradient(150deg,#f5ce16_0%,#153a76_50%,#07172f_100%)] shadow-[0_18px_38px_rgba(0,0,0,.58),0_0_28px_rgba(255,213,30,.26),inset_0_1px_0_rgba(255,247,190,.38)]",
-  Beşiktaş: "border-white/90 bg-[linear-gradient(150deg,#f5f5f5_0%,#555_23%,#111_58%,#020202_100%)] shadow-[0_18px_38px_rgba(0,0,0,.62),0_0_24px_rgba(255,255,255,.18),inset_0_1px_0_rgba(255,255,255,.50)]",
-  Trabzonspor: "border-[#7fc7f1]/90 bg-[linear-gradient(150deg,#7cc8ef_0%,#7f183b_48%,#351020_100%)] shadow-[0_18px_38px_rgba(0,0,0,.58),0_0_25px_rgba(105,190,240,.22)]",
-  "Corendon Alanyaspor": "border-[#ff7a22]/90 bg-[linear-gradient(150deg,#ff7a22_0%,#1b1b1b_48%,#060606_100%)] shadow-[0_18px_38px_rgba(0,0,0,.58),0_0_24px_rgba(255,122,34,.22)]",
-  Alanyaspor: "border-[#ff7a22]/90 bg-[linear-gradient(150deg,#ff7a22_0%,#1b1b1b_48%,#060606_100%)] shadow-[0_18px_38px_rgba(0,0,0,.58),0_0_24px_rgba(255,122,34,.22)]",
-  Göztepe: "border-[#f0d325]/90 bg-[linear-gradient(150deg,#e9d31f_0%,#c91524_50%,#620b12_100%)] shadow-[0_18px_38px_rgba(0,0,0,.58),0_0_24px_rgba(240,211,37,.22)]",
-  Samsunspor: "border-white/85 bg-[linear-gradient(150deg,#f5f5f5_0%,#d21d2b_46%,#6e0f17_100%)] shadow-[0_18px_38px_rgba(0,0,0,.58),0_0_24px_rgba(215,35,48,.24)]",
-  Konyaspor: "border-[#d8fff0]/85 bg-[linear-gradient(150deg,#f5fff9_0%,#0b8d54_46%,#06492f_100%)] shadow-[0_18px_38px_rgba(0,0,0,.58),0_0_24px_rgba(38,190,119,.22)]",
-  "Tümosan Konyaspor": "border-[#d8fff0]/85 bg-[linear-gradient(150deg,#f5fff9_0%,#0b8d54_46%,#06492f_100%)] shadow-[0_18px_38px_rgba(0,0,0,.58),0_0_24px_rgba(38,190,119,.22)]",
-  Kasımpaşa: "border-white/85 bg-[linear-gradient(150deg,#f6f6f6_0%,#1f4f9a_48%,#0b2248_100%)] shadow-[0_18px_38px_rgba(0,0,0,.58),0_0_24px_rgba(75,133,214,.22)]",
-  "İstanbul Başakşehir FK": "border-[#ff8a2a]/90 bg-[linear-gradient(150deg,#ff8a2a_0%,#173d73_48%,#09192f_100%)] shadow-[0_18px_38px_rgba(0,0,0,.58),0_0_24px_rgba(255,138,42,.22)]",
-};
-
 const positionLabel: Record<PlayerPosition, string> = { GK: "KL", DEF: "DEF", MID: "ORT", FWD: "FOR" };
 
-export default function PlayerCard({ player, tier = "gold", captain = false, tripleCaptain = false, substitute = false, compact = false, isDragging = false, invalidPosition = false, onClick }: PlayerCardProps) {
-  const badge = tripleCaptain ? "3×" : captain ? "C" : null;
-  const clubStyle = clubThemes[player.club] ?? tierStyles[tier];
+export default function PlayerCard({ player, tier = "gold", captain = false, viceCaptain = false, tripleCaptain = false, substitute = false, compact = false, isDragging = false, invalidPosition = false, onClick }: PlayerCardProps) {
+  const badge = tripleCaptain ? "3×" : captain ? "C" : viceCaptain ? "C2" : null;
+  const leadership = tripleCaptain || captain || viceCaptain;
+  const leadershipGlow = viceCaptain
+    ? "drop-shadow-[0_0_18px_rgba(67,155,255,.58)]"
+    : captain || tripleCaptain
+      ? "drop-shadow-[0_0_18px_rgba(255,210,54,.55)]"
+      : "";
 
   return (
     <motion.article
@@ -69,7 +60,7 @@ export default function PlayerCard({ player, tier = "gold", captain = false, tri
       className={[
         "group relative isolate select-none overflow-visible [transform-origin:50%_88%]",
         compact ? "h-[110px] w-[86px]" : "h-[134px] w-[102px]",
-        captain || tripleCaptain ? "drop-shadow-[0_0_18px_rgba(255,210,54,.55)]" : "",
+        leadershipGlow,
         isDragging ? "z-[9999] drop-shadow-[0_26px_34px_rgba(0,0,0,.60)]" : "",
         onClick ? "cursor-pointer" : "",
       ].join(" ")}
@@ -81,8 +72,12 @@ export default function PlayerCard({ player, tier = "gold", captain = false, tri
           "[clip-path:polygon(13%_0,87%_0,100%_12%,97%_82%,84%_100%,16%_100%,3%_82%,0_12%)]",
           invalidPosition
             ? "border-rose-300/90 bg-[linear-gradient(155deg,rgba(128,29,37,.99),rgba(67,13,20,.99)_55%,rgba(20,7,10,.99))] ring-2 ring-rose-400/75 shadow-[0_0_34px_rgba(244,63,94,.47)]"
-            : clubStyle,
-          captain || tripleCaptain ? "ring-2 ring-[#ffe889]/90 shadow-[0_18px_40px_rgba(0,0,0,.54),0_0_42px_rgba(255,211,74,.58)]" : "",
+            : tierStyles[tier],
+          viceCaptain
+            ? "ring-2 ring-[#80bdff]/90 shadow-[0_18px_40px_rgba(0,0,0,.54),0_0_42px_rgba(60,147,255,.52)]"
+            : captain || tripleCaptain
+              ? "ring-2 ring-[#ffe889]/90 shadow-[0_18px_40px_rgba(0,0,0,.54),0_0_42px_rgba(255,211,74,.58)]"
+              : "",
         ].join(" ")}
       >
         <div className="pointer-events-none absolute inset-[1px] z-10 bg-[linear-gradient(120deg,transparent_8%,rgba(255,255,255,.22)_21%,transparent_34%,transparent_66%,rgba(255,255,255,.10)_82%,transparent_94%)] opacity-55 transition-opacity group-hover:opacity-90" />
@@ -101,7 +96,12 @@ export default function PlayerCard({ player, tier = "gold", captain = false, tri
 
       {invalidPosition ? <span className="absolute -left-1.5 -top-1.5 z-[80] rounded-full border border-rose-200/70 bg-rose-600 px-1.5 py-0.5 text-[6px] font-black text-white shadow-[0_0_16px_rgba(244,63,94,.55)]">MEVKİ HATASI</span> : null}
       {badge ? (
-        <span className="absolute -right-[18px] -top-[18px] z-[100] grid h-10 w-10 place-items-center rounded-full border-2 border-[#fff8c7] bg-[radial-gradient(circle_at_32%_22%,#fffef0_0%,#ffe66d_28%,#d69b13_64%,#6a3f03_100%)] text-[15px] font-black text-[#211400] shadow-[0_0_0_3px_rgba(255,223,91,.20),0_0_12px_rgba(255,245,180,.9),0_0_30px_rgba(255,199,30,.9),0_8px_16px_rgba(0,0,0,.55)]">
+        <span className={[
+          "absolute -right-[18px] -top-[18px] z-[100] grid h-10 w-10 place-items-center rounded-full border-2 text-[15px] font-black shadow-[0_8px_16px_rgba(0,0,0,.55)]",
+          viceCaptain && !captain && !tripleCaptain
+            ? "border-[#d7ecff] bg-[radial-gradient(circle_at_32%_22%,#f6fbff_0%,#86c4ff_28%,#378de8_64%,#0c3d78_100%)] text-[#031b36] shadow-[0_0_0_3px_rgba(88,169,255,.20),0_0_12px_rgba(188,225,255,.9),0_0_30px_rgba(57,146,239,.85),0_8px_16px_rgba(0,0,0,.55)]"
+            : "border-[#fff8c7] bg-[radial-gradient(circle_at_32%_22%,#fffef0_0%,#ffe66d_28%,#d69b13_64%,#6a3f03_100%)] text-[#211400] shadow-[0_0_0_3px_rgba(255,223,91,.20),0_0_12px_rgba(255,245,180,.9),0_0_30px_rgba(255,199,30,.9),0_8px_16px_rgba(0,0,0,.55)]",
+        ].join(" ")}>
           {badge}
         </span>
       ) : null}
