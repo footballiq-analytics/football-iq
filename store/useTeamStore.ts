@@ -75,14 +75,12 @@ function getCounts(ids: string[], players: Record<string, Player>) {
 function inferFormation(ids: string[], players: Record<string, Player>) {
   const counts = getCounts(ids, players);
   return FORMATIONS.find((formation) => {
-    const required = getCounts(
-      FORMATION_POSITIONS[formation].map((position, index) => `${position}-${index}`),
-      Object.fromEntries(
-        FORMATION_POSITIONS[formation].map((position, index) => [
-          `${position}-${index}`,
-          { id: `${position}-${index}`, name: "", club: "", position, price: 0, points: 0 },
-        ]),
-      ) as Record<string, Player>,
+    const required = FORMATION_POSITIONS[formation].reduce(
+      (acc, position) => {
+        acc[position] += 1;
+        return acc;
+      },
+      { GK: 0, DEF: 0, MID: 0, FWD: 0 } as Record<PlayerPosition, number>,
     );
     return required.GK === counts.GK && required.DEF === counts.DEF && required.MID === counts.MID && required.FWD === counts.FWD;
   });
@@ -129,14 +127,20 @@ export const useTeamStore = create<TeamStore>((set, get) => ({
 
   setFormation: (formation) => {
     const { startingSlots, players } = get();
-    const ids = startingSlots.map((slot) => slot.playerId).filter((id): id is string => Boolean(id));
-    const rebuilt = reflow(ids, formation, players);
-    const allFit = rebuilt.filter(Boolean).length === ids.length;
-    if (!allFit) {
-      set({ toast: "Bu diziliş mevcut ilk 11 ile uyumlu değil." });
-      return false;
-    }
-    set({ formation, startingSlots: buildStartingSlots(formation, rebuilt), toast: `${formation} dizilişi uygulandı.` });
+    const ids = startingSlots.map((slot) => slot.playerId);
+    const nextSlots = buildStartingSlots(formation, ids);
+    const invalidCount = nextSlots.filter((slot) => {
+      if (!slot.playerId) return false;
+      return players[slot.playerId]?.position !== slot.position;
+    }).length;
+
+    set({
+      formation,
+      startingSlots: nextSlots,
+      toast: invalidCount > 0
+        ? `${formation} uygulandı. ${invalidCount} oyuncu kendi mevkisi dışında kaldı; kırmızı oyuncuları düzeltmeden kadro kaydedilemez.`
+        : `${formation} dizilişi uygulandı.`,
+    });
     return true;
   },
 
