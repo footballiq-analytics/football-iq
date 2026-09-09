@@ -8,7 +8,7 @@ import PlayerCard, { FantasyPlayer, PlayerPosition } from "./PlayerCard";
 export type PitchSlot = { id: string; index: number; position: PlayerPosition; player?: FantasyPlayer | null; invalidPosition?: boolean };
 export type BenchPitchSlot = { id: string; kind: "GK" | "OUTFIELD"; player?: FantasyPlayer | null };
 
-type FootballPitchProps = {
+type Props = {
   formationLabel: string;
   formations: readonly string[];
   slots: PitchSlot[];
@@ -23,36 +23,24 @@ type FootballPitchProps = {
 
 const lineOrder: PlayerPosition[] = ["FWD", "MID", "DEF", "GK"];
 const lineLabel: Record<PlayerPosition, string> = { FWD: "FORVET", MID: "ORTA SAHA", DEF: "DEFANS", GK: "KALECİ" };
+const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const asset = (name: string) => `${base}/game-ui/${name}`;
 
-export default function FootballPitch({ formationLabel, formations, slots, benchSlots, captainId, tripleCaptainId, draggingPlayer, onFormationChange, onPlayerClick, onBenchPlayerClick }: FootballPitchProps) {
+export default function FootballPitch({ formationLabel, formations, slots, benchSlots, captainId, tripleCaptainId, draggingPlayer, onFormationChange, onPlayerClick, onBenchPlayerClick }: Props) {
   return (
-    <section className="relative mx-auto w-full max-w-[920px] overflow-visible rounded-[28px] border border-cyan-300/15 bg-[linear-gradient(180deg,#0b1329,#080d1a)] p-2 shadow-[0_34px_100px_rgba(0,0,0,.66)] sm:p-2.5">
-      <div className="pointer-events-none absolute inset-x-[2%] -top-14 h-28 rounded-full bg-cyan-300/10 blur-3xl" />
-      <div className="pointer-events-none absolute -left-10 top-6 h-28 w-28 rounded-full bg-white/25 blur-3xl" />
-      <div className="pointer-events-none absolute -right-10 top-6 h-28 w-28 rounded-full bg-white/25 blur-3xl" />
+    <section className="relative mx-auto w-full max-w-[920px] overflow-visible rounded-[30px] border border-cyan-300/15 bg-[linear-gradient(180deg,#0b1329,#080d1a)] p-2 shadow-[0_36px_110px_rgba(0,0,0,.70)] sm:p-2.5">
+      <div className="pointer-events-none absolute inset-x-[4%] -top-12 h-28 rounded-full bg-cyan-300/10 blur-3xl" />
 
-      <div
-        className="relative h-[610px] overflow-hidden rounded-[22px] border border-[#dfffe9]/25 shadow-[inset_0_0_120px_rgba(0,20,5,.58),0_22px_46px_rgba(0,0,0,.38)] sm:h-[630px] lg:h-[650px]"
-        style={{
-          backgroundImage: "linear-gradient(180deg,rgba(0,30,14,.14),rgba(0,15,6,.34)),radial-gradient(circle at 50% -5%,rgba(255,255,255,.24),transparent 34%),repeating-linear-gradient(90deg,#318d31 0 12.5%,#247c2a 12.5% 25%)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="pointer-events-none absolute inset-0 opacity-45 [background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.025)_0_1px,transparent_1px_4px)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(108deg,rgba(255,255,255,.07),transparent_20%,transparent_76%,rgba(255,255,255,.04))]" />
-        <div className="pointer-events-none absolute inset-x-[12%] top-[-30px] h-24 rounded-[50%] bg-white/12 blur-3xl" />
+      <div className="relative h-[610px] overflow-hidden rounded-[24px] border border-[#dfffe9]/25 bg-[#155d29] shadow-[inset_0_0_120px_rgba(0,20,5,.60),0_24px_48px_rgba(0,0,0,.42)] sm:h-[630px] lg:h-[650px]">
+        <img src={asset("pitch-texture.svg")} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" draggable={false} />
+        <img src={asset("stadium-lights.svg")} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover mix-blend-screen" draggable={false} />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,10,20,.12),transparent_18%,transparent_75%,rgba(0,8,12,.18))]" />
 
-        <div className="pointer-events-none absolute inset-[2.8%] rounded-[6px] border-2 border-white/72 shadow-[0_0_18px_rgba(255,255,255,.12)]" />
-        <div className="pointer-events-none absolute left-[2.8%] right-[2.8%] top-1/2 border-t-2 border-white/65" />
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[120px] w-[120px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/65" />
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/70" />
-        <div className="pointer-events-none absolute left-1/2 top-[2.8%] h-[82px] w-[220px] -translate-x-1/2 border-x-2 border-b-2 border-white/60" />
-        <div className="pointer-events-none absolute bottom-[2.8%] left-1/2 h-[82px] w-[220px] -translate-x-1/2 border-x-2 border-t-2 border-white/60" />
+        <PitchMarkings />
 
         <div className="absolute left-[4%] top-[3.2%] z-40">
-          <select value={formationLabel} onChange={(event) => onFormationChange(event.target.value)} className="h-10 min-w-[116px] rounded-full border border-[#f3ca40]/85 bg-[linear-gradient(180deg,rgba(16,27,36,.96),rgba(7,15,23,.98))] px-4 text-[13px] font-black text-white outline-none shadow-[0_0_18px_rgba(243,202,64,.16),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-xl">
-            {formations.map((formation) => <option key={formation} value={formation}>{formation}</option>)}
+          <select value={formationLabel} onChange={(e) => onFormationChange(e.target.value)} className="h-10 min-w-[116px] rounded-full border border-[#f3ca40]/85 bg-[linear-gradient(180deg,rgba(16,27,36,.96),rgba(7,15,23,.98))] px-4 text-[13px] font-black text-white outline-none shadow-[0_0_18px_rgba(243,202,64,.16),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-xl">
+            {formations.map((f) => <option key={f} value={f}>{f}</option>)}
           </select>
         </div>
 
@@ -78,9 +66,9 @@ export default function FootballPitch({ formationLabel, formations, slots, bench
                               <Draggable draggableId={`player:${slot.player.id}`} index={0}>
                                 {(dragProvided, dragSnapshot) => (
                                   <DragPortal isDragging={dragSnapshot.isDragging}>
-                                    <DragCardFrame provided={dragProvided} snapshot={dragSnapshot}>
+                                    <DragFrame provided={dragProvided} snapshot={dragSnapshot}>
                                       <PlayerCard compact player={slot.player!} captain={slot.player!.id === captainId} tripleCaptain={slot.player!.id === tripleCaptainId} isDragging={dragSnapshot.isDragging} invalidPosition={Boolean(slot.invalidPosition)} onClick={() => onPlayerClick?.(slot.player!)} />
-                                    </DragCardFrame>
+                                    </DragFrame>
                                   </DragPortal>
                                 )}
                               </Draggable>
@@ -102,18 +90,10 @@ export default function FootballPitch({ formationLabel, formations, slots, bench
         </div>
       </div>
 
-      <div className="relative mt-2 overflow-hidden rounded-[24px] border border-white/18 bg-[linear-gradient(180deg,rgba(23,39,51,.96)_0%,rgba(11,23,31,.94)_35%,rgba(8,18,15,.96)_36%,rgba(15,53,27,.98)_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.18),inset_0_-30px_56px_rgba(0,0,0,.44),0_20px_44px_rgba(0,0,0,.46)] backdrop-blur-xl">
-        <div className="pointer-events-none absolute inset-x-[2%] top-0 h-[43%] rounded-t-[22px] border-x border-t border-white/10 bg-[linear-gradient(105deg,rgba(255,255,255,.14),transparent_18%,transparent_76%,rgba(255,255,255,.08))]" />
-        <div className="pointer-events-none absolute inset-x-[3%] top-[34%] h-px bg-white/12" />
-        <div className="pointer-events-none absolute inset-x-[1.5%] bottom-0 h-[44%] bg-[repeating-linear-gradient(90deg,#1d5d2d_0_12.5%,#184f27_12.5%_25%)] opacity-75" />
-        <div className="pointer-events-none absolute inset-x-[1.5%] bottom-1 h-[42%] rounded-[45%] bg-[radial-gradient(ellipse_at_center,rgba(120,218,92,.38),rgba(38,88,32,.22)_48%,rgba(8,24,12,.08)_72%)]" />
-        <div className="pointer-events-none absolute left-[2%] right-[2%] top-[36%] h-[64%] rounded-b-[22px] border-x border-b border-white/8" />
-        <div className="pointer-events-none absolute left-[8%] right-[8%] top-[7%] h-10 rounded-[50%] bg-white/8 blur-2xl" />
-
-        <div className="relative mb-2 flex items-center justify-between gap-3">
-          <span className="rounded-full border border-white/10 bg-[#0b1329]/72 px-3 py-1 text-[9px] font-black tracking-[.12em] text-white shadow-[0_6px_16px_rgba(0,0,0,.26)] backdrop-blur-lg">YEDEK KULÜBESİ</span>
-          <span className="rounded-full border border-white/8 bg-black/20 px-2 py-1 text-[8px] font-black text-white/45">{benchSlots.filter((slot) => slot.player).length}/4</span>
-        </div>
+      <div className="relative mt-2 overflow-hidden rounded-[26px] border border-white/18 bg-[linear-gradient(180deg,rgba(12,24,34,.97),rgba(7,15,21,.98)_48%,rgba(10,36,18,.99))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.18),0_22px_48px_rgba(0,0,0,.48)] backdrop-blur-xl">
+        <img src={asset("dugout-glass.svg")} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-fill opacity-90" draggable={false} />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-[linear-gradient(180deg,rgba(21,78,34,.72),rgba(7,34,15,.92))]" />
+        <div className="relative mb-2 flex items-center justify-between gap-3"><span className="rounded-full border border-white/10 bg-[#0b1329]/75 px-3 py-1 text-[9px] font-black tracking-[.12em] text-white backdrop-blur-lg">YEDEK KULÜBESİ</span><span className="rounded-full border border-white/8 bg-black/25 px-2 py-1 text-[8px] font-black text-white/45">{benchSlots.filter((slot) => slot.player).length}/4</span></div>
 
         <div className="relative grid grid-cols-[88px_repeat(4,minmax(0,1fr))] items-end gap-1.5 max-[620px]:grid-cols-[72px_repeat(4,minmax(0,1fr))] sm:gap-3">
           <CoachCard />
@@ -122,15 +102,15 @@ export default function FootballPitch({ formationLabel, formations, slots, bench
             return (
               <Droppable key={slot.id} droppableId={slot.id} isDropDisabled={!valid}>
                 {(provided, snapshot) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps} className={["relative grid h-[116px] min-w-0 place-items-center overflow-visible rounded-xl border border-white/[.07] bg-[#080d1a]/18 transition duration-150 backdrop-blur-sm", draggingPlayer && valid ? "border-emerald-300/45 bg-emerald-300/[.07]" : "", draggingPlayer && !valid ? "border-rose-300/30 bg-rose-400/[.06]" : "", snapshot.isDraggingOver ? "ring-2 ring-[#f3ca40]/75 shadow-[0_0_24px_rgba(243,202,64,.18)]" : ""].join(" ")}>
+                  <div ref={provided.innerRef} {...provided.droppableProps} className={["relative grid h-[116px] min-w-0 place-items-center overflow-visible rounded-xl border border-white/[.07] bg-[#080d1a]/16 transition duration-150 backdrop-blur-sm", draggingPlayer && valid ? "border-emerald-300/45 bg-emerald-300/[.07]" : "", draggingPlayer && !valid ? "border-rose-300/30 bg-rose-400/[.06]" : "", snapshot.isDraggingOver ? "ring-2 ring-[#f3ca40]/75 shadow-[0_0_24px_rgba(243,202,64,.18)]" : ""].join(" ")}>
                     {draggingPlayer && valid ? <GhostCard player={draggingPlayer} substitute /> : null}
                     {slot.player ? (
                       <Draggable draggableId={`player:${slot.player.id}`} index={0}>
                         {(dragProvided, dragSnapshot) => (
                           <DragPortal isDragging={dragSnapshot.isDragging}>
-                            <DragCardFrame provided={dragProvided} snapshot={dragSnapshot}>
+                            <DragFrame provided={dragProvided} snapshot={dragSnapshot}>
                               <PlayerCard compact player={slot.player!} substitute tier="gold" isDragging={dragSnapshot.isDragging} onClick={() => onBenchPlayerClick?.(slot.player!)} />
-                            </DragCardFrame>
+                            </DragFrame>
                           </DragPortal>
                         )}
                       </Draggable>
@@ -147,30 +127,21 @@ export default function FootballPitch({ formationLabel, formations, slots, bench
   );
 }
 
+function PitchMarkings() {
+  return <><div className="pointer-events-none absolute inset-[2.8%] rounded-[6px] border-2 border-white/72 shadow-[0_0_18px_rgba(255,255,255,.12)]"/><div className="pointer-events-none absolute left-[2.8%] right-[2.8%] top-1/2 border-t-2 border-white/65"/><div className="pointer-events-none absolute left-1/2 top-1/2 h-[120px] w-[120px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/65"/><div className="pointer-events-none absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/70"/><div className="pointer-events-none absolute left-1/2 top-[2.8%] h-[82px] w-[220px] -translate-x-1/2 border-x-2 border-b-2 border-white/60"/><div className="pointer-events-none absolute bottom-[2.8%] left-1/2 h-[82px] w-[220px] -translate-x-1/2 border-x-2 border-t-2 border-white/60"/></>;
+}
+
 function DragPortal({ isDragging, children }: { isDragging: boolean; children: React.ReactNode }) {
   if (!isDragging || typeof document === "undefined") return <>{children}</>;
   return createPortal(children, document.body);
 }
 
-function DragCardFrame({ provided, snapshot, children }: { provided: DraggableProvided; snapshot: DraggableStateSnapshot; children: React.ReactNode }) {
-  return (
-    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} style={{ ...provided.draggableProps.style, zIndex: snapshot.isDragging ? 99999 : undefined }} className={["z-20 cursor-grab touch-none active:cursor-grabbing", snapshot.isDragging ? "will-change-transform drop-shadow-[0_22px_28px_rgba(0,0,0,.55)]" : ""].join(" ")}>
-      {children}
-    </div>
-  );
+function DragFrame({ provided, snapshot, children }: { provided: DraggableProvided; snapshot: DraggableStateSnapshot; children: React.ReactNode }) {
+  return <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} style={{ ...provided.draggableProps.style, zIndex: snapshot.isDragging ? 99999 : undefined }} className={["z-20 cursor-grab touch-none active:cursor-grabbing", snapshot.isDragging ? "will-change-transform drop-shadow-[0_22px_28px_rgba(0,0,0,.55)]" : ""].join(" ")}>{children}</div>;
 }
 
 function CoachCard() {
-  return (
-    <div className="relative h-[116px] overflow-visible rounded-[18px] border border-[#f3ca40]/45 bg-[linear-gradient(160deg,#283846,#111b24_43%,#5a420f_44%,#241b09)] shadow-[0_14px_30px_rgba(0,0,0,.46),0_0_20px_rgba(243,202,64,.12),inset_0_1px_0_rgba(255,255,255,.12)]">
-      <div className="absolute inset-x-0 top-0 h-8 rounded-t-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,.14),transparent)]" />
-      <span className="absolute left-2 top-2 z-20 rounded-full border border-[#f3ca40]/40 bg-[#0b1329]/72 px-1.5 py-0.5 text-[6px] font-black tracking-[.08em] text-[#f3ca40] backdrop-blur-md">TD</span>
-      <div className="absolute left-1/2 top-[18px] h-[68px] w-[56px] -translate-x-1/2 overflow-visible">
-        <div className="absolute bottom-0 left-1/2 h-[64px] w-[52px] -translate-x-1/2 rounded-t-[46%] bg-[radial-gradient(circle_at_50%_20%,#d0a17f_0_17%,#8f674f_18%_31%,#17222a_32%_66%,#0c1216_67%)] drop-shadow-[0_8px_10px_rgba(0,0,0,.48)]" />
-      </div>
-      <div className="absolute inset-x-2 bottom-2 rounded-md bg-[#080d1a]/86 px-1 py-1 text-center backdrop-blur-md"><b className="block truncate text-[8px] font-black text-white">Teknik Direktör</b><small className="mt-0.5 block text-[6px] font-bold text-[#f3ca40]/70">Yönetim Kartı</small></div>
-    </div>
-  );
+  return <div className="relative h-[116px] overflow-visible rounded-[18px] border border-[#f3ca40]/45 bg-[linear-gradient(160deg,#283846,#111b24_43%,#5a420f_44%,#241b09)] shadow-[0_14px_30px_rgba(0,0,0,.46),0_0_20px_rgba(243,202,64,.12),inset_0_1px_0_rgba(255,255,255,.12)]"><div className="absolute inset-x-0 top-0 h-8 rounded-t-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,.14),transparent)]"/><span className="absolute left-2 top-2 z-20 rounded-full border border-[#f3ca40]/40 bg-[#0b1329]/72 px-1.5 py-0.5 text-[6px] font-black tracking-[.08em] text-[#f3ca40] backdrop-blur-md">TD</span><div className="absolute left-1/2 top-[18px] h-[68px] w-[56px] -translate-x-1/2 overflow-visible"><div className="absolute bottom-0 left-1/2 h-[64px] w-[52px] -translate-x-1/2 rounded-t-[46%] bg-[radial-gradient(circle_at_50%_20%,#d0a17f_0_17%,#8f674f_18%_31%,#17222a_32%_66%,#0c1216_67%)] drop-shadow-[0_8px_10px_rgba(0,0,0,.48)]"/></div><div className="absolute inset-x-2 bottom-2 rounded-md bg-[#080d1a]/86 px-1 py-1 text-center backdrop-blur-md"><b className="block truncate text-[8px] font-black text-white">Teknik Direktör</b><small className="mt-0.5 block text-[6px] font-bold text-[#f3ca40]/70">Yönetim Kartı</small></div></div>;
 }
 
 function GhostCard({ player, substitute = false }: { player: FantasyPlayer; substitute?: boolean }) {
