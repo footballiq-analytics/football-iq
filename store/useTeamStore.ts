@@ -23,9 +23,26 @@ const buildStartingSlots=(formation:Formation,ids:(string|null)[])=>FORMATION_PO
 const buildBenchSlots=(ids:(string|null)[])=>BENCH_POSITIONS.map((position,index)=>({id:`bench-${index}`,position,playerId:ids[index]??null}));
 const benchAccepts=(slot:BenchSlot,player:Player)=>slot.position===player.position;
 
+function sanitizeHydratedSquad(players:Player[],formation:Formation,startingIds:(string|null)[],benchIds:(string|null)[]){
+ const map=Object.fromEntries(players.map(p=>[p.id,p]));
+ const used=new Set<string>();
+ const clubCounts=new Map<string,number>();
+ let spend=0;
+ let repaired=0;
+ const accept=(id:string|null|undefined,position:PlayerPosition)=>{
+  if(!id)return null;
+  const p=map[id];
+  if(!p||used.has(id)||p.position!==position||(clubCounts.get(p.club)??0)>=3||spend+p.price>MAX_BUDGET+0.0001){repaired++;return null}
+  used.add(id);clubCounts.set(p.club,(clubCounts.get(p.club)??0)+1);spend+=p.price;return id;
+ };
+ const cleanStarting=FORMATION_POSITIONS[formation].map((position,index)=>accept(startingIds[index],position));
+ const cleanBench=BENCH_POSITIONS.map((position,index)=>accept(benchIds[index],position));
+ return{map,cleanStarting,cleanBench,repaired};
+}
+
 export const useTeamStore=create<TeamStore>((set,get)=>({
  formation:"4-3-3",players:{},startingSlots:buildStartingSlots("4-3-3",[]),benchSlots:buildBenchSlots([]),toast:null,captainId:null,viceCaptainId:null,jokers:{tripleCaptain:false,benchBoost:false,wildcard:false,goldenBench:false},
- hydrateTeam:(players,formation,startingIds,benchIds)=>set({players:Object.fromEntries(players.map(p=>[p.id,p])),formation,startingSlots:buildStartingSlots(formation,startingIds),benchSlots:buildBenchSlots(benchIds)}),
+ hydrateTeam:(players,formation,startingIds,benchIds)=>{const clean=sanitizeHydratedSquad(players,formation,startingIds,benchIds);set({players:clean.map,formation,startingSlots:buildStartingSlots(formation,clean.cleanStarting),benchSlots:buildBenchSlots(clean.cleanBench),toast:clean.repaired?`${clean.repaired} eski/geçersiz kadro kaydı temizlendi.`:null})},
  setFormation:(formation)=>{
   const state=get();
   if(formation===state.formation){set({toast:`${formation} dizilişi zaten aktif.`});return true}
