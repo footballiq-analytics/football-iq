@@ -4,6 +4,7 @@ import { BESIKTAS_FANTASY_PLAYERS } from "./besiktas-squad-2026";
 import { FENERBAHCE_FANTASY_PLAYERS } from "./fenerbahce-squad-2026";
 import { TRABZONSPOR_FANTASY_PLAYERS } from "./trabzonspor-squad-2026";
 import { ALANYASPOR_FANTASY_PLAYERS } from "./alanyaspor-squad-2026";
+import { SAMSUNSPOR_FANTASY_PLAYERS } from "./samsunspor-squad-2026";
 
 /**
  * Tek oyuncu havuzu giriş noktası.
@@ -13,7 +14,6 @@ import { ALANYASPOR_FANTASY_PLAYERS } from "./alanyaspor-squad-2026";
 const LEGACY_PLACEHOLDER_PLAYERS: StorePlayer[] = [
   { id: "22", name: "Ali", club: "Tümosan Konyaspor", position: "DEF", price: 4.2, points: 0, matches: 0, selected: 0 },
   { id: "23", name: "Burak", club: "Göztepe", position: "GK", price: 4.0, points: 0, matches: 0, selected: 0 },
-  { id: "24", name: "Yusuf", club: "Samsunspor", position: "DEF", price: 4.1, points: 0, matches: 0, selected: 0 },
   { id: "25", name: "Kerem", club: "İstanbul Başakşehir FK", position: "MID", price: 4.3, points: 0, matches: 0, selected: 0 },
   { id: "26", name: "Deniz", club: "Kasımpaşa", position: "FWD", price: 4.5, points: 0, matches: 0, selected: 0 },
 ];
@@ -24,6 +24,7 @@ export const REAL_SQUAD_CLUBS = [
   "Fenerbahçe",
   "Trabzonspor",
   "Alanyaspor",
+  "Samsunspor",
 ] as const;
 
 export const FANTASY_PLAYER_POOL: StorePlayer[] = [
@@ -32,10 +33,11 @@ export const FANTASY_PLAYER_POOL: StorePlayer[] = [
   ...FENERBAHCE_FANTASY_PLAYERS,
   ...TRABZONSPOR_FANTASY_PLAYERS,
   ...ALANYASPOR_FANTASY_PLAYERS,
+  ...SAMSUNSPOR_FANTASY_PLAYERS,
   ...LEGACY_PLACEHOLDER_PLAYERS,
 ];
 
-export const SQUAD_STORAGE_KEY = "futbol-iq-fantasy-squad-v13";
+export const SQUAD_STORAGE_KEY = "futbol-iq-fantasy-squad-v14";
 
 export const INITIAL_LINEUP_IDS: (string | null)[] = [
   "gs-victor-osimhen",
@@ -51,4 +53,4 @@ export const INITIAL_LINEUP_IDS: (string | null)[] = [
   "ts-andre-onana",
 ];
 
-export const INITIAL_BENCH_IDS: (string | null)[] = ["23", "24", "25", "26"];
+export const INITIAL_BENCH_IDS: (string | null)[] = ["23", "sam-logi-tomasson", "25", "26"];
