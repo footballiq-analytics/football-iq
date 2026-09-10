@@ -2,7 +2,8 @@ import type { FantasyPlayer, PlayerPosition } from "@/components/fantasy/PlayerC
 
 export type FenerbahceDetailedPosition = "GK" | "CB" | "LB" | "RB" | "CDM" | "CM" | "CAM" | "RW" | "LW" | "ST";
 
-export type FenerbahceFantasyPlayer = FantasyPlayer & {
+export type FenerbahceFantasyPlayer = Omit<FantasyPlayer,"id"> & {
+  id: string;
   detailedPosition: FenerbahceDetailedPosition;
   nationality: string;
   footballIQ: number;
@@ -34,7 +35,6 @@ export const FENERBAHCE_FANTASY_PLAYERS: FenerbahceFantasyPlayer[] = [
   p("fb-mert-gunok","Mert Günok","GK","Türkiye",5.5,84),
   p("fb-kuzey-sapaz","Kuzey Sapaz","GK","Türkiye",3.5,66),
   p("fb-yasir-cakli","Yasir Çaklı","GK","Türkiye",3.5,64),
-
   p("fb-yigit-efe-demir","Yiğit Efe Demir","CB","Türkiye",4.0,71),
   p("fb-nathan-ake","Nathan Aké","CB","Hollanda",9.0,90),
   p("fb-mert-muldur","Mert Müldür","RB","Türkiye",6.5,81),
@@ -45,7 +45,6 @@ export const FENERBAHCE_FANTASY_PLAYERS: FenerbahceFantasyPlayer[] = [
   p("fb-cagan-saridikmen","Çağan Sarıdikmen","CB","Türkiye",3.5,65),
   p("fb-bedirhan-korkmaz","Bedirhan Korkmaz","CB","Türkiye",3.5,64),
   p("fb-gokmen-ozdemir","Gökmen Özdemir","CB","Türkiye",3.5,64),
-
   p("fb-archie-brown","Archie Brown","LB","İngiltere",6.5,78),
   p("fb-ismail-yuksek","İsmail Yüksek","CDM","Türkiye",7.0,85),
   p("fb-matteo-guendouzi","Mattéo Guendouzi","CM","Fransa",8.5,88),
@@ -58,7 +57,6 @@ export const FENERBAHCE_FANTASY_PLAYERS: FenerbahceFantasyPlayer[] = [
   p("fb-guner-ekici","Güner Ekici","CAM","Türkiye",3.5,65),
   p("fb-emirhan-ates","Emirhan Ateş","CM","Türkiye",3.5,65),
   p("fb-ngolo-kante","N'Golo Kanté","CDM","Fransa",9.0,96),
-
   p("fb-kerem-akturkoglu","Kerem Aktürkoğlu","LW","Türkiye",9.5,87),
   p("fb-romelu-lukaku","Romelu Lukaku","ST","Belçika",10.5,90),
   p("fb-marco-asensio","Marco Asensio","CAM","İspanya",9.5,92),
