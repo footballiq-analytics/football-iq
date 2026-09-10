@@ -9,16 +9,9 @@ import { KOCAELISPOR_FANTASY_PLAYERS } from "./kocaelispor-squad-2026";
 import { BASAKSEHIR_FANTASY_PLAYERS } from "./basaksehir-squad-2026";
 import { GOZTEPE_FANTASY_PLAYERS } from "./goztepe-squad-2026";
 import { KASIMPASA_FANTASY_PLAYERS } from "./kasimpasa-squad-2026";
+import { KONYASPOR_FANTASY_PLAYERS } from "./konyaspor-squad-2026";
 
-/**
- * Tek oyuncu havuzu giriş noktası.
- * Yeni bir kulübün gerçek kadrosu hazır olduğunda yalnızca burada birleştirilir.
- * Aşağıdaki geçici kayıtlar, henüz gerçek kadro veri dosyası oluşturulmamış kulüpler içindir.
- */
-const LEGACY_PLACEHOLDER_PLAYERS: StorePlayer[] = [
-  { id: "22", name: "Ali", club: "Tümosan Konyaspor", position: "DEF", price: 4.2, points: 0, matches: 0, selected: 0 },
-];
-
+/** Tek oyuncu havuzu giriş noktası. Yeni gerçek kulüp kadroları burada birleştirilir. */
 export const REAL_SQUAD_CLUBS = [
   "Galatasaray",
   "Beşiktaş",
@@ -30,6 +23,7 @@ export const REAL_SQUAD_CLUBS = [
   "İstanbul Başakşehir FK",
   "Göztepe",
   "Kasımpaşa",
+  "Tümosan Konyaspor",
 ] as const;
 
 export const FANTASY_PLAYER_POOL: StorePlayer[] = [
@@ -43,10 +37,10 @@ export const FANTASY_PLAYER_POOL: StorePlayer[] = [
   ...BASAKSEHIR_FANTASY_PLAYERS,
   ...GOZTEPE_FANTASY_PLAYERS,
   ...KASIMPASA_FANTASY_PLAYERS,
-  ...LEGACY_PLACEHOLDER_PLAYERS,
+  ...KONYASPOR_FANTASY_PLAYERS,
 ];
 
-export const SQUAD_STORAGE_KEY = "futbol-iq-fantasy-squad-v18";
+export const SQUAD_STORAGE_KEY = "futbol-iq-fantasy-squad-v19";
 
 export const INITIAL_LINEUP_IDS: (string | null)[] = [
   "gs-victor-osimhen",
@@ -58,7 +52,7 @@ export const INITIAL_LINEUP_IDS: (string | null)[] = [
   "gs-el-chadaille-bitshiabu",
   "bjk-umit-akdag",
   "ts-cenk-ozkacar",
-  "22",
+  "kon-adil-demirbag",
   "ts-andre-onana",
 ];
 
