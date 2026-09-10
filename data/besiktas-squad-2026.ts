@@ -2,7 +2,8 @@ import type { FantasyPlayer, PlayerPosition } from "@/components/fantasy/PlayerC
 
 export type BesiktasDetailedPosition = "GK" | "CB" | "LB" | "RB" | "CDM" | "CM" | "CAM" | "RW" | "LW" | "ST";
 
-export type BesiktasFantasyPlayer = FantasyPlayer & {
+export type BesiktasFantasyPlayer = Omit<FantasyPlayer,"id"> & {
+  id: string;
   detailedPosition: BesiktasDetailedPosition;
   shirtNumber: number;
   footballIQ: number;
@@ -33,7 +34,6 @@ export const BESIKTAS_FANTASY_PLAYERS: BesiktasFantasyPlayer[] = [
   p("bjk-alexander-nubel","Alexander Nübel","GK",1,7.5,84),
   p("bjk-dogan-alemdar","Doğan Alemdar","GK",80,5.0,76),
   p("bjk-emir-yasar","Emir Yaşar","GK",96,3.5,65),
-
   p("bjk-ridvan-yilmaz","Rıdvan Yılmaz","LB",33,7.0,80),
   p("bjk-emirhan-topcu","Emirhan Topçu","CB",53,6.5,80),
   p("bjk-taylan-bulut","Taylan Bulut","RB",22,6.0,77),
@@ -45,7 +45,6 @@ export const BESIKTAS_FANTASY_PLAYERS: BesiktasFantasyPlayer[] = [
   p("bjk-mustafa-azem-yortac","Mustafa Azem Yortaç","CB",63,3.5,65),
   p("bjk-kassoum-ouattara","Kassoum Ouattara","LB",11,6.5,78),
   p("bjk-umit-akdag","Ümit Akdağ","CB",50,5.0,75),
-
   p("bjk-kartal-kayra-yilmaz","Kartal Kayra Yılmaz","CDM",8,5.5,80),
   p("bjk-milot-rashica","Milot Rashica","RW",7,7.5,82),
   p("bjk-orkun-kokcu","Orkun Kökçü","CM",10,10.0,92),
@@ -58,7 +57,6 @@ export const BESIKTAS_FANTASY_PLAYERS: BesiktasFantasyPlayer[] = [
   p("bjk-leandro-trossard","Leandro Trossard","LW",19,9.5,89),
   p("bjk-ernest-poku","Ernest Poku","RW",17,6.5,77),
   p("bjk-fabio-miretti","Fabio Miretti","CM",21,7.5,85),
-
   p("bjk-semih-kilicsoy","Semih Kılıçsoy","ST",90,7.5,81),
   p("bjk-mustafa-erhan-hekimoglu","Mustafa Erhan Hekimoğlu","ST",23,5.0,74),
   p("bjk-ahmet-sami-bircan","Ahmet Sami Bircan","ST",70,3.5,65),
