@@ -10,6 +10,7 @@ import { BASAKSEHIR_FANTASY_PLAYERS } from "./basaksehir-squad-2026";
 import { GOZTEPE_FANTASY_PLAYERS } from "./goztepe-squad-2026";
 import { KASIMPASA_FANTASY_PLAYERS } from "./kasimpasa-squad-2026";
 import { KONYASPOR_FANTASY_PLAYERS } from "./konyaspor-squad-2026";
+import { GAZIANTEP_FANTASY_PLAYERS } from "./gaziantep-squad-2026";
 
 /** Tek oyuncu havuzu giriş noktası. Yeni gerçek kulüp kadroları burada birleştirilir. */
 export const REAL_SQUAD_CLUBS = [
@@ -24,6 +25,7 @@ export const REAL_SQUAD_CLUBS = [
   "Göztepe",
   "Kasımpaşa",
   "Tümosan Konyaspor",
+  "Gaziantep FK",
 ] as const;
 
 export const FANTASY_PLAYER_POOL: StorePlayer[] = [
@@ -38,9 +40,10 @@ export const FANTASY_PLAYER_POOL: StorePlayer[] = [
   ...GOZTEPE_FANTASY_PLAYERS,
   ...KASIMPASA_FANTASY_PLAYERS,
   ...KONYASPOR_FANTASY_PLAYERS,
+  ...GAZIANTEP_FANTASY_PLAYERS,
 ];
 
-export const SQUAD_STORAGE_KEY = "futbol-iq-fantasy-squad-v19";
+export const SQUAD_STORAGE_KEY = "futbol-iq-fantasy-squad-v20";
 
 export const INITIAL_LINEUP_IDS: (string | null)[] = [
   "gs-victor-osimhen",
