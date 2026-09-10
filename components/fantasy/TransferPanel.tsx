@@ -31,7 +31,7 @@ export default function TransferPanel({players,coaches,clubs,selectedIds,selecte
  const[selectedClubs,setSelectedClubs]=useState<string[]>([]);
  const[clubMenuOpen,setClubMenuOpen]=useState(false);
  const[position,setPosition]=useState<FilterTab>("ALL");
- const[sort,setSort]=useState<SortMode>("POINTS");
+ const[sort,setSort]=useState<SortMode>("PRICE_DESC");
  const[smartOnly,setSmartOnly]=useState(false);
  const showingCoaches=position==="COACH";
  useEffect(()=>{const id=window.setTimeout(()=>setDebouncedQuery(query),300);return()=>window.clearTimeout(id)},[query]);
