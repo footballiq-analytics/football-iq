@@ -17,6 +17,8 @@ type TeamStore={
 };
 export const FORMATION_POSITIONS:Record<Formation,PlayerPosition[]>={"4-3-3":["FWD","FWD","FWD","MID","MID","MID","DEF","DEF","DEF","DEF","GK"],"4-4-2":["FWD","FWD","MID","MID","MID","MID","DEF","DEF","DEF","DEF","GK"],"3-4-3":["FWD","FWD","FWD","MID","MID","MID","MID","DEF","DEF","DEF","GK"],"3-5-2":["FWD","FWD","MID","MID","MID","MID","MID","DEF","DEF","DEF","GK"],"5-3-2":["FWD","FWD","MID","MID","MID","DEF","DEF","DEF","DEF","DEF","GK"]};
 const BENCH_POSITIONS:PlayerPosition[]=["GK","DEF","MID","FWD"];
+const POSITIONS:PlayerPosition[]=["GK","DEF","MID","FWD"];
+const MAX_BUDGET=100;
 const buildStartingSlots=(formation:Formation,ids:(string|null)[])=>FORMATION_POSITIONS[formation].map((position,index)=>({id:`start-${index}`,position,playerId:ids[index]??null}));
 const buildBenchSlots=(ids:(string|null)[])=>BENCH_POSITIONS.map((position,index)=>({id:`bench-${index}`,position,playerId:ids[index]??null}));
 const benchAccepts=(slot:BenchSlot,player:Player)=>slot.position===player.position;
@@ -24,7 +26,52 @@ const benchAccepts=(slot:BenchSlot,player:Player)=>slot.position===player.positi
 export const useTeamStore=create<TeamStore>((set,get)=>({
  formation:"4-3-3",players:{},startingSlots:buildStartingSlots("4-3-3",[]),benchSlots:buildBenchSlots([]),toast:null,captainId:null,viceCaptainId:null,jokers:{tripleCaptain:false,benchBoost:false,wildcard:false,goldenBench:false},
  hydrateTeam:(players,formation,startingIds,benchIds)=>set({players:Object.fromEntries(players.map(p=>[p.id,p])),formation,startingSlots:buildStartingSlots(formation,startingIds),benchSlots:buildBenchSlots(benchIds)}),
- setFormation:(formation)=>{const{startingSlots,players}=get();const nextSlots=buildStartingSlots(formation,startingSlots.map(s=>s.playerId));const invalidCount=nextSlots.filter(s=>s.playerId&&players[s.playerId]?.position!==s.position).length;set({formation,startingSlots:nextSlots,toast:invalidCount?`${formation} uygulandı. ${invalidCount} oyuncu kendi mevkisi dışında kaldı; Oto Tamamla ile düzenleyebilirsin.`:`${formation} dizilişi uygulandı.`});return true},
+ setFormation:(formation)=>{
+  const state=get();
+  if(formation===state.formation){set({toast:`${formation} dizilişi zaten aktif.`});return true}
+  const selectedIds=[...state.startingSlots,...state.benchSlots].map(s=>s.playerId).filter((id):id is string=>Boolean(id));
+  if(!selectedIds.length){set({formation,startingSlots:buildStartingSlots(formation,[]),toast:`${formation} dizilişi uygulandı.`});return true}
+  const selected=selectedIds.map(id=>state.players[id]).filter((p):p is Player=>Boolean(p));
+  const desired=[...FORMATION_POSITIONS[formation],...BENCH_POSITIONS];
+  const targetCounts:Record<PlayerPosition,number>={GK:0,DEF:0,MID:0,FWD:0};
+  desired.forEach(pos=>targetCounts[pos]++);
+  let working=[...selected];
+  const removed:Player[]=[];
+  const oldBenchIds=new Set(state.benchSlots.map(s=>s.playerId).filter((id):id is string=>Boolean(id)));
+  for(const pos of POSITIONS){
+   let excess=working.filter(p=>p.position===pos).length-targetCounts[pos];
+   if(excess<=0)continue;
+   const candidates=working.filter(p=>p.position===pos).sort((a,b)=>Number(oldBenchIds.has(b.id))-Number(oldBenchIds.has(a.id))||a.points-b.points||a.price-b.price);
+   for(const player of candidates){if(excess<=0)break;working=working.filter(p=>p.id!==player.id);removed.push(player);excess--}
+  }
+  const counts=new Map<string,number>();working.forEach(p=>counts.set(p.club,(counts.get(p.club)??0)+1));
+  let spend=working.reduce((sum,p)=>sum+p.price,0);
+  const pool=Object.values(state.players);
+  const added:Player[]=[];
+  for(const pos of POSITIONS){
+   let deficit=targetCounts[pos]-working.filter(p=>p.position===pos).length;
+   while(deficit>0){
+    const available=pool.filter(p=>p.position===pos&&!working.some(x=>x.id===p.id)&&(counts.get(p.club)??0)<3&&spend+p.price<=MAX_BUDGET+0.0001).sort((a,b)=>a.price-b.price||b.points-a.points);
+    const pick=available[0];
+    if(!pick){set({toast:`${formation} için kadroyu kurallara uygun dönüştüremedim. Oto Tamamla kullanabilirsin.`});return false}
+    working.push(pick);added.push(pick);counts.set(pick.club,(counts.get(pick.club)??0)+1);spend+=pick.price;deficit--
+   }
+  }
+  const reservedBench=new Map<PlayerPosition,string>();
+  for(const pos of BENCH_POSITIONS){
+   const oldBench=state.benchSlots.find(s=>s.position===pos&&s.playerId&&working.some(p=>p.id===s.playerId));
+   const fallback=working.filter(p=>p.position===pos).sort((a,b)=>a.price-b.price||a.points-b.points)[0];
+   const id=oldBench?.playerId??fallback?.id;
+   if(id)reservedBench.set(pos,id)
+  }
+  const usedBench=new Set(reservedBench.values());
+  const byPosition:Record<PlayerPosition,string[]>={GK:[],DEF:[],MID:[],FWD:[]};
+  for(const p of working)if(!usedBench.has(p.id))byPosition[p.position].push(p.id);
+  const startingIds=FORMATION_POSITIONS[formation].map(pos=>byPosition[pos].shift()??null);
+  const benchIds=BENCH_POSITIONS.map(pos=>reservedBench.get(pos)??null);
+  if(startingIds.some(id=>!id)||benchIds.some(id=>!id)){set({toast:`${formation} için mevki dağılımı tamamlanamadı. Oto Tamamla kullanabilirsin.`});return false}
+  set({formation,startingSlots:buildStartingSlots(formation,startingIds),benchSlots:buildBenchSlots(benchIds),toast:removed.length||added.length?`${formation} uygulandı · mevki dengesi için ${removed.length} oyuncu çıkarılıp ${added.length} oyuncu eklendi.`:`${formation} dizilişi uygulandı.`});return true
+ },
  setToast:(message)=>set({toast:message}),
  setCaptain:(id)=>set(state=>({captainId:id,viceCaptainId:state.viceCaptainId===id?null:state.viceCaptainId,toast:id?`${state.players[id]?.name??"Oyuncu"} kaptan seçildi · x2`:"Kaptan seçimi kaldırıldı."})),
  setViceCaptain:(id)=>set(state=>({viceCaptainId:id===state.captainId?null:id,toast:id===state.captainId?"Kaptan aynı zamanda ikinci kaptan olamaz.":id?`${state.players[id]?.name??"Oyuncu"} ikinci kaptan seçildi.`:"İkinci kaptan seçimi kaldırıldı."})),
@@ -56,7 +103,6 @@ export const useTeamStore=create<TeamStore>((set,get)=>({
      if(candidate.position!==desired[i]||used.has(candidate.id)||candidate.price<=current.price)continue;
      const delta=candidate.price-current.price;
      if(delta>room+0.0001)continue;
-     const currentClubCount=counts.get(current.club)??0;
      const candidateClubCount=counts.get(candidate.club)??0;
      const clubOk=candidate.club===current.club||candidateClubCount<3;
      if(!clubOk)continue;
@@ -66,7 +112,7 @@ export const useTeamStore=create<TeamStore>((set,get)=>({
    if(best){
     const current=chosen[best.slot]!;
     used.delete(current.id);used.add(best.candidate.id);
-    counts.set(current.club,(counts.get(current.club)??1)-1);
+    counts.set(current.club,Math.max(0,(counts.get(current.club)??1)-1));
     counts.set(best.candidate.club,(counts.get(best.candidate.club)??0)+1);
     chosen[best.slot]=best.candidate;spend+=best.delta;improved=true;
    }
