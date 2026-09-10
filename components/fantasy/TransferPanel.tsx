@@ -18,6 +18,7 @@ export type TransferPanelProps = {
 
 type FilterTab = "ALL" | PlayerPosition | "COACH";
 type SortMode = "POINTS" | "PRICE_ASC" | "PRICE_DESC" | "POPULAR";
+type TransferAssessment = { eligible: boolean; reason: string | null };
 
 const tabLabel: Record<FilterTab, string> = {
   ALL: "TÜMÜ",
@@ -84,38 +85,73 @@ export default function TransferPanel({
     return counts;
   }, [scopePlayers]);
 
-  const filteredPlayers = useMemo(() => {
-    if (showingCoaches) return [];
-    const normalizedQuery = debouncedQuery.toLocaleLowerCase("tr");
+  const transferAssessments = useMemo(() => {
+    const assessments = new Map<string, TransferAssessment>();
+    const hasFreeSquadPlace = selectedIds.length < 15;
 
-    const isEligible = (candidate: FantasyPlayer) => {
-      if (selectedSet.has(String(candidate.id))) return false;
+    for (const candidate of players) {
+      const candidateId = String(candidate.id);
+      if (selectedSet.has(candidateId)) {
+        assessments.set(candidateId, { eligible: false, reason: "KADRODA" });
+        continue;
+      }
 
       const candidateClubCount = selectedClubCounts.get(candidate.club) ?? 0;
-      const hasFreeSquadPlace = selectedIds.length < 15;
-      const directAdd =
-        hasFreeSquadPlace &&
-        candidateClubCount < 3 &&
-        candidate.price <= remainingBudget + 0.0001;
-
       const samePositionSelected = selectedPlayers.filter(
         (selected) => selected.position === candidate.position,
       );
+      const directClubOk = candidateClubCount < 3;
+      const directBudgetOk = candidate.price <= remainingBudget + 0.0001;
+      const directAdd = hasFreeSquadPlace && directClubOk && directBudgetOk;
+
       const validReplacement = samePositionSelected.some((replaced) => {
         const effectiveBudget = remainingBudget + replaced.price;
         const clubLimitOk = candidateClubCount < 3 || replaced.club === candidate.club;
         return clubLimitOk && candidate.price <= effectiveBudget + 0.0001;
       });
 
-      return directAdd || validReplacement;
-    };
+      if (directAdd || validReplacement) {
+        assessments.set(candidateId, { eligible: true, reason: null });
+        continue;
+      }
 
+      const canFixClubLimitByReplacement = samePositionSelected.some(
+        (replaced) => replaced.club === candidate.club,
+      );
+      const clubBlocked = candidateClubCount >= 3 && !canFixClubLimitByReplacement;
+      const bestReplacementBudget = samePositionSelected.reduce(
+        (best, replaced) => Math.max(best, remainingBudget + replaced.price),
+        remainingBudget,
+      );
+      const budgetBlocked = candidate.price > bestReplacementBudget + 0.0001;
+      const positionBlocked = !hasFreeSquadPlace && samePositionSelected.length === 0;
+
+      assessments.set(candidateId, {
+        eligible: false,
+        reason: clubBlocked
+          ? "3 OYUNCU SINIRI"
+          : budgetBlocked
+            ? "BÜTÇE YETERSİZ"
+            : positionBlocked
+              ? "UYGUN MEVKİ/DEĞİŞİM YOK"
+              : !hasFreeSquadPlace
+                ? "UYGUN DEĞİŞİM YOK"
+                : "UYGUN TRANSFER DEĞİL",
+      });
+    }
+
+    return assessments;
+  }, [players, remainingBudget, selectedClubCounts, selectedIds.length, selectedPlayers, selectedSet]);
+
+  const filteredPlayers = useMemo(() => {
+    if (showingCoaches) return [];
+    const normalizedQuery = debouncedQuery.toLocaleLowerCase("tr");
     const list = players.filter(
       (p) =>
         `${p.name} ${p.club}`.toLocaleLowerCase("tr").includes(normalizedQuery) &&
         (club === "ALL" || p.club === club) &&
         (position === "ALL" || p.position === position) &&
-        (!smartOnly || isEligible(p)),
+        (!smartOnly || transferAssessments.get(String(p.id))?.eligible),
     );
 
     return [...list].sort((a, b) =>
@@ -127,7 +163,7 @@ export default function TransferPanel({
             ? (b.selected ?? 0) - (a.selected ?? 0)
             : b.points - a.points,
     );
-  }, [club, debouncedQuery, players, position, remainingBudget, selectedClubCounts, selectedIds.length, selectedPlayers, selectedSet, showingCoaches, smartOnly, sort]);
+  }, [club, debouncedQuery, players, position, showingCoaches, smartOnly, sort, transferAssessments]);
 
   const filteredCoaches = useMemo(() => {
     if (!showingCoaches) return [];
@@ -296,6 +332,7 @@ export default function TransferPanel({
                 key={String(player.id)}
                 player={player}
                 selected={selectedSet.has(String(player.id))}
+                assessment={transferAssessments.get(String(player.id)) ?? { eligible: false, reason: "UYGUN TRANSFER DEĞİL" }}
                 onQuickAdd={onQuickAdd}
                 onPlayerClick={onPlayerClick}
               />
@@ -322,7 +359,7 @@ function CoachRow({ coach, selected, onSelectCoach }: { coach: FantasyCoach; sel
   );
 }
 
-function TransferDraggable({ player, selected, onQuickAdd, onPlayerClick }: { player: FantasyPlayer; selected: boolean; onQuickAdd: (player: FantasyPlayer) => void; onPlayerClick?: (player: FantasyPlayer) => void }) {
+function TransferDraggable({ player, selected, assessment, onQuickAdd, onPlayerClick }: { player: FantasyPlayer; selected: boolean; assessment: TransferAssessment; onQuickAdd: (player: FantasyPlayer) => void; onPlayerClick?: (player: FantasyPlayer) => void }) {
   const draggable = useDraggable({
     id: `transfer:${player.id}`,
     disabled: selected,
@@ -333,7 +370,7 @@ function TransferDraggable({ player, selected, onQuickAdd, onPlayerClick }: { pl
     <div
       ref={draggable.setNodeRef}
       data-fiq-dnd="true"
-      className={`mb-1.5 select-none rounded-xl border px-2.5 py-2.5 transition-all ${draggable.isDragging ? "border-cyan-300/60 bg-cyan-400/10 opacity-35 shadow-[0_0_24px_rgba(34,211,238,.22)]" : selected ? "border-emerald-300/45 bg-emerald-300/[.07] shadow-[inset_3px_0_0_rgba(110,231,183,.7)]" : "border-white/[.06] bg-[#0b1e2a] hover:border-cyan-300/20"}`}
+      className={`mb-1.5 select-none rounded-xl border px-2.5 py-2.5 transition-all ${draggable.isDragging ? "border-cyan-300/60 bg-cyan-400/10 opacity-35 shadow-[0_0_24px_rgba(34,211,238,.22)]" : selected ? "border-emerald-300/45 bg-emerald-300/[.07] shadow-[inset_3px_0_0_rgba(110,231,183,.7)]" : assessment.eligible ? "border-emerald-300/20 bg-[#0b1e2a] hover:border-emerald-300/35" : "border-white/[.06] bg-[#0b1e2a] hover:border-[#f3ca40]/25"}`}
     >
       <div className="grid grid-cols-[42px_minmax(0,1fr)_58px_42px] items-center gap-2">
         <button
@@ -350,9 +387,16 @@ function TransferDraggable({ player, selected, onQuickAdd, onPlayerClick }: { pl
         <button type="button" onClick={() => onPlayerClick?.(player)} className="min-w-0 text-left">
           <div className="flex min-w-0 items-center gap-1.5">
             <strong className="block min-w-0 truncate text-[13px] font-black leading-tight tracking-[-.01em] text-white">{player.name}</strong>
-            {selected ? <span className="shrink-0 rounded-full border border-emerald-300/35 bg-emerald-300/10 px-1.5 py-0.5 text-[6px] font-black tracking-[.08em] text-emerald-200">KADRODA</span> : null}
+            {selected ? (
+              <span className="shrink-0 rounded-full border border-emerald-300/35 bg-emerald-300/10 px-1.5 py-0.5 text-[6px] font-black tracking-[.08em] text-emerald-200">KADRODA</span>
+            ) : assessment.eligible ? (
+              <span className="shrink-0 rounded-full border border-emerald-300/30 bg-emerald-300/[.08] px-1.5 py-0.5 text-[6px] font-black tracking-[.06em] text-emerald-200">UYGUN</span>
+            ) : null}
           </div>
           <small className="mt-0.5 block text-[8px] font-semibold text-white/45">{player.club} · {player.position}</small>
+          {!selected && !assessment.eligible && assessment.reason ? (
+            <span className="mt-1 inline-flex max-w-full truncate rounded-md border border-[#f3ca40]/30 bg-black px-1.5 py-0.5 text-[6px] font-black tracking-[.04em] text-[#f7cf62]">{assessment.reason}</span>
+          ) : null}
         </button>
         <span className="text-right">
           <b className="block text-[9px]">{player.price.toFixed(1)}M</b>
