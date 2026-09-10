@@ -20,16 +20,60 @@ const BENCH_POSITIONS:PlayerPosition[]=["GK","DEF","MID","FWD"];
 const buildStartingSlots=(formation:Formation,ids:(string|null)[])=>FORMATION_POSITIONS[formation].map((position,index)=>({id:`start-${index}`,position,playerId:ids[index]??null}));
 const buildBenchSlots=(ids:(string|null)[])=>BENCH_POSITIONS.map((position,index)=>({id:`bench-${index}`,position,playerId:ids[index]??null}));
 const benchAccepts=(slot:BenchSlot,player:Player)=>slot.position===player.position;
+
 export const useTeamStore=create<TeamStore>((set,get)=>({
  formation:"4-3-3",players:{},startingSlots:buildStartingSlots("4-3-3",[]),benchSlots:buildBenchSlots([]),toast:null,captainId:null,viceCaptainId:null,jokers:{tripleCaptain:false,benchBoost:false,wildcard:false,goldenBench:false},
  hydrateTeam:(players,formation,startingIds,benchIds)=>set({players:Object.fromEntries(players.map(p=>[p.id,p])),formation,startingSlots:buildStartingSlots(formation,startingIds),benchSlots:buildBenchSlots(benchIds)}),
- setFormation:(formation)=>{const{startingSlots,players}=get();const nextSlots=buildStartingSlots(formation,startingSlots.map(s=>s.playerId));const invalidCount=nextSlots.filter(s=>s.playerId&&players[s.playerId]?.position!==s.position).length;set({formation,startingSlots:nextSlots,toast:invalidCount?`${formation} uygulandı. ${invalidCount} oyuncu kendi mevkisi dışında kaldı; Otomatik Tamamla ile düzenleyebilirsin.`:`${formation} dizilişi uygulandı.`});return true},
+ setFormation:(formation)=>{const{startingSlots,players}=get();const nextSlots=buildStartingSlots(formation,startingSlots.map(s=>s.playerId));const invalidCount=nextSlots.filter(s=>s.playerId&&players[s.playerId]?.position!==s.position).length;set({formation,startingSlots:nextSlots,toast:invalidCount?`${formation} uygulandı. ${invalidCount} oyuncu kendi mevkisi dışında kaldı; Oto Tamamla ile düzenleyebilirsin.`:`${formation} dizilişi uygulandı.`});return true},
  setToast:(message)=>set({toast:message}),
  setCaptain:(id)=>set(state=>({captainId:id,viceCaptainId:state.viceCaptainId===id?null:state.viceCaptainId,toast:id?`${state.players[id]?.name??"Oyuncu"} kaptan seçildi · x2`:"Kaptan seçimi kaldırıldı."})),
  setViceCaptain:(id)=>set(state=>({viceCaptainId:id===state.captainId?null:id,toast:id===state.captainId?"Kaptan aynı zamanda ikinci kaptan olamaz.":id?`${state.players[id]?.name??"Oyuncu"} ikinci kaptan seçildi.`:"İkinci kaptan seçimi kaldırıldı."})),
  activateJoker:(joker)=>{const state=get();if(state.jokers[joker]){set({toast:"Bu joker daha önce kullanıldı."});return false}set({jokers:{...state.jokers,[joker]:true},toast:"Joker bu hafta için etkinleştirildi."});return true},
  clearSquad:()=>set(state=>({startingSlots:buildStartingSlots(state.formation,[]),benchSlots:buildBenchSlots([]),captainId:null,viceCaptainId:null,toast:"Kadro temizlendi. Kullanılabilir bütçe yeniden 100M."})),
- autoArrangeSquad:(candidates,budget)=>{const{formation,players}=get();const allPlayers={...players,...Object.fromEntries(candidates.map(p=>[p.id,p]))};const desired=[...FORMATION_POSITIONS[formation],...BENCH_POSITIONS];const used=new Set<string>();const counts=new Map<string,number>();let spend=0;const chosen:(string|null)[]=desired.map(()=>null);const sorted=[...candidates].sort((a,b)=>a.price-b.price||b.points-a.points);for(let i=0;i<desired.length;i++){const pos=desired[i];const p=sorted.find(x=>x.position===pos&&!used.has(x.id)&&(counts.get(x.club)??0)<3&&spend+x.price<=budget);if(!p)continue;chosen[i]=p.id;used.add(p.id);counts.set(p.club,(counts.get(p.club)??0)+1);spend+=p.price}const missing=chosen.filter(id=>!id).length;set({players:allPlayers,startingSlots:buildStartingSlots(formation,chosen.slice(0,11)),benchSlots:buildBenchSlots(chosen.slice(11)),toast:missing?`${formation} için ilk 11 ve yedekler dolduruldu ancak ${missing} pozisyon boş kaldı.`:`${formation} dizilişinde ilk 11 ve 4 yedek otomatik dolduruldu.`});return missing===0},
+ autoArrangeSquad:(candidates,budget)=>{
+  const{formation,players}=get();
+  const allPlayers={...players,...Object.fromEntries(candidates.map(p=>[p.id,p]))};
+  const desired=[...FORMATION_POSITIONS[formation],...BENCH_POSITIONS];
+  const used=new Set<string>();const counts=new Map<string,number>();let spend=0;
+  const chosen:(Player|null)[]=desired.map(()=>null);
+  const cheapest=[...candidates].sort((a,b)=>a.price-b.price||b.points-a.points);
+  for(let i=0;i<desired.length;i++){
+   const pos=desired[i];
+   const pick=cheapest.find(x=>x.position===pos&&!used.has(x.id)&&(counts.get(x.club)??0)<3&&spend+x.price<=budget+0.0001);
+   if(!pick)continue;
+   chosen[i]=pick;used.add(pick.id);counts.set(pick.club,(counts.get(pick.club)??0)+1);spend+=pick.price;
+  }
+  const missing=chosen.filter(x=>!x).length;
+  if(missing){set({players:allPlayers,startingSlots:buildStartingSlots(formation,chosen.slice(0,11).map(x=>x?.id??null)),benchSlots:buildBenchSlots(chosen.slice(11).map(x=>x?.id??null)),toast:`${formation} için ${missing} pozisyon doldurulamadı.`});return false}
+  let improved=true;
+  while(improved){
+   improved=false;
+   let best:{slot:number;candidate:Player;delta:number}|null=null;
+   const room=budget-spend;
+   for(let i=0;i<chosen.length;i++){
+    const current=chosen[i]!;
+    for(const candidate of candidates){
+     if(candidate.position!==desired[i]||used.has(candidate.id)||candidate.price<=current.price)continue;
+     const delta=candidate.price-current.price;
+     if(delta>room+0.0001)continue;
+     const currentClubCount=counts.get(current.club)??0;
+     const candidateClubCount=counts.get(candidate.club)??0;
+     const clubOk=candidate.club===current.club||candidateClubCount<3;
+     if(!clubOk)continue;
+     if(!best||delta>best.delta||(Math.abs(delta-best.delta)<0.0001&&candidate.points>best.candidate.points))best={slot:i,candidate,delta};
+    }
+   }
+   if(best){
+    const current=chosen[best.slot]!;
+    used.delete(current.id);used.add(best.candidate.id);
+    counts.set(current.club,(counts.get(current.club)??1)-1);
+    counts.set(best.candidate.club,(counts.get(best.candidate.club)??0)+1);
+    chosen[best.slot]=best.candidate;spend+=best.delta;improved=true;
+   }
+  }
+  const ids=chosen.map(x=>x!.id);const remaining=Math.max(0,budget-spend);
+  set({players:allPlayers,startingSlots:buildStartingSlots(formation,ids.slice(0,11)),benchSlots:buildBenchSlots(ids.slice(11)),toast:`Oto Tamamla tamamlandı · ${spend.toFixed(1)}M kullanıldı · ${remaining.toFixed(1)}M kaldı.`});return true
+ },
  swapStartingAndBench:(a,b)=>{const{startingSlots,benchSlots,players}=get();const ai=startingSlots.findIndex(s=>s.playerId===a),bi=benchSlots.findIndex(s=>s.playerId===b);if(ai<0||bi<0)return false;const ap=players[a],bp=players[b];if(!ap||!bp)return false;if(startingSlots[ai].position!==bp.position||benchSlots[bi].position!==ap.position){set({toast:"Geçersiz Değişiklik · mevki kuralları uyuşmuyor."});return false}const ns=[...startingSlots],nb=[...benchSlots];ns[ai]={...ns[ai],playerId:b};nb[bi]={...nb[bi],playerId:a};set({startingSlots:ns,benchSlots:nb,toast:`${ap.name} ile ${bp.name} yer değiştirdi.`});return true},
  swapFieldPositions:(a,b)=>{const{startingSlots,players}=get();const ai=startingSlots.findIndex(s=>s.playerId===a),bi=startingSlots.findIndex(s=>s.playerId===b);if(ai<0||bi<0)return false;if(players[a]?.position!==players[b]?.position){set({toast:"Geçersiz Değişiklik · saha içi takas aynı mevki arasında yapılabilir."});return false}const n=[...startingSlots],x=n[ai].playerId;n[ai]={...n[ai],playerId:n[bi].playerId};n[bi]={...n[bi],playerId:x};set({startingSlots:n,toast:"Saha içi pozisyonlar değiştirildi."});return true},
  swapBenchPlayers:(a,b)=>{const{benchSlots,players}=get();const ai=benchSlots.findIndex(s=>s.playerId===a),bi=benchSlots.findIndex(s=>s.playerId===b);if(ai<0||bi<0)return false;const ap=players[a],bp=players[b];if(!ap||!bp)return false;if(!benchAccepts(benchSlots[ai],bp)||!benchAccepts(benchSlots[bi],ap)){set({toast:"Yedek koltukları mevkiye özeldir: KL, DEF, ORT ve FOR."});return false}const n=[...benchSlots];n[ai]={...n[ai],playerId:b};n[bi]={...n[bi],playerId:a};set({benchSlots:n,toast:"Yedek oyuncuların sırası değiştirildi."});return true},
