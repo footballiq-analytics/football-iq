@@ -41,7 +41,6 @@ const positionLabel: Record<PlayerPosition, string> = { GK: "KL", DEF: "DEF", MI
 
 export default function PlayerCard({ player, tier = "gold", captain = false, viceCaptain = false, tripleCaptain = false, substitute = false, compact = false, isDragging = false, invalidPosition = false, onClick }: PlayerCardProps) {
   const badge = tripleCaptain ? "3×" : captain ? "C" : viceCaptain ? "C2" : null;
-  const leadership = tripleCaptain || captain || viceCaptain;
   const leadershipGlow = viceCaptain
     ? "drop-shadow-[0_0_18px_rgba(67,155,255,.58)]"
     : captain || tripleCaptain
@@ -83,8 +82,8 @@ export default function PlayerCard({ player, tier = "gold", captain = false, vic
         <div className="pointer-events-none absolute inset-[1px] z-10 bg-[linear-gradient(120deg,transparent_8%,rgba(255,255,255,.22)_21%,transparent_34%,transparent_66%,rgba(255,255,255,.10)_82%,transparent_94%)] opacity-55 transition-opacity group-hover:opacity-90" />
         <div className="pointer-events-none absolute inset-0 z-[11] bg-[linear-gradient(180deg,rgba(255,255,255,.08),transparent_26%,rgba(0,0,0,.18)_80%,rgba(0,0,0,.35))]" />
         {substitute ? <span className="absolute right-1.5 top-1.5 z-40 rounded-full border border-[#f3ca40]/30 bg-[#101521]/88 px-1.5 py-0.5 text-[6px] font-black tracking-[.09em] text-[#f7d85e]">YEDEK</span> : null}
-        <div className="absolute left-1.5 top-1.5 z-40 rounded-md border border-white/25 bg-[#07111d]/90 px-1.5 py-[2px] text-[8px] font-black leading-none tracking-[.04em] text-white shadow-[0_3px_9px_rgba(0,0,0,.45)] backdrop-blur-md">{positionLabel[player.position]}</div>
-        {player.clubLogo ? <div className="absolute left-1.5 top-7 z-40 grid h-4 w-4 place-items-center"><img src={player.clubLogo} alt="" className="h-4 w-4 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,.45)]" draggable={false} /></div> : null}
+        <div className="absolute left-1 top-1 z-40 min-w-[27px] rounded-md border-2 border-[#f3ca40]/90 bg-[#02070c]/95 px-1.5 py-[3px] text-center text-[10px] font-black leading-none tracking-[.02em] text-[#fff4b0] shadow-[0_3px_10px_rgba(0,0,0,.68),0_0_10px_rgba(243,202,64,.20)] backdrop-blur-md sm:text-[10.5px]">{positionLabel[player.position]}</div>
+        {player.clubLogo ? <div className="absolute left-1.5 top-8 z-40 grid h-4 w-4 place-items-center"><img src={player.clubLogo} alt="" className="h-4 w-4 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,.45)]" draggable={false} /></div> : null}
         <div className="pointer-events-none relative z-20 mx-auto -mt-3 h-[78px] w-[74px] overflow-visible pt-1 [transform:translateZ(14px)]">
           {player.photo ? <img src={player.photo} alt={player.name} className="absolute bottom-0 left-1/2 h-[88px] w-[80px] max-w-none -translate-x-1/2 object-contain object-bottom drop-shadow-[0_10px_12px_rgba(0,0,0,.58)]" draggable={false} /> : <div className="absolute bottom-0 left-1/2 h-[76px] w-[60px] -translate-x-1/2 rounded-t-[48%] bg-[radial-gradient(circle_at_50%_23%,#c59270_0_17%,#8d6149_18%_30%,#16382f_31%_66%,#091c18_67%)] opacity-95 drop-shadow-[0_9px_11px_rgba(0,0,0,.52)]" />}
         </div>
