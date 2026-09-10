@@ -2,7 +2,8 @@ import type { FantasyPlayer, PlayerPosition } from "@/components/fantasy/PlayerC
 
 export type DetailedPosition = "GK" | "CB" | "LB" | "RB" | "CDM" | "CM" | "CAM" | "RW" | "LW" | "ST";
 
-export type GalatasarayFantasyPlayer = FantasyPlayer & {
+export type GalatasarayFantasyPlayer = Omit<FantasyPlayer,"id"> & {
+  id: string;
   detailedPosition: DetailedPosition;
   nationality: string;
   footballIQ: number;
