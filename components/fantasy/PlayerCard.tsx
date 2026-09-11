@@ -54,8 +54,8 @@ export default function PlayerCard({ player, tier = "gold", captain = false, vic
 
   return (
     <motion.article
-      layout="position"
-      animate={{ scale: isDragging ? 1.055 : 1, opacity: isDragging ? 0.98 : 1, y: 0, rotateX: isDragging ? 0 : 4 }}
+      layout={isDragging ? false : "position"}
+      animate={{ scale: 1, opacity: isDragging ? 0.98 : 1, y: 0, rotateX: isDragging ? 0 : 4 }}
       whileHover={!isDragging ? { y: -6, scale: 1.03, rotateX: 1.2 } : undefined}
       whileTap={!isDragging ? { scale: 0.985 } : undefined}
       transition={{ type: "spring", stiffness: 390, damping: 28, mass: 0.7 }}

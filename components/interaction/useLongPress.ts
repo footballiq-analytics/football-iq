@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type {
   MouseEvent as ReactMouseEvent,
   PointerEvent as ReactPointerEvent,
 } from "react";
 
 type LongPressOptions = {
+  disabled?: boolean;
   delay?: number;
   moveTolerance?: number;
 };
@@ -32,8 +33,10 @@ export function useLongPress(onLongPress?: () => void, options: LongPressOptions
     startRef.current = null;
   };
 
+  useEffect(()=>{if(options.disabled){if(timerRef.current)clearTimeout(timerRef.current);timerRef.current=null;startRef.current=null;triggeredRef.current=true}return()=>{if(timerRef.current)clearTimeout(timerRef.current)}},[options.disabled]);
+
   const onPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
-    if (!onLongPress || event.button !== 0 || !event.isPrimary) return;
+    if (options.disabled || !onLongPress || event.button !== 0 || !event.isPrimary) return;
 
     clear();
     triggeredRef.current = false;
@@ -65,6 +68,7 @@ export function useLongPress(onLongPress?: () => void, options: LongPressOptions
       : moveTolerance;
 
     if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > tolerance) {
+      triggeredRef.current = true;
       suppressContextMenuRef.current = false;
       clear();
     }
