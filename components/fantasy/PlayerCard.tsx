@@ -62,7 +62,7 @@ export default function PlayerCard({ player, tier = "gold", captain = false, vic
       onClick={onClick}
       style={{ transformPerspective: 900, transformStyle: "preserve-3d" }}
       className={[
-        "group relative isolate select-none overflow-visible [transform-origin:50%_88%]",
+        "fiq-player-card group relative isolate select-none overflow-visible [transform-origin:50%_88%]",
         compact ? "h-[110px] w-[86px]" : "h-[134px] w-[102px]",
         leadershipGlow,
         isDragging ? "z-[9999] drop-shadow-[0_26px_34px_rgba(0,0,0,.60)]" : "",
@@ -72,7 +72,7 @@ export default function PlayerCard({ player, tier = "gold", captain = false, vic
     >
       <div
         className={[
-          "absolute inset-0 overflow-hidden border backdrop-blur-xl",
+          "fiq-card-face absolute inset-0 overflow-hidden border backdrop-blur-xl",
           "[clip-path:polygon(13%_0,87%_0,100%_12%,97%_82%,84%_100%,16%_100%,3%_82%,0_12%)]",
           invalidPosition
             ? "border-rose-300/90 bg-[linear-gradient(155deg,rgba(128,29,37,.99),rgba(67,13,20,.99)_55%,rgba(20,7,10,.99))] ring-2 ring-rose-400/75 shadow-[0_0_34px_rgba(244,63,94,.47)]"
@@ -86,22 +86,22 @@ export default function PlayerCard({ player, tier = "gold", captain = false, vic
       >
         <div className="pointer-events-none absolute inset-[1px] z-10 bg-[linear-gradient(120deg,transparent_8%,rgba(255,255,255,.22)_21%,transparent_34%,transparent_66%,rgba(255,255,255,.10)_82%,transparent_94%)] opacity-55 transition-opacity group-hover:opacity-90" />
         <div className="pointer-events-none absolute inset-0 z-[11] bg-[linear-gradient(180deg,rgba(255,255,255,.08),transparent_26%,rgba(0,0,0,.18)_80%,rgba(0,0,0,.35))]" />
-        {substitute ? <span className="absolute right-1.5 top-1.5 z-40 rounded-full border border-[#f3ca40]/30 bg-[#101521]/88 px-1.5 py-0.5 text-[6px] font-black tracking-[.09em] text-[#f7d85e]">YEDEK</span> : null}
-        <div className="absolute left-1.5 top-1.5 z-40 min-w-[30px] rounded-md border-2 border-[#ffe778]/90 bg-[#02070c]/95 px-2 py-[3px] text-center text-[9px] font-black leading-none tracking-[.045em] text-white shadow-[0_0_0_1px_rgba(0,0,0,.8),0_4px_10px_rgba(0,0,0,.55),0_0_10px_rgba(243,202,64,.18)] backdrop-blur-md">{positionLabel[player.position]}</div>
+        {substitute ? <span className="fiq-card-substitute absolute right-1.5 top-1.5 z-40 rounded-full border border-[#f3ca40]/30 bg-[#101521]/88 px-1.5 py-0.5 text-[6px] font-black tracking-[.09em] text-[#f7d85e]">YEDEK</span> : null}
+        <div className="fiq-card-position absolute left-1.5 top-1.5 z-40 min-w-[30px] rounded-md border-2 border-[#ffe778]/90 bg-[#02070c]/95 px-2 py-[3px] text-center text-[9px] font-black leading-none tracking-[.045em] text-white shadow-[0_0_0_1px_rgba(0,0,0,.8),0_4px_10px_rgba(0,0,0,.55),0_0_10px_rgba(243,202,64,.18)] backdrop-blur-md">{positionLabel[player.position]}</div>
         {safeClubLogo ? <div className="absolute left-1.5 top-8 z-40 grid h-4 w-4 place-items-center"><img src={safeClubLogo} alt="" className="h-4 w-4 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,.45)]" draggable={false} /></div> : null}
-        <div className="pointer-events-none relative z-20 mx-auto -mt-3 h-[78px] w-[74px] overflow-visible pt-1 [transform:translateZ(14px)]">
+        <div className="fiq-card-portrait pointer-events-none relative z-20 mx-auto -mt-3 h-[78px] w-[74px] overflow-visible pt-1 [transform:translateZ(14px)]">
           {safePhoto ? <img src={safePhoto} alt={player.name} className="absolute bottom-0 left-1/2 h-[88px] w-[80px] max-w-none -translate-x-1/2 object-contain object-bottom drop-shadow-[0_10px_12px_rgba(0,0,0,.58)]" draggable={false} /> : <div className="absolute bottom-0 left-1/2 h-[76px] w-[60px] -translate-x-1/2 rounded-t-[48%] bg-[radial-gradient(circle_at_50%_23%,#c59270_0_17%,#8d6149_18%_30%,#16382f_31%_66%,#091c18_67%)] opacity-95 drop-shadow-[0_9px_11px_rgba(0,0,0,.52)]" />}
         </div>
-        <div className="relative z-30 -mt-1 min-w-0 px-1.5 text-center [transform:translateZ(18px)]">
-          <div className="rounded-md border border-white/15 bg-[#080d1a]/88 px-1 py-0.5"><strong className="block truncate text-[9px] font-black leading-tight text-white">{player.name}</strong></div>
-          <div className="mt-1 grid grid-cols-2 gap-1 text-[7px] font-black leading-none"><span className="rounded border border-white/15 bg-black/40 px-1 py-[3px] text-[#ffe676]">{player.price.toFixed(1)}M</span><span className="rounded border border-emerald-300/10 bg-black/40 px-1 py-[3px] text-[#00e676]">{player.points} P</span></div>
+        <div className="fiq-card-info relative z-30 -mt-1 min-w-0 px-1.5 text-center [transform:translateZ(18px)]">
+          <div className="rounded-md border border-white/15 bg-[#080d1a]/88 px-1 py-0.5"><strong title={player.name} className="fiq-card-name block truncate text-[9px] font-black leading-tight text-white">{player.name}</strong></div>
+          <div className="fiq-card-stats mt-1 grid grid-cols-2 gap-1 text-[7px] font-black leading-none"><span className="rounded border border-white/15 bg-black/40 px-1 py-[3px] text-[#ffe676]">{player.price.toFixed(1)}M</span><span className="rounded border border-emerald-300/10 bg-black/40 px-1 py-[3px] text-[#00e676]">{player.points} P</span></div>
         </div>
       </div>
 
       {invalidPosition ? <span className="absolute -left-1.5 -top-1.5 z-[80] rounded-full border border-rose-200/70 bg-rose-600 px-1.5 py-0.5 text-[6px] font-black text-white shadow-[0_0_16px_rgba(244,63,94,.55)]">MEVKİ HATASI</span> : null}
       {badge ? (
         <span className={[
-          "absolute -right-[18px] -top-[18px] z-[100] grid h-10 w-10 place-items-center rounded-full border-2 text-[15px] font-black shadow-[0_8px_16px_rgba(0,0,0,.55)]",
+          "fiq-card-captain absolute -right-[18px] -top-[18px] z-[100] grid h-10 w-10 place-items-center rounded-full border-2 text-[15px] font-black shadow-[0_8px_16px_rgba(0,0,0,.55)]",
           viceCaptain && !captain && !tripleCaptain
             ? "border-[#d7ecff] bg-[radial-gradient(circle_at_32%_22%,#f6fbff_0%,#86c4ff_28%,#378de8_64%,#0c3d78_100%)] text-[#031b36] shadow-[0_0_0_3px_rgba(88,169,255,.20),0_0_12px_rgba(188,225,255,.9),0_0_30px_rgba(57,146,239,.85),0_8px_16px_rgba(0,0,0,.55)]"
             : "border-[#fff8c7] bg-[radial-gradient(circle_at_32%_22%,#fffef0_0%,#ffe66d_28%,#d69b13_64%,#6a3f03_100%)] text-[#211400] shadow-[0_0_0_3px_rgba(255,223,91,.20),0_0_12px_rgba(255,245,180,.9),0_0_30px_rgba(255,199,30,.9),0_8px_16px_rgba(0,0,0,.55)]",

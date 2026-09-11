@@ -1,5 +1,6 @@
 "use client";
 
+import { assessDirectTransfer, type TransferAssessment } from "@/lib/direct-transfer";
 import { useDraggable } from "@dnd-kit/core";
 import { useEffect, useMemo, useState } from "react";
 import type { FantasyCoach } from "@/data/superlig-coaches-2026";
@@ -11,7 +12,7 @@ export type TransferPanelProps = {
   clubs: readonly string[];
   selectedIds: (string | number)[];
   selectedCoachId?: string | null;
-  positionCapacity: Record<PlayerPosition, number>;
+  availableSlots: Record<PlayerPosition, number>;
   onQuickAdd: (player: FantasyPlayer) => void;
   onSelectCoach: (coach: FantasyCoach) => void;
   onPlayerClick?: (player: FantasyPlayer) => void;
@@ -19,13 +20,11 @@ export type TransferPanelProps = {
 
 type FilterTab = "ALL" | PlayerPosition | "COACH";
 type SortMode = "POINTS" | "PRICE_ASC" | "PRICE_DESC" | "POPULAR";
-type TransferAssessment = { eligible: boolean; reason: string | null };
 
 const tabLabel: Record<FilterTab, string> = { ALL:"TÜMÜ", GK:"KL", DEF:"DEF", MID:"ORT", FWD:"FOR", COACH:"TD" };
-const positions: PlayerPosition[] = ["GK", "DEF", "MID", "FWD"];
 const BUDGET = 100;
 
-export default function TransferPanel({players,coaches,clubs,selectedIds,selectedCoachId,positionCapacity,onQuickAdd,onSelectCoach,onPlayerClick}:TransferPanelProps){
+export default function TransferPanel({players,coaches,clubs,selectedIds,selectedCoachId,availableSlots,onQuickAdd,onSelectCoach,onPlayerClick}:TransferPanelProps){
  const[query,setQuery]=useState("");
  const[debouncedQuery,setDebouncedQuery]=useState("");
  const[selectedClubs,setSelectedClubs]=useState<string[]>([]);
@@ -39,7 +38,6 @@ export default function TransferPanel({players,coaches,clubs,selectedIds,selecte
  const sortedClubs=useMemo(()=>[...clubs].sort((a,b)=>a.localeCompare(b,"tr",{sensitivity:"base"})),[clubs]);
  const selectedSet=useMemo(()=>new Set(selectedIds.map(String)),[selectedIds]);
  const selectedPlayers=useMemo(()=>players.filter(p=>selectedSet.has(String(p.id))),[players,selectedSet]);
- const selectedByPosition=useMemo(()=>{const c:Record<PlayerPosition,number>={GK:0,DEF:0,MID:0,FWD:0};for(const p of selectedPlayers)c[p.position]++;return c},[selectedPlayers]);
  const spent=useMemo(()=>selectedPlayers.reduce((sum,p)=>sum+p.price,0),[selectedPlayers]);
  const remainingBudget=BUDGET-spent;
  const selectedClubCounts=useMemo(()=>{const counts=new Map<string,number>();for(const p of selectedPlayers)counts.set(p.club,(counts.get(p.club)??0)+1);return counts},[selectedPlayers]);
@@ -48,33 +46,17 @@ export default function TransferPanel({players,coaches,clubs,selectedIds,selecte
  const scopePlayers=useMemo(()=>selectedClubs.length===0?players:players.filter(p=>selectedClubs.includes(p.club)),[players,selectedClubs]);
  const positionCounts=useMemo(()=>{const counts:Record<PlayerPosition,number>={GK:0,DEF:0,MID:0,FWD:0};for(const p of scopePlayers)counts[p.position]++;return counts},[scopePlayers]);
 
- const transferAssessments=useMemo(()=>{
-  const assessments=new Map<string,TransferAssessment>();
-  for(const candidate of players){
-   const id=String(candidate.id);
-   if(selectedSet.has(id)){assessments.set(id,{eligible:false,reason:"KADRODA"});continue}
-   const samePositionSelected=selectedPlayers.filter(p=>p.position===candidate.position);
-   const freePositionSlot=selectedByPosition[candidate.position]<(positionCapacity[candidate.position]??0);
-   const hasFreeSquadPlace=selectedIds.length<15&&freePositionSlot;
-   const clubCount=selectedClubCounts.get(candidate.club)??0;
-   const directClubOk=clubCount<3;
-   const directBudgetOk=candidate.price<=remainingBudget+0.0001;
-   const directAdd=hasFreeSquadPlace&&directClubOk&&directBudgetOk;
-   const replacementOptions=samePositionSelected.filter(replaced=>{
-    const clubOk=clubCount<3||replaced.club===candidate.club;
-    const budgetOk=candidate.price<=remainingBudget+replaced.price+0.0001;
-    return clubOk&&budgetOk;
-   });
-   if(directAdd||replacementOptions.length){assessments.set(id,{eligible:true,reason:null});continue}
-   const canFixClub=samePositionSelected.some(replaced=>replaced.club===candidate.club);
-   const clubBlocked=clubCount>=3&&!canFixClub;
-   const bestReplacementBudget=samePositionSelected.reduce((best,replaced)=>Math.max(best,remainingBudget+replaced.price),remainingBudget);
-   const budgetBlocked=candidate.price>bestReplacementBudget+0.0001;
-   const noPositionPath=!freePositionSlot&&samePositionSelected.length===0;
-   assessments.set(id,{eligible:false,reason:clubBlocked?"3 OYUNCU SINIRI":budgetBlocked?"BÜTÇE YETERSİZ":noPositionPath?"UYGUN MEVKİ/DEĞİŞİM YOK":!hasFreeSquadPlace?"UYGUN DEĞİŞİM YOK":"UYGUN TRANSFER DEĞİL"});
-  }
-  return assessments;
- },[players,positionCapacity,remainingBudget,selectedByPosition,selectedClubCounts,selectedIds.length,selectedPlayers,selectedSet]);
+ const transferAssessments=useMemo(()=>new Map(players.map(candidate=>[
+  String(candidate.id),
+  assessDirectTransfer({
+   alreadySelected:selectedSet.has(String(candidate.id)),
+   squadSize:selectedIds.length,
+   clubCount:selectedClubCounts.get(candidate.club)??0,
+   availableSlots:availableSlots[candidate.position]??0,
+   price:candidate.price,
+   remainingBudget,
+  }),
+ ])),[players,availableSlots,remainingBudget,selectedClubCounts,selectedIds.length,selectedSet]);
 
  const filteredPlayers=useMemo(()=>{
   if(showingCoaches)return[];
@@ -105,7 +87,7 @@ export default function TransferPanel({players,coaches,clubs,selectedIds,selecte
 
    <div className="fiq-position-tabs mt-2 grid grid-cols-6 gap-1 rounded-lg border-2 border-[#f3ca40]/55 bg-black/60 p-1">{(["ALL","GK","DEF","MID","FWD","COACH"] as const).map(item=><button type="button" key={item} onClick={()=>{setPosition(item);setQuery("")}} className={`min-h-10 rounded-md border text-[9px] font-black leading-tight ${position===item?"border-[#ffe778] bg-[#f3ca40]/12 text-[#ffe778] shadow-[0_0_12px_rgba(243,202,64,.22)]":"border-[#f3ca40]/35 bg-black text-white/85"}`}><span>{tabLabel[item]}</span>{item!=="ALL"&&item!=="COACH"?<small className="mt-0.5 block text-[8px] text-white/55">{positionCounts[item]}</small>:null}</button>)}</div>
 
-   {!showingCoaches?<div className="fiq-transfer-sort mt-2 grid grid-cols-[minmax(0,1fr)_86px] gap-1.5"><button type="button" onClick={()=>setSmartOnly(v=>!v)} className={`min-h-10 rounded-lg border-2 bg-black px-2.5 py-1.5 text-left font-black ${smartOnly?"border-emerald-300/70 text-emerald-300":"border-[#f3ca40]/70 text-[#ffe778]"}`}><span className="block text-[10px]">UYGUN TRANSFERLER {smartOnly?"✓":""}</span><small className="block text-[7px] font-semibold text-white/45">Bütçe · kulüp sınırı · mevki</small></button><select value={sort} onChange={e=>setSort(e.target.value as SortMode)} aria-label="Sıralama" className="h-10 rounded-lg border-2 border-[#f3ca40]/65 bg-black px-2 text-[10px] font-black text-[#ffe778] outline-none"><option value="POINTS">PUAN</option><option value="PRICE_ASC">Fiyat: Artan</option><option value="PRICE_DESC">Fiyat: Azalan</option><option value="POPULAR">Popülerlik</option></select></div>:null}
+   {!showingCoaches?<div className="fiq-transfer-sort mt-2 grid grid-cols-[minmax(0,1fr)_86px] gap-1.5"><button type="button" onClick={()=>setSmartOnly(v=>!v)} className={`min-h-10 rounded-lg border-2 bg-black px-2.5 py-1.5 text-left font-black ${smartOnly?"border-emerald-300/70 text-emerald-300":"border-[#f3ca40]/70 text-[#ffe778]"}`}><span className="block text-[10px]">UYGUN TRANSFERLER {smartOnly?"✓":""}</span><small className="block text-[7px] font-semibold text-white/45">Mevcut bütçe · boş mevki · en fazla 3 oyuncu</small></button><select value={sort} onChange={e=>setSort(e.target.value as SortMode)} aria-label="Sıralama" className="h-10 rounded-lg border-2 border-[#f3ca40]/65 bg-black px-2 text-[10px] font-black text-[#ffe778] outline-none"><option value="POINTS">PUAN</option><option value="PRICE_ASC">Fiyat: Artan</option><option value="PRICE_DESC">Fiyat: Azalan</option><option value="POPULAR">Popülerlik</option></select></div>:null}
   </div>
 
   <div aria-label="Transfer sonuçları" tabIndex={0} className="fiq-transfer-results relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-8 pt-1.5 touch-pan-y [-webkit-overflow-scrolling:touch]">{showingCoaches?filteredCoaches.map(c=><CoachRow key={c.id} coach={c} selected={c.id===selectedCoachId} onSelectCoach={onSelectCoach}/>):filteredPlayers.map(player=><TransferDraggable key={String(player.id)} player={player} selected={selectedSet.has(String(player.id))} assessment={transferAssessments.get(String(player.id))??{eligible:false,reason:null}} onQuickAdd={onQuickAdd} onPlayerClick={onPlayerClick}/>)}{!resultCount?<div className="grid min-h-36 place-items-center px-4 text-center text-[10px] font-bold text-white/35">{smartOnly?"Kadro kurallarına uyan transfer bulunamadı.":"Bu filtrelerle eşleşen kayıt bulunamadı."}</div>:null}</div>
@@ -114,4 +96,4 @@ export default function TransferPanel({players,coaches,clubs,selectedIds,selecte
 
 function Status({label,value,ok=false}:{label:string;value:string;ok?:boolean}){return <div className="rounded-md border border-[#f3ca40]/35 bg-black px-2 py-1 text-right"><small className="block text-[6px] font-black text-white/35">{label}</small><b className={`text-[10px] font-black ${ok?"text-emerald-300":"text-[#ffe778]"}`}>{value}</b></div>}
 function CoachRow({coach,selected,onSelectCoach}:{coach:FantasyCoach;selected:boolean;onSelectCoach:(c:FantasyCoach)=>void}){return <div className="mb-1.5 grid grid-cols-[1fr_44px] items-center gap-2 rounded-lg border border-white/10 bg-[#101b29] px-2.5 py-2"><div><strong className="block truncate text-[12px] font-black">{coach.name}</strong><small className="text-[8px] text-white/45">{coach.club}</small></div><button type="button" onClick={()=>onSelectCoach(coach)} className="h-9 w-9 rounded-full border-2 border-[#f3ca40]/70 bg-black text-[#ffe778]">{selected?"✓":"+"}</button></div>}
-function TransferDraggable({player,selected,assessment,onQuickAdd,onPlayerClick}:{player:FantasyPlayer;selected:boolean;assessment:TransferAssessment;onQuickAdd:(p:FantasyPlayer)=>void;onPlayerClick?:(p:FantasyPlayer)=>void}){const d=useDraggable({id:`transfer:${player.id}`,disabled:selected,data:{sourceSlotId:"transfer",playerId:String(player.id),sourceType:"transfer"}});return <div ref={d.setNodeRef} data-fiq-dnd="true" className={`mb-1.5 select-none rounded-lg border px-2.5 py-2 transition-all ${d.isDragging?"border-cyan-300/60 bg-cyan-400/10 opacity-35":selected?"border-emerald-300/45 bg-emerald-300/[.07]":assessment.eligible?"border-emerald-300/20 bg-[#0b1e2a]":"border-white/10 bg-[#0b1e2a]"}`}><div className="grid grid-cols-[40px_minmax(0,1fr)_54px_40px] items-center gap-2"><button ref={d.setActivatorNodeRef} type="button" disabled={selected} {...d.listeners}{...d.attributes} aria-label={`${player.name} oyuncusunu sürükle`} className={`grid h-10 w-9 place-items-center rounded-md border-2 text-[14px] ${selected?"border-emerald-300/20 bg-black text-emerald-300/45":"cursor-grab touch-none border-[#f3ca40]/65 bg-black text-[#ffe778]"}`}>{selected?"✓":"⋮⋮"}</button><button type="button" onClick={()=>onPlayerClick?.(player)} className="min-w-0 text-left"><div className="flex min-w-0 items-center gap-1"><strong className="truncate text-[13px] font-black text-white">{player.name}</strong>{selected?<span className="shrink-0 rounded-full border border-emerald-300/35 px-1.5 py-0.5 text-[6px] font-black text-emerald-200">KADRODA</span>:null}</div><small className="block text-[8px] font-semibold text-white/50">{player.club} · {player.position}</small>{!selected?<span className={`mt-1 inline-block rounded-full border px-1.5 py-0.5 text-[6px] font-black ${assessment.eligible?"border-emerald-300/35 bg-emerald-300/10 text-emerald-200":"border-rose-300/25 bg-rose-300/[.06] text-rose-200"}`}>{assessment.eligible?"UYGUN":assessment.reason??"UYGUN DEĞİL"}</span>:null}</button><span className="text-right"><b className="block text-[10px]">{player.price.toFixed(1)}M</b><small className="text-[8px] text-[#ffe45f]">{player.points} P</small></span><button type="button" disabled={selected} onPointerDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();onQuickAdd(player)}} className="h-9 w-9 rounded-full border-2 border-[#f3ca40]/70 bg-black text-lg font-black text-[#ffe778] disabled:border-emerald-300/20 disabled:text-emerald-300/50">{selected?"✓":"+"}</button></div></div>}
+function TransferDraggable({player,selected,assessment,onQuickAdd,onPlayerClick}:{player:FantasyPlayer;selected:boolean;assessment:TransferAssessment;onQuickAdd:(p:FantasyPlayer)=>void;onPlayerClick?:(p:FantasyPlayer)=>void}){const d=useDraggable({id:`transfer:${player.id}`,disabled:selected,data:{sourceSlotId:"transfer",playerId:String(player.id),sourceType:"transfer"}});return <div ref={d.setNodeRef} data-fiq-dnd="true" className={`mb-1.5 select-none rounded-lg border px-2.5 py-2 transition-all ${d.isDragging?"border-cyan-300/60 bg-cyan-400/10 opacity-35":selected?"border-emerald-300/45 bg-emerald-300/[.07]":assessment.eligible?"border-emerald-300/20 bg-[#0b1e2a]":"border-white/10 bg-[#0b1e2a]"}`}><div className="grid grid-cols-[40px_minmax(0,1fr)_54px_40px] items-center gap-2"><button ref={d.setActivatorNodeRef} type="button" disabled={selected} {...d.listeners}{...d.attributes} aria-label={`${player.name} oyuncusunu sürükle`} className={`grid h-10 w-9 place-items-center rounded-md border-2 text-[14px] ${selected?"border-emerald-300/20 bg-black text-emerald-300/45":"cursor-grab touch-none border-[#f3ca40]/65 bg-black text-[#ffe778]"}`}>{selected?"✓":"⋮⋮"}</button><button type="button" onClick={()=>onPlayerClick?.(player)} className="min-w-0 text-left"><div className="flex min-w-0 items-center gap-1"><strong className="truncate text-[13px] font-black text-white">{player.name}</strong>{selected?<span className="shrink-0 rounded-full border border-emerald-300/35 px-1.5 py-0.5 text-[6px] font-black text-emerald-200">KADRODA</span>:null}</div><small className="block text-[8px] font-semibold text-white/50">{player.club} · {player.position}</small>{!selected?<span className={`mt-1 inline-block rounded-full border px-1.5 py-0.5 text-[6px] font-black ${assessment.eligible?"border-emerald-300/35 bg-emerald-300/10 text-emerald-200":"border-rose-300/25 bg-rose-300/[.06] text-rose-200"}`}>{assessment.eligible?"UYGUN":assessment.reason??"UYGUN DEĞİL"}</span>:null}</button><span className="text-right"><b className="block text-[10px]">{player.price.toFixed(1)}M</b><small className="text-[8px] text-[#ffe45f]">{player.points} P</small></span><button type="button" disabled={selected||!assessment.eligible} aria-label={`${player.name} kadroya ekle`} title={assessment.reason??"Kadroya ekle"} onPointerDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();onQuickAdd(player)}} className="h-9 w-9 rounded-full border-2 border-[#f3ca40]/70 bg-black text-lg font-black text-[#ffe778] disabled:border-emerald-300/20 disabled:text-emerald-300/50">{selected?"✓":"+"}</button></div></div>}
