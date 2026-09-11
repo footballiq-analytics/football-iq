@@ -155,6 +155,12 @@ export const useTeamStore=create<TeamStore>((set,get)=>({
  addPlayerFromTransfer:(p,target)=>{
   const{startingSlots,benchSlots,players}=get();
   if(containsPlayer(startingSlots,benchSlots,p.id)){set({toast:`${p.name} zaten kadroda.`});return false}
+  const selectedIds=[...startingSlots,...benchSlots].map(s=>s.playerId).filter((id):id is string=>Boolean(id));
+  if(selectedIds.length>=15){set({toast:"Transfer iptal edildi · 15 kişilik kadro dolu."});return false}
+  const selectedPlayers=selectedIds.map(id=>players[id]).filter((x):x is Player=>Boolean(x));
+  const spend=selectedPlayers.reduce((sum,x)=>sum+x.price,0);
+  if(spend+p.price>MAX_BUDGET+0.0001){set({toast:"Transfer iptal edildi · bütçe yetersiz."});return false}
+  if(selectedPlayers.filter(x=>x.club===p.club).length>=3){set({toast:`${p.club} için 3 oyuncu sınırına ulaştın.`});return false}
   const nextPlayers={...players,[p.id]:p};
   if(target.startsWith("start-")){const i=startingSlots.findIndex(s=>s.id===target);if(i<0){set({toast:"Transfer iptal edildi · saha slotu bulunamadı."});return false}const slot=startingSlots[i];if(slot.playerId||slot.position!==p.position){set({toast:`${p.name} bu mevki alanına bırakılamaz.`});return false}const n=[...startingSlots];n[i]={...slot,playerId:p.id};set({players:nextPlayers,startingSlots:n,toast:`${p.name} ilk 11'e eklendi.`});return true}
   if(target.startsWith("bench-")){const i=benchSlots.findIndex(s=>s.id===target);if(i<0){set({toast:"Transfer iptal edildi · yedek slotu bulunamadı."});return false}const slot=benchSlots[i];if(slot.playerId||!benchAccepts(slot,p)){set({toast:`Bu yedek koltuğu yalnızca ${slot.position} oyuncusu kabul eder.`});return false}const n=[...benchSlots];n[i]={...slot,playerId:p.id};set({players:nextPlayers,benchSlots:n,toast:`${p.name} yedek kulübesine eklendi.`});return true}
