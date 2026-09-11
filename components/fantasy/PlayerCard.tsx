@@ -32,6 +32,7 @@ type PlayerCardProps = {
   isDragging?: boolean;
   invalidPosition?: boolean;
   onClick?: () => void;
+  onRemove?: () => void;
 };
 
 const tierStyles: Record<CardTier, string> = {
@@ -42,7 +43,7 @@ const tierStyles: Record<CardTier, string> = {
 
 const positionLabel: Record<PlayerPosition, string> = { GK: "KL", DEF: "DEF", MID: "ORT", FWD: "FOR" };
 
-export default function PlayerCard({ player, tier = "gold", captain = false, viceCaptain = false, tripleCaptain = false, substitute = false, compact = false, isDragging = false, invalidPosition = false, onClick }: PlayerCardProps) {
+export default function PlayerCard({ player, tier = "gold", captain = false, viceCaptain = false, tripleCaptain = false, substitute = false, compact = false, isDragging = false, invalidPosition = false, onClick, onRemove }: PlayerCardProps) {
   const badge = tripleCaptain ? "3×" : captain ? "C" : viceCaptain ? "C2" : null;
   const leadershipGlow = viceCaptain
     ? "drop-shadow-[0_0_18px_rgba(67,155,255,.58)]"
@@ -109,6 +110,7 @@ export default function PlayerCard({ player, tier = "gold", captain = false, vic
           {badge}
         </span>
       ) : null}
+      {onRemove && !isDragging ? <button type="button" data-card-remove="true" className="fiq-card-remove" aria-label={`${player.name} kadrodan çıkar`} title="Kadrodan çıkar" onPointerDown={e=>e.stopPropagation()} onMouseDown={e=>e.stopPropagation()} onTouchStart={e=>e.stopPropagation()} onKeyDown={e=>e.stopPropagation()} onClick={e=>{e.preventDefault();e.stopPropagation();onRemove()}}>×</button> : null}
     </motion.article>
   );
 }

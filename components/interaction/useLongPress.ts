@@ -85,6 +85,7 @@ export function useLongPress(onLongPress?: () => void, options: LongPressOptions
   const onLostPointerCapture = () => finish();
 
   const onClickCapture = (event: ReactMouseEvent<HTMLElement>) => {
+    if ((event.target as Element).closest('[data-card-remove="true"]')) { triggeredRef.current=false; return; }
     if (!triggeredRef.current) return;
     event.preventDefault();
     event.stopPropagation();
