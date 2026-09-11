@@ -53,16 +53,17 @@ body:has(.fiq-team-page) .fiq-card-captain{top:22px;left:auto;right:-5px;width:2
 .fiq-dugout>.relative{margin:0}
 .fiq-dugout>.relative>b{font-size:14px;line-height:20px;letter-spacing:.08em;color:#ffe89a;text-shadow:0 2px 3px #000,0 0 10px #e8b83a80}
 .fiq-dugout>.relative>small{display:none}
-.fiq-coach-label{display:none}
+.fiq-coach-label{display:block;visibility:hidden}
 .fiq-team-page .fiq-bench-grid{display:block;height:var(--fiq-card-height);margin:2px 0 0}
 .fiq-team-page .fiq-bench-grid>*{position:absolute;bottom:0;transform:translateX(-50%);margin:0;width:var(--fiq-card-width)}
 .fiq-team-page .fiq-bench-grid>:nth-child(1){left:9%;width:42px;height:60px}
 .fiq-team-page .fiq-bench-grid>:nth-child(1) span{font-size:10px}
 .fiq-team-page .fiq-bench-grid>:nth-child(1) b{font-size:10px;white-space:normal;line-height:1.1}
-.fiq-team-page .fiq-bench-grid>:nth-child(2){left:29%}
-.fiq-team-page .fiq-bench-grid>:nth-child(3){left:50%}
-.fiq-team-page .fiq-bench-grid>:nth-child(4){left:69.5%}
-.fiq-team-page .fiq-bench-grid>:nth-child(5){left:90%}
+.fiq-team-page .fiq-bench-grid>:not(:first-child){transform:none}
+.fiq-team-page .fiq-bench-grid>:nth-child(2){left:calc(29% - var(--fiq-card-width)/2)}
+.fiq-team-page .fiq-bench-grid>:nth-child(3){left:calc(50% - var(--fiq-card-width)/2)}
+.fiq-team-page .fiq-bench-grid>:nth-child(4){left:calc(69.5% - var(--fiq-card-width)/2)}
+.fiq-team-page .fiq-bench-grid>:nth-child(5){left:calc(90% - var(--fiq-card-width)/2)}
 .fiq-team-page .fiq-bench-slot{border:0;background:transparent}
 /* A mounted drawer retains search and selection through orientation changes. */
 .fiq-transfer-drawer{position:relative;min-width:0;min-height:0;height:100%}
@@ -109,6 +110,7 @@ body:has(.fiq-team-page) .fiq-card-captain{top:22px;left:auto;right:-5px;width:2
 @media(max-width:900px) and (orientation:portrait){
  body:has(.fiq-team-page){--fiq-card-width:clamp(50px,calc((100vw - 40px)/5),100px);--fiq-card-height:clamp(66px,calc((100dvh - 264px - env(safe-area-inset-top) - env(safe-area-inset-bottom))/5),136px)}
  .fiq-team-page{gap:4px;padding:4px}
+ .fiq-team-page:has(.fiq-transfer-drawer.is-open){z-index:100}
  .fiq-team-toolbar{grid-template-columns:1fr}
  .fiq-team-metrics>div{min-height:38px;padding:3px 6px}
  .fiq-team-metrics strong{font-size:14px}
@@ -139,7 +141,7 @@ body:has(.fiq-team-page) .fiq-card-captain{top:22px;left:auto;right:-5px;width:2
 @media(max-height:740px){body:has(.fiq-team-page) .fiq-card-portrait{display:none}}
 /* Short landscape: goalkeeper + four reserves share the bottom band. */
 @media(orientation:landscape) and (max-height:600px){
- body:has(.fiq-team-page){--fiq-header-h:28px;--fiq-nav-h:28px;--fiq-card-height:54px;--fiq-card-width:clamp(52px,calc((100vw - 320px)/5),84px)}
+ body:has(.fiq-team-page){--fiq-header-h:28px;--fiq-nav-h:28px;--fiq-card-height:54px;--fiq-card-width:clamp(52px,calc((100vw - 320px - env(safe-area-inset-left) - env(safe-area-inset-right))/5),84px)}
  .fiq-team-page{padding:2px max(4px,env(safe-area-inset-right)) 2px max(4px,env(safe-area-inset-left));gap:3px}
  .fiq-team-toolbar{grid-template-columns:minmax(0,1fr) auto}
  .fiq-team-metrics>div{min-height:32px;padding:1px 5px}
@@ -161,12 +163,12 @@ body:has(.fiq-team-page) .fiq-card-captain{top:22px;left:auto;right:-5px;width:2
  .fiq-dugout-art>img{left:-48%;width:170%}
  .fiq-dugout>.relative{grid-template-columns:1fr auto;padding:0 3px;height:19px}
  .fiq-dugout>.relative>b{font-size:10px;line-height:13px;letter-spacing:0}
- .fiq-coach-label{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;color:white}
+ .fiq-coach-label{display:block;visibility:visible;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;color:white}
  .fiq-team-page .fiq-bench-grid>:first-child{display:none}
- .fiq-team-page .fiq-bench-grid>:nth-child(2){left:12.5%}
- .fiq-team-page .fiq-bench-grid>:nth-child(3){left:37.5%}
- .fiq-team-page .fiq-bench-grid>:nth-child(4){left:62.5%}
- .fiq-team-page .fiq-bench-grid>:nth-child(5){left:87.5%}
+ .fiq-team-page .fiq-bench-grid>:nth-child(2){left:calc(12.5% - var(--fiq-card-width)/2)}
+ .fiq-team-page .fiq-bench-grid>:nth-child(3){left:calc(37.5% - var(--fiq-card-width)/2)}
+ .fiq-team-page .fiq-bench-grid>:nth-child(4){left:calc(62.5% - var(--fiq-card-width)/2)}
+ .fiq-team-page .fiq-bench-grid>:nth-child(5){left:calc(87.5% - var(--fiq-card-width)/2)}
  .fiq-team-status{position:fixed;top:0;left:210px;width:calc(100vw - 300px);height:28px;padding:6px 3px;font-size:10px;color:#ffecb1;z-index:70}
  body:has(.fiq-team-page) .fiq-card-info{bottom:3px;padding:0 1px}
  body:has(.fiq-team-page) .fiq-card-name{height:26px;font-size:12px;line-height:13px;padding-right:7px;text-align:left}
@@ -196,3 +198,5 @@ body:has(.fiq-team-page) .fiq-logo b{color:#f5d379}
 }
 /* Preserve the existing six-item navigation on the other mobile pages too. */
 @media(max-width:800px){body:not(:has(.fiq-team-page)) .fiq-bottom-nav{grid-template-columns:repeat(6,minmax(0,1fr))}}
+
+body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";margin-left:3px}
