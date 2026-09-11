@@ -56,8 +56,8 @@ export default function PlayerCard({ player, tier = "gold", captain = false, vic
   return (
     <motion.article
       layout={isDragging ? false : "position"}
-      animate={{ scale: 1, opacity: isDragging ? 0.98 : 1, y: 0, rotateX: isDragging ? 0 : 4 }}
-      whileHover={!isDragging ? { y: -6, scale: 1.03, rotateX: 1.2 } : undefined}
+      animate={{ scale: 1, opacity: isDragging ? 0.98 : 1, y: 0, rotateX: 0 }}
+      whileHover={undefined}
       whileTap={!isDragging ? { scale: 0.985 } : undefined}
       transition={{ type: "spring", stiffness: 390, damping: 28, mass: 0.7 }}
       onClick={onClick}
@@ -95,7 +95,7 @@ export default function PlayerCard({ player, tier = "gold", captain = false, vic
         </div>
         <div className="fiq-card-info relative z-30 -mt-1 min-w-0 px-1.5 text-center [transform:translateZ(18px)]">
           <div className="rounded-md border border-white/15 bg-[#080d1a]/88 px-1 py-0.5"><strong title={player.name} className="fiq-card-name block truncate text-[9px] font-black leading-tight text-white">{player.name}</strong></div>
-          <div className="fiq-card-stats mt-1 grid grid-cols-2 gap-1 text-[7px] font-black leading-none"><span className="rounded border border-white/15 bg-black/40 px-1 py-[3px] text-[#ffe676]">{player.price.toFixed(1)}M</span><span className="rounded border border-emerald-300/10 bg-black/40 px-1 py-[3px] text-[#00e676]">{player.points} P</span></div>
+          <div className="fiq-card-stats mt-1 grid grid-cols-2 gap-1 text-[7px] font-black leading-none"><span className="rounded border border-white/15 bg-black/40 px-1 py-[3px] text-[#ffe676]">{Number(player.price.toFixed(1))}M</span><span className="rounded border border-emerald-300/10 bg-black/40 px-1 py-[3px] text-[#00e676]">{player.points} P</span></div>
         </div>
       </div>
 
