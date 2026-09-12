@@ -41,6 +41,8 @@ export const REAL_SQUAD_CLUBS = [
   "Çorum FK",
 ] as const;
 
+export const POSITION_PRICE_CAPS = { GK: 5.5, DEF: 6 } as const;
+
 export const FANTASY_PLAYER_POOL: StorePlayer[] = [
   ...GALATASARAY_FANTASY_PLAYERS,
   ...BESIKTAS_FANTASY_PLAYERS,
@@ -60,7 +62,12 @@ export const FANTASY_PLAYER_POOL: StorePlayer[] = [
   ...EYUPSPOR_FANTASY_PLAYERS,
   ...ERZURUMSPOR_FANTASY_PLAYERS,
   ...CORUM_FANTASY_PLAYERS,
-];
+].map(player => ({
+  ...player,
+  price: player.position === "GK" || player.position === "DEF"
+    ? Math.min(player.price, POSITION_PRICE_CAPS[player.position])
+    : player.price,
+}));
 
 export const SQUAD_STORAGE_KEY = "futbol-iq-fantasy-squad-v26";
 
@@ -117,6 +124,7 @@ export function validateFantasyDataIntegrity(): FantasyDataIntegrityReport {
     if (!leagueClubs.has(club)) errors.push(`${name || id}: geçersiz kulüp adı '${club}'.`);
     if (!VALID_POSITIONS.has(player.position)) errors.push(`${name || id}: geçersiz mevki '${String(player.position)}'.`);
     if (!Number.isFinite(player.price) || player.price <= 0) errors.push(`${name || id}: geçersiz fiyat '${player.price}'.`);
+    if ((player.position === "GK" || player.position === "DEF") && player.price > POSITION_PRICE_CAPS[player.position]) errors.push(`${name}: mevki fiyat tavanı aşıldı.`);
     if (!Number.isFinite(player.points)) errors.push(`${name || id}: geçersiz puan '${player.points}'.`);
     if (seenIds.has(id)) errors.push(`Tekrarlanan oyuncu ID'si: ${id}.`);
     seenIds.add(id);

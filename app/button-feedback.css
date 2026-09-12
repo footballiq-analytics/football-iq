@@ -1,0 +1,23 @@
+/* Shared tactile feedback: independent scale leaves drag transforms intact. */
+:is(button,[role="button"],a[href],select,summary,input[type="submit"],input[type="button"]){
+ -webkit-tap-highlight-color:transparent;
+ transition:box-shadow 140ms ease,border-color 140ms ease,filter 140ms ease,scale 100ms ease;
+}
+:is(button,[role="button"],a[href],select,summary,input[type="submit"],input[type="button"]):not(:disabled):not([aria-disabled="true"]):is(:active,[data-fiq-pressed="true"]){
+ scale:.97;
+ border-color:#fff0a5!important;
+ outline:1px solid #fff0a5;
+ outline-offset:1px;
+ box-shadow:0 0 0 2px #f7d66766,0 0 16px #f7d667aa,inset 0 0 12px #fff0a533!important;
+ filter:brightness(1.2);
+}
+@media(hover:hover) and (pointer:fine){
+ :is(button,[role="button"],a[href],select,summary):not(:disabled):not([aria-disabled="true"]):hover{border-color:#efd88e;box-shadow:0 0 10px #eec95855}
+}
+:is(button,[role="button"],a[href],select,summary,input[type="submit"],input[type="button"]):focus-visible{outline:2px solid #ffe79e;outline-offset:2px;box-shadow:0 0 12px #ffe79e88}
+@media(prefers-reduced-motion:reduce){
+ :is(button,[role="button"],a[href],select,summary,input[type="submit"],input[type="button"]){transition:none}
+ :is(button,[role="button"],a[href],select,summary,input[type="submit"],input[type="button"]):is(:active,[data-fiq-pressed="true"]){scale:1}
+}
+/* A draggable card keeps its measured rectangle while its edge lights up. */
+[data-fiq-dnd] [role="button"]:is(:active,[data-fiq-pressed="true"]){scale:1}
