@@ -378,3 +378,13 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-team-page .fiq-transfer-row>div>span b{font-size:9px}
  .fiq-team-page .fiq-eligibility-badge,.fiq-team-page .fiq-owned-badge{font-size:7px!important;padding:1px 3px;margin-top:1px}
 }
+
+@media(orientation:landscape) and (max-height:300px){
+ body:has(.fiq-team-page) .fiq-card-name{font-size:7px;line-height:7px;height:14px}
+ body:has(.fiq-team-page) .fiq-card-stats{font-size:6px;line-height:6px}
+ body:has(.fiq-team-page) .fiq-card-position{font-size:6px;line-height:6px}
+ body:has(.fiq-team-page) .fiq-card-info{bottom:1px}
+ .fiq-card-remove,.fiq-coach-card>.fiq-coach-remove{width:14px;height:14px;font-size:12px}
+ body:has(.fiq-team-page) .fiq-card-captain{width:13px;height:13px;top:13px;font-size:7px}
+ .fiq-coach-name{font-size:7px;line-height:7px;bottom:6px}
+}
