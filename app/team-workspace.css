@@ -202,3 +202,11 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
 .mobile-drawer>a,.mobile-drawer>button{padding:14px 8px;text-align:left;font-size:15px;font-weight:800;color:#f2e8cb;border:0;border-bottom:1px solid #c8a65440;background:transparent}
 .fiq-menu-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;color:#ffe79e}
 .fiq-menu-heading button{width:36px;height:36px;border:1px solid #c8a654;border-radius:7px;background:#02080d;font-size:25px;color:white}
+
+@media(max-width:900px) and (orientation:portrait){
+ .fiq-team-actions{grid-template-columns:1fr .72fr 1fr 1.4fr;align-items:center}
+ .fiq-team-actions .fiq-transfer-trigger{display:flex;align-items:center;justify-content:center;gap:3px;height:34px;padding:3px;font-size:11px;border:1px solid #74efd6;background:linear-gradient(135deg,#087e78,#064b69);color:#edfff9;box-shadow:0 0 12px #21dcc32b}
+ .fiq-transfer-trigger svg{flex:none}
+ .fiq-transfer-trigger>span{font-size:15px}
+}
+@media(max-width:360px) and (orientation:portrait){.fiq-team-actions .fiq-transfer-trigger{font-size:10px;gap:2px}.fiq-transfer-trigger>span{display:none}}
