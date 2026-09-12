@@ -210,3 +210,20 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-transfer-trigger>span{font-size:15px}
 }
 @media(max-width:360px) and (orientation:portrait){.fiq-team-actions .fiq-transfer-trigger{font-size:10px;gap:2px}.fiq-transfer-trigger>span{display:none}}
+
+.fiq-transfer-target{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 7px;border:1px solid #60e5ce;border-radius:6px;background:#073e40;color:#c5fff1;font-size:12px}
+.fiq-transfer-target button{width:28px;height:28px;border:1px solid #73dfcc;border-radius:5px;background:#08252d;color:white;font-size:20px}
+.fiq-position-tabs button:disabled{opacity:.4}
+@media(max-width:900px) and (orientation:portrait){
+ .fiq-team-page .fiq-transfer-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;padding-right:0;padding-top:34px;gap:5px}
+ .fiq-team-page .fiq-transfer-heading>div:first-child>span{font-size:12px}
+ .fiq-team-page .fiq-transfer-heading p{font-size:10px}
+ .fiq-team-page .fiq-transfer-budget{display:flex;gap:4px}
+ .fiq-team-page .fiq-transfer-budget>div{padding:4px 6px;min-width:58px}
+ .fiq-team-page .fiq-transfer-budget small{font-size:10px;color:#dde8ee}
+ .fiq-team-page .fiq-transfer-budget b{font-size:14px}
+ .fiq-team-page .fiq-club-filter>button,.fiq-team-page .fiq-player-search input{height:32px}
+ .fiq-team-page .fiq-club-filter>button{padding-inline:6px;font-size:11px}
+ .fiq-team-page .fiq-player-search input{padding-left:26px;padding-right:28px}
+ .fiq-team-page #fiq-club-menu{top:36px}
+}
