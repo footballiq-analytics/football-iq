@@ -271,3 +271,13 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  body:has(.fiq-team-page) .fiq-card-info{bottom:1px}
  body:has(.fiq-team-page) .fiq-card-stats{margin-top:0}
 }
+
+.fiq-team-page .fiq-eligibility-badge:is([data-reason="3 OYUNCU SINIRI"],[data-reason="KADRO DOLU"]){background:#bb1734;border-color:#ff6379;color:#fff;font-size:9px;box-shadow:0 0 8px #f3285059}
+.fiq-coach-card>.fiq-coach-remove{top:-4px;right:-4px;width:22px;height:22px;font-size:19px}
+.fiq-coach-label-remove{display:inline-grid;place-items:center;width:18px;height:18px;margin-left:3px;vertical-align:middle;border:1px solid #f5df9c;border-radius:50%;background:#09111f;color:white;font-size:15px;line-height:1}
+/* Tablet landscape only: portrait keeps its existing geometry exactly. */
+@media(orientation:landscape) and (min-height:601px) and (any-pointer:coarse){
+ body:has(.fiq-team-page){--fiq-card-width:var(--fiq-mobile-card-width,72px);--fiq-card-height:var(--fiq-mobile-card-height,92px)}
+ .fiq-team-page .fiq-field-slot{width:var(--fiq-card-width);max-width:100%}
+ body:has(.fiq-team-page) .fiq-card-portrait{width:46px;top:4px;bottom:52px}
+}
