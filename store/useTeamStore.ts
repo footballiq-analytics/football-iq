@@ -1,3 +1,4 @@
+import { formatFantasyPrice } from "@/lib/fantasy-price";
 import { create } from "zustand";
 
 export type PlayerPosition = "GK" | "DEF" | "MID" | "FWD";
@@ -136,7 +137,7 @@ export const useTeamStore=create<TeamStore>((set,get)=>({
    }
   }
   const ids=chosen.map(x=>x!.id);const remaining=Math.max(0,budget-spend);
-  set({players:allPlayers,startingSlots:buildStartingSlots(formation,ids.slice(0,11)),benchSlots:buildBenchSlots(ids.slice(11)),toast:`Oto Tamamla tamamlandı · ${spend.toFixed(1)}M kullanıldı · ${remaining.toFixed(1)}M kaldı.`});return true
+  set({players:allPlayers,startingSlots:buildStartingSlots(formation,ids.slice(0,11)),benchSlots:buildBenchSlots(ids.slice(11)),toast:`Oto Tamamla tamamlandı · ${formatFantasyPrice(spend)}M kullanıldı · ${formatFantasyPrice(remaining)}M kaldı.`});return true
  },
  swapStartingAndBench:(a,b)=>{const{startingSlots,benchSlots,players}=get();const ai=startingSlots.findIndex(s=>s.playerId===a),bi=benchSlots.findIndex(s=>s.playerId===b);if(ai<0||bi<0)return false;const ap=players[a],bp=players[b];if(!ap||!bp)return false;if(startingSlots[ai].position!==bp.position||benchSlots[bi].position!==ap.position){set({toast:"Geçersiz Değişiklik · mevki kuralları uyuşmuyor."});return false}const ns=[...startingSlots],nb=[...benchSlots];ns[ai]={...ns[ai],playerId:b};nb[bi]={...nb[bi],playerId:a};set({startingSlots:ns,benchSlots:nb,toast:`${ap.name} ile ${bp.name} yer değiştirdi.`});return true},
  swapFieldPositions:(a,b)=>{const{startingSlots,players}=get();const ai=startingSlots.findIndex(s=>s.playerId===a),bi=startingSlots.findIndex(s=>s.playerId===b);if(ai<0||bi<0)return false;if(players[a]?.position!==players[b]?.position){set({toast:"Geçersiz Değişiklik · saha içi takas aynı mevki arasında yapılabilir."});return false}const n=[...startingSlots],x=n[ai].playerId;n[ai]={...n[ai],playerId:n[bi].playerId};n[bi]={...n[bi],playerId:x};set({startingSlots:n,toast:"Saha içi pozisyonlar değiştirildi."});return true},

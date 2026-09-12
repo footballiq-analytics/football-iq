@@ -41,7 +41,33 @@ export const REAL_SQUAD_CLUBS = [
   "Çorum FK",
 ] as const;
 
-export const POSITION_PRICE_CAPS = { GK: 5.5, DEF: 6 } as const;
+export const POSITION_PRICE_CAPS = { GK: 5.5, DEF: 5.25 } as const;
+
+/** Product pricing, independent of real-world market values. */
+export const PLAYER_PRICE_OVERRIDES: Readonly<Record<string, number>> = {
+  "bjk-orkun-kokcu": 8, "fb-ngolo-kante": 7, "gs-rafael-leao": 9.5,
+  "ts-mohamed-salah": 10, "bjk-dusan-vlahovic": 10, "gs-leroy-sane": 9,
+  "fb-romelu-lukaku": 8, "fb-mason-greenwood": 9, "ts-franculino-dju": 7.6,
+  "bjk-leandro-trossard": 9, "fb-kerem-akturkoglu": 7.5, "gs-baris-alper-yilmaz": 8,
+  "kon-mostafa-mohamed": 7.5, "amed-gift-orban": 7.5, "sam-mohamed-bayo": 7.5,
+  "koc-bruno-petkovic": 7, "cor-youssoufa-moukoko": 7.5, "ibfk-eldor-shomurodov": 9,
+  "gs-gabriel-sara": 7.8, "gs-lucas-torreira": 7.4, "fb-matteo-guendouzi": 7.6,
+  "ibfk-abbosbek-fayzullaev": 7.5, "ibfk-andreas-skov-olsen": 7,
+  "bjk-wilfred-ndidi": 6.3, "ts-ruslan-malinovskyi": 7, "aln-ianis-hagi": 6.4,
+  "ksp-haris-hajradinovic": 6, "ksp-kerem-demirbay": 6,
+};
+// The three highest-priced defenders in the original pool retain the premium tier.
+export const PREMIUM_DEFENDER_IDS = ["gs-wilfried-singo", "gs-davinson-sanchez", "fb-nathan-ake"] as const;
+const premiumDefenders = new Set<string>(PREMIUM_DEFENDER_IDS);
+function fantasyPrice(player: StorePlayer): number {
+  if (player.position === "GK") return Math.min(player.price, POSITION_PRICE_CAPS.GK);
+  if (player.position === "DEF") {
+    if (premiumDefenders.has(player.id)) return POSITION_PRICE_CAPS.DEF;
+    // Compress the remaining original 3.5–8.5M scale into 3.5–5M quarter steps.
+    return Math.min(5, Math.max(3.5, Math.round((3.5 + (player.price - 3.5) * .3) * 4) / 4));
+  }
+  return PLAYER_PRICE_OVERRIDES[player.id] ?? player.price;
+}
 
 export const FANTASY_PLAYER_POOL: StorePlayer[] = [
   ...GALATASARAY_FANTASY_PLAYERS,
@@ -64,9 +90,7 @@ export const FANTASY_PLAYER_POOL: StorePlayer[] = [
   ...CORUM_FANTASY_PLAYERS,
 ].map(player => ({
   ...player,
-  price: player.position === "GK" || player.position === "DEF"
-    ? Math.min(player.price, POSITION_PRICE_CAPS[player.position])
-    : player.price,
+  price: fantasyPrice(player),
 }));
 
 export const SQUAD_STORAGE_KEY = "futbol-iq-fantasy-squad-v26";
@@ -133,6 +157,10 @@ export function validateFantasyDataIntegrity(): FantasyDataIntegrityReport {
     seenIdentity.add(identity);
     playerById.set(id, player);
   }
+
+  for (const [id, price] of Object.entries(PLAYER_PRICE_OVERRIDES)) if (playerById.get(id)?.price !== price) errors.push(`Fiyat ayarı eksik/uyumsuz: ${id}.`);
+  const premium = FANTASY_PLAYER_POOL.filter(p => p.position === "DEF" && p.price === POSITION_PRICE_CAPS.DEF);
+  if (premium.length !== 3 || PREMIUM_DEFENDER_IDS.some(id => !premium.some(p => p.id === id))) errors.push("5.25M defans katmanında tam üç oyuncu olmalı.");
 
   for (const club of leagueClubs) if (!FANTASY_PLAYER_POOL.some(player => player.club === club)) errors.push(`Oyuncu havuzunda futbolcusu olmayan kulüp: ${club}.`);
 

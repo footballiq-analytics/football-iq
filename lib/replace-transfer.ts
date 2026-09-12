@@ -1,3 +1,4 @@
+import { formatFantasyPrice } from "@/lib/fantasy-price";
 import type { Player, StartingSlot, BenchSlot } from "@/store/useTeamStore";
 
 type Squad = { players: Record<string, Player>; startingSlots: StartingSlot[]; benchSlots: BenchSlot[] };
@@ -23,12 +24,12 @@ export function buildTransferReplacement(state: Squad, incoming: Player, target:
  const spent = retained.reduce((sum,p) => sum + cents(p.price), 0) + cents(outgoing.price);
  const available = 10000 - spent + cents(outgoing.price);
  const balance = available - cents(incoming.price);
- if (balance < 0) return reject(`Değişim için bütçe yetersiz · mevcut bütçe + ${outgoing.price.toFixed(1)}M = ${(available/100).toFixed(1)}M.`);
+ if (balance < 0) return reject(`Değişim için bütçe yetersiz · mevcut bütçe + ${formatFantasyPrice(outgoing.price)}M = ${formatFantasyPrice(available/100)}M.`);
  const replace = <T extends StartingSlot | BenchSlot>(s: T): T => s.id === target ? { ...s, playerId: incoming.id } : s;
  return { success: true, update: {
   players: { ...state.players, [incoming.id]: incoming },
   startingSlots: state.startingSlots.map(replace),
   benchSlots: state.benchSlots.map(replace),
-  toast: `${outgoing.name} → ${incoming.name} · ${outgoing.price.toFixed(1)}M iade edildi · ${(balance/100).toFixed(1)}M kaldı.`,
+  toast: `${outgoing.name} → ${incoming.name} · ${formatFantasyPrice(outgoing.price)}M iade edildi · ${formatFantasyPrice(balance/100)}M kaldı.`,
  } };
 }

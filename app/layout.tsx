@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./tailwind.css";
 import "./globals.css";
 import "./fantasy.css";
@@ -19,7 +19,10 @@ import ButtonFeedback from "@/components/interaction/ButtonFeedback";
 import { Footer, Header } from "@/components/site-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
+
 export const metadata: Metadata = {
+  appleWebApp: { capable: true, title: "FUTBOL IQ", statusBarStyle: "black-translucent" },
   title: { default: "FUTBOL IQ Fantasy", template: "%s | FUTBOL IQ Fantasy" },
   description: "Türkiye odaklı, mobil uyumlu fantasy football deneyimi. Kadronu kur, bütçeni yönet ve liglerde yarış.",
   openGraph: { title: "FUTBOL IQ Fantasy", description: "Kadronu kur, bütçeni yönet ve fantasy liglerinde yarış.", type: "website" },

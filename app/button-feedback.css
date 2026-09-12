@@ -21,3 +21,22 @@
 }
 /* A draggable card keeps its measured rectangle while its edge lights up. */
 [data-fiq-dnd] [role="button"]:is(:active,[data-fiq-pressed="true"]){scale:1}
+
+/* A raised rim and inset highlights give every control a physical face without moving hit areas. */
+:is(button,[role="button"],select,summary,input[type="submit"],input[type="button"],a[class*="button"],.mobile-drawer>a):not(.fiq-market-backdrop){
+ background-image:linear-gradient(180deg,#ffffff1f 0%,#ffffff08 43%,#00000030 100%);
+ box-shadow:inset 0 1px 0 #fff6,inset 1px 0 0 #ffffff14,inset 0 -2px 1px #0009,0 3px 0 #010609,0 5px 8px #0007!important;
+}
+:is(button,[role="button"],select,summary,input[type="submit"],input[type="button"]):not(:disabled):not([aria-disabled="true"]):is(:active,[data-fiq-pressed="true"]){
+ box-shadow:inset 0 2px 5px #000b,inset 0 -1px 0 #fff5,0 1px 0 #02070b,0 0 0 1px #fff0a5,0 0 15px #f7d667aa!important;
+}
+/* The draggable wrapper already contains a sculpted player card. */
+.fiq-drag-frame [role="button"]{background-image:none;box-shadow:none!important}
+.fiq-drag-frame [role="button"][data-fiq-pressed="true"]{box-shadow:0 0 15px #f7d667aa!important}
+.fiq-fullscreen-button{display:flex;align-items:center;justify-content:center;gap:4px;height:30px;padding:3px 7px;flex:none;border:1px solid #d5bb70;border-radius:6px;background-color:#07121e;color:#fff0b2;font-size:10px;font-weight:900;white-space:nowrap}
+.fiq-fullscreen-help{width:min(90vw,420px);padding:22px;border:1px solid #e8ca7b;border-radius:14px;background:#081724;color:#fff;margin:auto}
+.fiq-fullscreen-help::backdrop{background:#000b}
+.fiq-fullscreen-help h2{font-size:20px;font-weight:900;color:#ffe79e}
+.fiq-fullscreen-help p{margin:12px 0 20px;font-size:15px;line-height:1.6}
+.fiq-fullscreen-help button{width:100%;padding:10px;border:1px solid #d5bb70;border-radius:7px;background-color:#07121e;color:#ffe79e;font-weight:900}
+@media(max-width:600px){.fiq-header-actions{gap:5px}.fiq-header-actions>.icon-only:not(.menu-trigger),.fiq-header-actions>.profile-dot{display:none}.fiq-fullscreen-button{height:28px;font-size:9px;padding:2px 5px}}
