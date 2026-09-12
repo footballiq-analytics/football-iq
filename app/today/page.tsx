@@ -1,2 +1,3 @@
-import { DemoNotice, MatchCard } from "@/components/ui"; import { dataProvider } from "@/lib/data-provider";
-export default async function TodayPage() { const matches = await dataProvider.getMatches(); return <section className="page"><p className="eyebrow">MAÇ MERKEZİ</p><h1>Bugünün Maçları</h1><DemoNotice/><div className="match-grid">{matches.map((match) => <MatchCard key={match.id} match={match}/>)}</div></section>; }
+import Link from "next/link";
+import LeagueBoard from "@/components/league/LeagueBoard";
+export default function TodayPage(){return <section className="fiq-league-page"><p className="eyebrow">SÜPER LİG</p><h1>Fikstür</h1><nav className="fiq-league-links"><Link href="/today" aria-current="page">Fikstür</Link><Link href="/leagues/super-lig">Puan Durumu</Link></nav><LeagueBoard mode="fixtures"/></section>}

@@ -281,3 +281,37 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-team-page .fiq-field-slot{width:var(--fiq-card-width);max-width:100%}
  body:has(.fiq-team-page) .fiq-card-portrait{width:46px;top:4px;bottom:52px}
 }
+
+/* The coach uses the same footprint as footballers, with a separate ivory icon face. */
+.fiq-team-page .fiq-bench-grid>.fiq-coach-card{display:block;width:var(--fiq-card-width);height:var(--fiq-card-height);border:0;background:none;overflow:visible}
+.fiq-coach-face{position:absolute;inset:0;display:block;width:100%;height:100%;padding:0;overflow:hidden;clip-path:polygon(12% 0,88% 0,100% 12%,96% 83%,84% 91%,50% 100%,16% 91%,4% 83%,0 12%);border:2px solid #dac28b;background:linear-gradient(135deg,#fffdf0,#b7a16b 14%,#fff8de 17%,#e2d5af 58%,#fffbee 79%,#aa8645);color:#3d3019;box-shadow:inset 0 0 0 3px #fff5,inset 0 -12px 24px #8c672440;touch-action:manipulation}
+.fiq-coach-position{position:absolute;left:4px;top:3px;font-size:12px;font-weight:900}
+.fiq-coach-emblem{position:absolute;top:10px;left:20%;width:60%;height:calc(100% - 52px);color:#937344}
+.fiq-coach-emblem svg{width:100%;height:100%}
+.fiq-coach-name{position:absolute;inset:auto 3px 19px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:12px;line-height:13px;font-weight:900;text-align:center}
+.fiq-coach-caption{position:absolute;bottom:9px;left:1px;right:1px;font-size:6px;font-weight:900;white-space:nowrap;text-align:center}
+.fiq-coach-dialog{position:fixed;inset:0;margin:auto;width:min(90vw,420px);max-height:85dvh;overflow:auto;border:1px solid #d4ba78;border-radius:18px;background:#091824;color:white;padding:22px}
+.fiq-coach-dialog::backdrop{background:#000b}
+.fiq-coach-dialog>small{color:#e6ca88;font-size:11px;font-weight:900}
+.fiq-coach-dialog h2{font-size:24px;font-weight:900;margin-top:6px}
+.fiq-coach-dialog p{color:#bccbd5;margin-bottom:16px}
+.fiq-coach-dialog>button:not(.fiq-dialog-close){display:block;width:100%;padding:12px 8px;border:1px solid #cbb575;border-radius:9px;background:#05101b;color:#fff0c5;font-size:12px;font-weight:900;margin-top:10px}
+.fiq-dialog-close{position:absolute;right:8px;top:8px;width:30px;height:30px;border:1px solid #cbb575;border-radius:7px;background:#05101b;font-size:22px}
+.fiq-coach-dialog dl{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px}
+.fiq-coach-dialog dt{color:#a5b7c5}.fiq-coach-dialog dd{margin:0}
+.fiq-team-page .fiq-transfer-sort{grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr);align-items:stretch;gap:4px}
+.fiq-team-page .fiq-transfer-sort .fiq-clear-filters{display:grid;place-items:center;min-width:0;padding:0;border:1px solid #a8ddff;border-radius:7px;background:#255779;color:#e3faff}
+.fiq-clear-filters:disabled{opacity:.35}
+.fiq-league-modal{max-height:85dvh;overflow:auto;overscroll-behavior:contain}
+@media(orientation:landscape) and (max-height:600px){
+ .fiq-team-page .fiq-dugout>.relative{grid-template-columns:1fr}
+ .fiq-team-page .fiq-coach-label{display:none}
+ .fiq-team-page .fiq-bench-grid>:nth-child(1){left:10%}
+ .fiq-team-page .fiq-bench-grid>:nth-child(2){left:calc(30% - var(--fiq-card-width)/2)}
+ .fiq-team-page .fiq-bench-grid>:nth-child(3){left:calc(50% - var(--fiq-card-width)/2)}
+ .fiq-team-page .fiq-bench-grid>:nth-child(4){left:calc(70% - var(--fiq-card-width)/2)}
+ .fiq-team-page .fiq-bench-grid>:nth-child(5){left:calc(90% - var(--fiq-card-width)/2)}
+ .fiq-coach-emblem{display:none}
+ .fiq-coach-name{bottom:10px;line-height:12px}
+ .fiq-coach-caption{bottom:3px;font-size:5px}
+}
