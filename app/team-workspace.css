@@ -315,3 +315,66 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-coach-name{bottom:10px;line-height:12px}
  .fiq-coach-caption{bottom:3px;font-size:5px}
 }
+
+/* Compact phone landscape: allocate the bench roof before spacing the outfield rows. */
+@media(orientation:landscape) and (max-height:600px){
+ body:has(.fiq-team-page){--fiq-header-h:24px}
+ .fiq-team-page{gap:2px}
+ .fiq-team-workspace{grid-template-columns:minmax(0,1fr) minmax(190px,30%);gap:4px}
+ .fiq-team-metrics>div{min-height:26px;padding:1px 4px}
+ .fiq-team-metrics small{font-size:8px;line-height:9px}
+ .fiq-team-metrics strong{font-size:11px;line-height:13px}
+ .fiq-team-actions button{height:24px;font-size:9px;padding:1px 4px}
+ .fiq-team-page .fiq-pitch-rails button,.fiq-formation-control{height:22px;font-size:9px}
+ .fiq-formation-control select{height:20px;min-width:60px;font-size:10px;padding-inline:3px}
+ .fiq-formation-control>span{display:none}
+ .fiq-team-page .fiq-pitch-formation{inset:2px 2%;height:auto}
+ .fiq-team-page .fiq-pitch-formation>div{display:grid;grid-template-rows:repeat(3,minmax(0,1fr)) calc(var(--fiq-card-height) + 20px);align-items:center;gap:2px}
+ .fiq-team-page .fiq-pitch-row{width:100%;min-height:0}
+ .fiq-team-page .fiq-pitch-row[data-position="GK"]{align-self:end;margin:0;width:18%;justify-self:start}
+ .fiq-team-page .fiq-dugout{height:calc(var(--fiq-card-height) + 18px);bottom:4px}
+ .fiq-team-page .fiq-dugout>.relative{height:15px}
+ .fiq-team-page .fiq-dugout>.relative>b{font-size:9px;line-height:12px}
+ .fiq-team-page .fiq-bench-grid{margin-top:1px}
+ body:has(.fiq-team-page) .fiq-card-info{bottom:2px;padding:0 1px}
+ body:has(.fiq-team-page) .fiq-card-name{font-size:10px;line-height:10px;height:20px;padding:0;text-align:center}
+ body:has(.fiq-team-page) .fiq-card-position{font-size:8px;line-height:9px;top:1px}
+ body:has(.fiq-team-page) .fiq-card-stats{font-size:8px;line-height:9px;margin-top:0;gap:1px;letter-spacing:-.05em}
+ body:has(.fiq-team-page) .fiq-card-portrait{display:none}
+ .fiq-card-remove,.fiq-coach-card>.fiq-coach-remove{width:17px;height:17px;top:-1px;right:-2px;font-size:15px}
+ body:has(.fiq-team-page) .fiq-card-captain{width:16px;height:16px;top:16px;right:-3px;font-size:9px}
+ .fiq-coach-name{font-size:10px;line-height:10px;bottom:8px}
+ .fiq-coach-caption{font-size:4px;bottom:2px}
+ .fiq-coach-position{top:1px;left:2px;font-size:8px}
+ .fiq-team-status{height:24px;padding:5px 2px;font-size:9px;line-height:13px;pointer-events:none}
+ .fiq-team-page .fiq-transfer-controls{gap:3px;padding:4px}
+ .fiq-team-page .fiq-transfer-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px}
+ .fiq-team-page .fiq-transfer-heading>div:first-child>span{display:block;font-size:9px;line-height:11px}
+ .fiq-team-page .fiq-transfer-budget{gap:2px}
+ .fiq-team-page .fiq-transfer-budget>div{padding:1px 3px}
+ .fiq-team-page .fiq-transfer-budget small{font-size:7px;line-height:9px}
+ .fiq-team-page .fiq-transfer-budget b{font-size:10px;line-height:12px}
+ .fiq-team-page .fiq-club-filter>button{height:26px;padding:1px 4px;font-size:9px}
+ .fiq-team-page .fiq-player-search input{height:26px;padding:1px 20px 1px 22px;font-size:16px}
+ .fiq-team-page .fiq-player-search>span{left:5px;font-size:15px}
+ .fiq-team-page .fiq-player-search>button{width:19px;height:20px;right:2px;font-size:15px}
+ .fiq-team-page #fiq-club-menu{top:29px;max-height:45dvh}
+ .fiq-team-page .fiq-position-tabs{gap:2px}
+ .fiq-team-page .fiq-position-tabs button{min-height:24px;font-size:9px;padding:1px 0}
+ .fiq-team-page .fiq-position-tabs small{font-size:7px;display:block;margin:0;line-height:8px}
+ .fiq-team-page .fiq-transfer-sort{grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);gap:2px}
+ .fiq-team-page .fiq-transfer-sort button,.fiq-team-page .fiq-transfer-sort select{height:26px;min-height:26px;padding:1px 2px}
+ .fiq-team-page .fiq-transfer-sort button span,.fiq-team-page .fiq-transfer-sort select{font-size:8px;line-height:10px}
+ .fiq-clear-filters svg{width:17px;height:17px}
+ .fiq-transfer-target{font-size:9px;padding:2px 4px}
+ .fiq-transfer-target button{width:22px;height:22px;font-size:16px}
+ .fiq-team-page .fiq-transfer-results{padding:3px}
+ .fiq-team-page .fiq-transfer-row{padding:3px;margin-bottom:4px}
+ .fiq-team-page .fiq-transfer-results>div>div{grid-template-columns:23px minmax(0,1fr) 34px 25px;column-gap:3px}
+ .fiq-team-page .fiq-transfer-results strong{font-size:10px;line-height:12px}
+ .fiq-team-page .fiq-transfer-results small{font-size:8px;line-height:10px}
+ .fiq-team-page .fiq-transfer-results button[aria-label$="oyuncusunu sürükle"]{width:23px;height:30px;font-size:11px}
+ .fiq-team-page .fiq-transfer-results button[aria-label$="kadroya ekle"]{width:25px;height:25px;font-size:15px}
+ .fiq-team-page .fiq-transfer-row>div>span b{font-size:9px}
+ .fiq-team-page .fiq-eligibility-badge,.fiq-team-page .fiq-owned-badge{font-size:7px!important;padding:1px 3px;margin-top:1px}
+}

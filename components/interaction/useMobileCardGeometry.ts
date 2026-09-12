@@ -17,8 +17,8 @@ export function useMobileCardGeometry() {
    const short = window.matchMedia("(orientation:landscape) and (max-height:600px)").matches;
    const { width, height } = squad.getBoundingClientRect();
    // Reserve the rails, roof, status and gaps before allocating the four/five card rows.
-   const cardHeight = Math.max(short ? 48 : 52, Math.min(short ? 54 : tabletLandscape ? 92 : 104, Math.floor((height - (short ? 38 : 110)) / (short ? 4 : 5))));
-   const cardWidth = Math.max(44, Math.min(short ? 64 : tabletLandscape ? 72 : 76, Math.floor(width * .92 / 5 - 7)));
+   const cardHeight = short ? Math.max(34, Math.min(52, Math.floor((height - 64) / 4))) : Math.max(52, Math.min(tabletLandscape ? 92 : 104, Math.floor((height - 110) / 5)));
+   const cardWidth = short ? Math.max(30, Math.min(56, Math.floor((width - 8) * .79 / 5 - 8))) : Math.max(44, Math.min(tabletLandscape ? 72 : 76, Math.floor(width * .92 / 5 - 7)));
    document.body.style.setProperty(properties[0], `${cardWidth}px`);
    document.body.style.setProperty(properties[1], `${cardHeight}px`);
   }
