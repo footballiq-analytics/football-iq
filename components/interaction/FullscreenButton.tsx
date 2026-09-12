@@ -8,6 +8,7 @@ type FullscreenDocument = Document & {
 };
 type FullscreenRoot = HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void };
 
+const installHelp = "iPhone / iPad: Siteyi Safari’de aç → Paylaş → Ana Ekrana Ekle → varsa ‘Web Uygulaması Olarak Aç’ seçeneğini etkinleştir → Ekle. Sonra FUTBOL IQ simgesinden aç. Android: Chrome menüsü → Uygulamayı yükle veya Ana ekrana ekle. Tarayıcı sekmesinden açmaya devam edersen adres ve sekme çubukları görünür.";
 export default function FullscreenButton() {
  const [active, setActive] = useState(false);
  const [message, setMessage] = useState("");
@@ -15,10 +16,13 @@ export default function FullscreenButton() {
  useEffect(() => {
   const doc = document as FullscreenDocument;
   const sync = () => setActive(Boolean(doc.fullscreenElement || doc.webkitFullscreenElement));
+  const showInstallHelp=()=>setMessage(installHelp);
+  window.addEventListener("fiq-install-help",showInstallHelp);
   sync();
   document.addEventListener("fullscreenchange", sync);
   document.addEventListener("webkitfullscreenchange", sync);
   return () => {
+   window.removeEventListener("fiq-install-help",showInstallHelp);
    document.removeEventListener("fullscreenchange", sync);
    document.removeEventListener("webkitfullscreenchange", sync);
   };
@@ -37,7 +41,7 @@ export default function FullscreenButton() {
     await root.webkitRequestFullscreen();
    } else {
     const installed = window.matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone;
-    setMessage(installed ? "Zaten uygulama görünümündesin; tarayıcı araç çubukları kapalı." : "Bu tarayıcı sayfayı düğmeyle tam ekran açmayı desteklemiyor. iPhone/iPad’de Safari’nin Paylaş menüsünden Ana Ekrana Ekle seçeneğini kullanıp siteyi bu simgeden açabilirsin. Diğer cihazlarda tarayıcının Uygulamayı yükle veya Ana ekrana ekle seçeneğini kullanabilirsin.");
+    setMessage(installed ? "Zaten uygulama görünümündesin; tarayıcı araç çubukları kapalı." : installHelp);
    }
   } catch {
    setMessage("Tarayıcı tam ekran isteğini kabul etmedi. Sayfayı doğrudan Safari veya Chrome’da açıp tekrar deneyebilirsin.");

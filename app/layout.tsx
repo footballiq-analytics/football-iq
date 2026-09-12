@@ -20,9 +20,10 @@ import ButtonFeedback from "@/components/interaction/ButtonFeedback";
 import { Footer, Header } from "@/components/site-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#071522" };
 
 export const metadata: Metadata = {
+  icons: { apple: `${process.env.NEXT_PUBLIC_BASE_PATH??""}/icons/icon-180.png` },
   appleWebApp: { capable: true, title: "FUTBOL IQ", statusBarStyle: "black-translucent" },
   title: { default: "FUTBOL IQ Fantasy", template: "%s | FUTBOL IQ Fantasy" },
   description: "Türkiye odaklı, mobil uyumlu fantasy football deneyimi. Kadronu kur, bütçeni yönet ve liglerde yarış.",
