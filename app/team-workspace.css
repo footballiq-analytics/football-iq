@@ -561,10 +561,20 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
 }
 .fiq-team-page .fiq-pitch-rails{position:relative;z-index:45}
 .fiq-team-page .fiq-formation-control{flex-shrink:0;min-width:66px}
-.fiq-team-page .fiq-formation-trigger{width:100%;min-width:62px;touch-action:manipulation;white-space:nowrap}
-.fiq-formation-dialog{position:fixed;inset:0;margin:auto;width:min(90vw,340px);max-height:85dvh;overflow:auto;padding:16px;border:1px solid #eacb75;border-radius:12px;background:#091824;color:#fff}
-.fiq-formation-dialog::backdrop{background:#000a}
-.fiq-formation-dialog>div{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.fiq-formation-dialog nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.fiq-team-page .fiq-formation-dialog button{min-height:38px;height:auto;padding:8px;border:1px solid #d8b863;border-radius:6px;background:#06121c;font-size:14px;color:#fff}
-.fiq-team-page .fiq-formation-dialog button[aria-pressed="true"]{background:#ddbd65;color:#06121c}
+/* Keep the native formation selector in the rail, above pitch hit areas. */
+.fiq-team-page .fiq-formation-control select{display:block;position:relative;z-index:2;appearance:auto;-webkit-appearance:menulist;opacity:1;visibility:visible;pointer-events:auto;touch-action:manipulation;width:100%;min-width:68px;height:28px;padding:2px 5px;border:1px solid #eacb75;border-radius:5px;background:#06121c;color:#fff;font-size:12px;font-weight:900;scale:none!important;filter:none!important}
+.fiq-team-page .fiq-formation-control{height:30px;overflow:visible}
+.fiq-team-page .fiq-pitch-rails{flex-shrink:0;overflow:visible}
+@media(orientation:landscape) and (max-height:600px){
+ .fiq-team-page .fiq-team-workspace,.fiq-team-page.market-collapsed .fiq-team-workspace{grid-template-columns:minmax(0,1fr) minmax(170px,26%)}
+ .fiq-team-page .fiq-pitch-formation{inset:2px 0}
+ .fiq-team-page .fiq-team-status{height:14px;padding:1px 2px;line-height:12px}
+ .fiq-team-page .fiq-formation-control{height:26px}
+ .fiq-team-page .fiq-formation-control select{height:24px;font-size:11px}
+ .fiq-team-page .fiq-pitch-row[data-count="4"],.fiq-team-page .fiq-pitch-row[data-count="3"]{width:100%}
+}
+@media(orientation:landscape) and (min-height:601px) and (any-pointer:coarse){
+ .fiq-team-page .fiq-transfer-drawer,.fiq-team-page.market-collapsed .fiq-transfer-drawer{display:block}
+ .fiq-team-page .fiq-transfer-trigger,.fiq-team-page .fiq-transfer-heading .fiq-transfer-close{display:none}
+ .fiq-team-page .fiq-share-squad{display:flex;align-items:center;justify-content:center;gap:6px;border-color:#b3dfed;background:#155b72;color:#fff}
+}
