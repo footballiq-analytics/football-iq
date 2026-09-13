@@ -16,6 +16,7 @@ import "./team-dnd.css";
 import "./team-workspace.css";
 import "./button-feedback.css";
 import "./platform.css";
+import "./home.css";
 import ButtonFeedback from "@/components/interaction/ButtonFeedback";
 import { Footer, Header } from "@/components/site-shell";
 import { ThemeProvider } from "@/components/theme-provider";
