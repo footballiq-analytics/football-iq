@@ -492,3 +492,27 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
 /* Full transfer-panel width for the team picker, including tall landscape tablets. */
 .fiq-team-page .fiq-club-filter{position:static}
 .fiq-team-page #fiq-club-menu{left:4px;right:4px;top:auto;width:auto;margin-top:3px;max-height:min(360px,60dvh);z-index:90}
+
+/* Keep the dismiss control in normal header flow, away from budget values. */
+.fiq-team-page .fiq-transfer-heading{display:grid;grid-template-columns:minmax(0,1fr) 30px auto;gap:6px;padding:0;align-items:center}
+.fiq-team-page .fiq-transfer-heading .fiq-transfer-close{display:grid;position:static;place-items:center;width:30px;height:30px;padding:0;border:1px solid #b4f5ff;border-radius:7px;background:#08667e;color:#efffff;box-shadow:0 0 12px #43d9f477}
+.fiq-team-page.market-collapsed .fiq-transfer-drawer{display:none}
+.fiq-team-page.market-collapsed .fiq-team-workspace{grid-template-columns:minmax(0,1fr)}
+.fiq-team-page.market-collapsed .fiq-transfer-trigger{display:flex;align-items:center;gap:3px;background:#08667e;border-color:#9ce9f4;color:#fff}
+@media(max-width:900px) and (orientation:portrait){
+ body:has(.fiq-team-page .fiq-transfer-drawer.is-open) .fiq-header{visibility:hidden}
+ .fiq-transfer-drawer{width:79.2%;max-width:450px}
+ .fiq-team-page .fiq-transfer-heading{grid-template-columns:minmax(0,1fr) 28px auto;gap:3px;padding:0}
+ .fiq-team-page .fiq-transfer-heading .fiq-transfer-close{width:28px;height:30px}
+ .fiq-team-page .fiq-transfer-budget{gap:2px}
+ .fiq-team-page .fiq-transfer-budget>div{display:block;padding:2px 3px;min-width:0}
+ .fiq-team-page .fiq-transfer-budget small{font-size:8px;line-height:10px}
+ .fiq-team-page .fiq-transfer-budget b{font-size:11px;line-height:13px}
+ .fiq-team-page .fiq-transfer-heading>div:first-child>span{font-size:10px;line-height:12px}
+}
+@media(orientation:landscape) and (max-height:600px){
+ .fiq-team-page .fiq-pitch-row[data-count="4"]{width:100%}
+ .fiq-team-page .fiq-pitch-row[data-count="3"]{width:94%;margin-inline:auto;grid-template-columns:repeat(3,var(--fiq-card-width))!important;justify-content:space-between;gap:0}
+ .fiq-team-page .fiq-transfer-heading{grid-template-columns:minmax(0,1fr) 24px auto;gap:2px}
+ .fiq-team-page .fiq-transfer-heading .fiq-transfer-close{width:24px;height:26px}
+}

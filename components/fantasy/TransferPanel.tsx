@@ -9,6 +9,7 @@ import type { FantasyCoach } from "@/data/superlig-coaches-2026";
 import type { FantasyPlayer, PlayerPosition } from "./PlayerCard";
 
 export type TransferPanelProps = {
+  onClose: () => void;
   coachRequest?: number;
   target?: { id: string; position: PlayerPosition; label: string };
   onClearTarget?: () => void;
@@ -30,7 +31,7 @@ type SortMode = "POINTS" | "PRICE_ASC" | "PRICE_DESC" | "POPULAR";
 const tabLabel: Record<FilterTab, string> = { ALL:"TÜMÜ", GK:"KL", DEF:"DEF", MID:"ORT", FWD:"FOR", COACH:"TD" };
 const BUDGET = 100;
 
-export default function TransferPanel({coachRequest,target,onClearTarget,players,coaches,clubs,selectedIds,selectedCoachId,availableSlots,onQuickAdd,onRemovePlayer,onSelectCoach,onPlayerClick}:TransferPanelProps){
+export default function TransferPanel({onClose,coachRequest,target,onClearTarget,players,coaches,clubs,selectedIds,selectedCoachId,availableSlots,onQuickAdd,onRemovePlayer,onSelectCoach,onPlayerClick}:TransferPanelProps){
  const[query,setQuery]=useState("");
  const[debouncedQuery,setDebouncedQuery]=useState("");
  const[selectedClubs,setSelectedClubs]=useState<string[]>([]);
@@ -95,7 +96,7 @@ export default function TransferPanel({coachRequest,target,onClearTarget,players
 
  return <aside className="fiq-transfer-panel sticky top-3 flex h-[calc(100dvh-24px)] min-h-0 min-w-0 flex-col overflow-hidden rounded-[24px] border border-[#f3ca40]/25 bg-[linear-gradient(180deg,rgba(5,17,28,.985),rgba(2,10,17,.995))] shadow-[0_28px_80px_rgba(0,0,0,.55)] backdrop-blur-2xl max-[980px]:static max-[980px]:h-[68dvh] max-[980px]:min-h-[460px]">
   <div className="fiq-transfer-controls relative shrink-0 border-b border-white/[.06] p-2.5">
-   <div className="fiq-transfer-heading mb-2 flex items-end justify-between gap-2"><div><span className="text-[8px] font-black tracking-[.15em] text-[#f3ca40]">{showingCoaches?"TEKNİK DİREKTÖR HAVUZU":"TRANSFER MERKEZİ"}</span><p className="text-[9px] font-bold text-white/45">{resultCount} {showingCoaches?"teknik direktör":"oyuncu"} listeleniyor</p></div><div className="fiq-transfer-budget flex gap-1.5"><Status label="BÜTÇE" value="100.0M"/><Status label="KALAN" value={`${formatFantasyPrice(remainingBudget)}M`}/></div></div>
+   <div className="fiq-transfer-heading mb-2 flex items-end justify-between gap-2"><div><span className="text-[8px] font-black tracking-[.15em] text-[#f3ca40]">{showingCoaches?"TEKNİK DİREKTÖR HAVUZU":"TRANSFER MERKEZİ"}</span><p className="text-[9px] font-bold text-white/45">{resultCount} {showingCoaches?"teknik direktör":"oyuncu"} listeleniyor</p></div><button type="button" className="fiq-transfer-close" aria-label="Transfer panelini kapat" onClick={onClose}><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 6 12 12M18 6 6 18"/></svg></button><div className="fiq-transfer-budget flex gap-1.5"><Status label="BÜTÇE" value="100.0M"/><Status label="KALAN" value={`${formatFantasyPrice(remainingBudget)}M`}/></div></div>
 
    {target?<div className="fiq-transfer-target" role="status"><strong>HEDEF: {target.label}</strong><button type="button" onClick={onClearTarget} aria-label="Hedef seçimini kaldır">×</button></div>:null}
    <div className="fiq-club-filter relative">

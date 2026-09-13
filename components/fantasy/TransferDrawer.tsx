@@ -35,7 +35,6 @@ export default function TransferDrawer({open,portrait,dragging,onClose,children}
  return <>
   {modal?<button className="fiq-market-backdrop" tabIndex={-1} aria-label="Transfer Merkezi’ni kapat" onClick={onClose}/>:null}
   <div ref={panel} id="fiq-transfer-drawer" className={`fiq-transfer-drawer ${open?"is-open":""} ${dragging&&portrait?"is-dragging":""}`} role={modal?"dialog":undefined} aria-modal={modal||undefined} aria-label="Transfer Merkezi" inert={portrait&&!open}>
-   <button type="button" className="fiq-transfer-close" aria-label="Transfer panelini kapat" onClick={onClose}>×</button>
    {children}
   </div>
  </>;
