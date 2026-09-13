@@ -1,5 +1,6 @@
 "use client";
 
+import { lockInert } from "@/lib/inert-lock";
 import { useEffect, useRef, type ReactNode } from "react";
 
 /** Keep the market mounted: rotating or dragging never resets its filters. */
@@ -11,7 +12,7 @@ export default function TransferDrawer({open,portrait,dragging,onClose,children}
   if(!modal)return;
   const previous=document.activeElement as HTMLElement|null;
   const shell=Array.from(document.querySelectorAll<HTMLElement>(".fiq-header,.fiq-bottom-nav"));
-  const prior=shell.map(el=>el.inert);shell.forEach(el=>{el.inert=true});
+  const release=lockInert(shell);
   panel.current?.querySelector<HTMLButtonElement>(".fiq-transfer-close")?.focus({preventScroll:true});
   function key(e:KeyboardEvent){
    if(e.key==="Escape"){e.preventDefault();closeRef.current();return}
@@ -22,7 +23,7 @@ export default function TransferDrawer({open,portrait,dragging,onClose,children}
    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}
   }
   document.addEventListener("keydown",key);
-  return()=>{document.removeEventListener("keydown",key);shell.forEach((el,i)=>{el.inert=prior[i]});if(previous?.isConnected)previous.focus({preventScroll:true})};
+  return()=>{document.removeEventListener("keydown",key);release();if(previous?.isConnected)previous.focus({preventScroll:true})};
  },[modal]);
  useEffect(()=>{
   if(!portrait||!open)return;

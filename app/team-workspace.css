@@ -436,3 +436,20 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-team-page .fiq-transfer-player-info>.fiq-eligibility-badge{font-size:7px!important}
  .fiq-transfer-close{top:calc(4px + env(safe-area-inset-top));right:5px;width:25px;height:24px;font-size:20px}
 }
+
+/* Header controls stay above the landscape workspace, below modal navigation. */
+@media(orientation:landscape){
+ body:has(.fiq-team-page) .fiq-header{z-index:90;isolation:isolate}
+ body:has(.fiq-team-page) .fiq-header-actions{position:relative;z-index:1;pointer-events:auto}
+ .fiq-refresh-button,.fiq-header .menu-trigger{touch-action:manipulation}
+}
+.fiq-team-page .fiq-transfer-row button[data-remove="true"]{width:32px;height:32px;border-color:#ff9b9b;background-color:#792b35;color:#fff;font-size:20px}
+@media(max-width:900px) and (orientation:portrait), (orientation:landscape) and (max-height:600px){
+ .fiq-team-page .fiq-transfer-row button[data-remove="true"]{width:25px;height:25px;font-size:18px}
+}
+@media(max-width:600px) and (orientation:portrait){
+ .fiq-team-page .fiq-pitch-row[data-position="FWD"]{width:90%}
+ .fiq-team-page .fiq-pitch-row[data-position="MID"]{width:100%}
+ body:has(.fiq-team-page) .fiq-card-name{font-size:11px;line-height:12px;height:24px}
+ body:has(.fiq-team-page) .fiq-card-stats{font-size:10px;line-height:11px}
+}
