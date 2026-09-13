@@ -6,3 +6,7 @@ body:has(.fiq-home) .fiq-header{padding-inline:3%;gap:24px}body:has(.fiq-home) .
 body:has(.fiq-home) .fiq-header-actions>.recommend-button,body:has(.fiq-home) .fiq-header-actions>.icon-only:not(.menu-trigger),body:has(.fiq-home) .fiq-header-actions>.profile-dot{display:none}
 
 body:has(.fiq-home) .fiq-fullscreen-button{display:none}
+body:has(.fiq-home){overflow-x:clip}
+body:has(.fiq-home) .fiq-logo b,body:has(.fiq-home) .fiq-desktop-nav a.active{color:#f3ce73}
+body:has(.fiq-home) .fiq-desktop-nav a.active{border-bottom-color:#f3ce73}
+.home-pitch{background-size:auto,100% 240%;background-position:center,center 72%}
