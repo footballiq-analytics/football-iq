@@ -488,3 +488,7 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
 
 .fiq-club-name{display:flex;align-items:center;flex-wrap:wrap;gap:3px 5px}
 .fiq-team-page #fiq-club-menu .fiq-club-limit{display:inline-block;flex:none;margin:0;padding:2px 4px;border:1px solid #ff6379;border-radius:5px;background:#bb1734;color:#fff;font-size:8px;line-height:10px;font-weight:900;white-space:nowrap;box-shadow:0 0 8px #f3285059}
+
+/* Full transfer-panel width for the team picker, including tall landscape tablets. */
+.fiq-team-page .fiq-club-filter{position:static}
+.fiq-team-page #fiq-club-menu{left:4px;right:4px;top:auto;width:auto;margin-top:3px;max-height:min(360px,60dvh);z-index:90}

@@ -4,7 +4,7 @@ import { formatFantasyPrice } from "@/lib/fantasy-price";
 
 import { assessDirectTransfer, type TransferAssessment } from "@/lib/direct-transfer";
 import { useDraggable } from "@dnd-kit/core";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { FantasyCoach } from "@/data/superlig-coaches-2026";
 import type { FantasyPlayer, PlayerPosition } from "./PlayerCard";
 
@@ -40,6 +40,18 @@ export default function TransferPanel({coachRequest,target,onClearTarget,players
  const[smartOnly,setSmartOnly]=useState(false);
  const effectivePosition=target?.position??position;
  const showingCoaches=effectivePosition==="COACH";
+ const previousSlots=useRef({position:effectivePosition,available:availableSlots,targetId:target?.id});
+ useEffect(()=>{
+  const previous=previousSlots.current;
+  previousSlots.current={position:effectivePosition,available:availableSlots,targetId:target?.id};
+  const pos=previous.position;
+  if(target||pos==="ALL"||pos==="COACH")return;
+  if(previous.available[pos]>0&&availableSlots[pos]===0&&(effectivePosition===pos||previous.targetId)){
+   const next=(["GK","DEF","MID","FWD"] as const).find(p=>availableSlots[p]>0);
+   if(next){setPosition(next);setQuery("");setDebouncedQuery("")}
+  }
+ },[availableSlots,effectivePosition,target]);
+
  useEffect(()=>{if(target?.id){setQuery("");setDebouncedQuery("");setSelectedClubs([]);setClubMenuOpen(false)}},[target?.id]);
  useEffect(()=>{const id=window.setTimeout(()=>setDebouncedQuery(query),300);return()=>window.clearTimeout(id)},[query]);
 
