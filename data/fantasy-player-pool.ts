@@ -41,6 +41,48 @@ export const REAL_SQUAD_CLUBS = [
   "Çorum FK",
 ] as const;
 
+/** Explicit game-position choices; source scouting positions remain unchanged. */
+export const MIDFIELD_PLAYER_IDS = [
+  "ts-mohamed-salah",
+  "gs-rafael-leao",
+  "bjk-vaclav-cerny",
+  "bjk-ernest-poku",
+  "gs-yunus-akgun",
+  "bjk-leandro-trossard",
+  "fb-mason-greenwood",
+  "gs-baris-alper-yilmaz",
+  "bjk-milot-rashica",
+  "fb-oguz-aydin",
+  "fb-kerem-akturkoglu",
+  "ts-aral-simsir",
+  "kon-deniz-turuc",
+  "fb-dorgeles-nene",
+  "aln-hwang-ui-jo",
+  "sam-elayis-tavsan",
+  "ibfk-yusuf-sari",
+  "riz-ibrahim-olawoyin",
+  "koc-daniel-agyei",
+  "ksp-fousseni-diabate",
+  "kon-enis-destan",
+  "koc-r-rivas",
+  "gen-adama-traore",
+  "kon-jean-luc-dompe",
+  "ts-franculino-dju",
+  "gs-roland-sallai",
+  "amed-gift-orban",
+  "gen-pedro-mendes",
+  "sam-tanguy-coulibaly",
+  "erz-gyrano-kerk",
+  "sam-jaures-assoumou",
+  "gaz-sontje-hansen",
+  "koc-flo-aye",
+  "gaz-t-stewart",
+  "ksp-ali-yavuz-kol",
+  "eyp-prince-ampem",
+  "gaz-fuat-bavuk",
+] as const;
+const midfieldPlayerIds = new Set<string>(MIDFIELD_PLAYER_IDS);
+
 export const POSITION_PRICE_CAPS = { GK: 5.5, DEF: 5.25 } as const;
 
 /** Product pricing, independent of real-world market values. */
@@ -91,6 +133,7 @@ export const FANTASY_PLAYER_POOL: StorePlayer[] = [
 ].map(player => ({
   ...player,
   price: fantasyPrice(player),
+  position: midfieldPlayerIds.has(player.id) || ("detailedPosition" in player && ["LW", "RW"].includes(String(player.detailedPosition))) ? "MID" : player.position,
 }));
 
 export const SQUAD_STORAGE_KEY = "futbol-iq-fantasy-squad-v26";

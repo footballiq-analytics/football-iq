@@ -479,3 +479,9 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
 .fiq-save-notice h2{font-size:20px;font-weight:900;line-height:1.2}
 .fiq-save-notice p{font-size:14px;line-height:1.5;margin:12px 0 18px}
 .fiq-save-notice button{width:100%;padding:9px;border:1px solid #75e3a1;border-radius:7px;background:#08743a;color:white;font-weight:900}
+
+/* Spread crowded outfield rows without changing the portrait layout or drag scale. */
+@media(orientation:landscape) and (max-height:600px){
+ .fiq-team-page .fiq-pitch-row[data-count="5"]{width:100%;margin-inline:0;grid-template-columns:repeat(5,var(--fiq-card-width))!important;justify-content:space-between;gap:0}
+ .fiq-team-page .fiq-pitch-row[data-count="4"]{width:96%;margin-inline:auto;grid-template-columns:repeat(4,var(--fiq-card-width))!important;justify-content:space-between;gap:0}
+}
