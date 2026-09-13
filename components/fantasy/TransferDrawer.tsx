@@ -4,9 +4,9 @@ import { lockInert } from "@/lib/inert-lock";
 import { useEffect, useRef, type ReactNode } from "react";
 
 /** Keep the market mounted: rotating or dragging never resets its filters. */
-export default function TransferDrawer({open,portrait,dragging,onClose,children}:{open:boolean;portrait:boolean;dragging:boolean;onClose:()=>void;children:ReactNode}) {
+export default function TransferDrawer({open,portrait,modalEnabled,dragging,onClose,children}:{open:boolean;portrait:boolean;modalEnabled:boolean;dragging:boolean;onClose:()=>void;children:ReactNode}) {
  const panel=useRef<HTMLDivElement>(null);
- const modal=portrait&&open&&!dragging;
+ const modal=modalEnabled&&portrait&&open&&!dragging;
  const closeRef=useRef(onClose);closeRef.current=onClose;
  useEffect(()=>{
   if(!modal)return;

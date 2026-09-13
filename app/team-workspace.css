@@ -516,3 +516,26 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-team-page .fiq-transfer-heading{grid-template-columns:minmax(0,1fr) 24px auto;gap:2px}
  .fiq-team-page .fiq-transfer-heading .fiq-transfer-close{width:24px;height:26px}
 }
+
+/* Tablets keep navigation and the market toggle reachable in both orientations. */
+@media(min-width:601px) and (min-height:601px){
+ body:has(.fiq-team-page){--fiq-header-h:48px}
+ body:has(.fiq-team-page) .fiq-header,body:has(.fiq-team-page .fiq-transfer-drawer.is-open) .fiq-header{visibility:visible;gap:10px;padding-inline:8px}
+ body:has(.fiq-team-page) .fiq-logo{font-size:16px;min-width:0;flex:none}
+ body:has(.fiq-team-page) .fiq-logo em{display:none}
+ body:has(.fiq-team-page) .fiq-desktop-nav{display:flex!important;flex:1;min-width:0;gap:8px;justify-content:space-evenly}
+ body:has(.fiq-team-page) .fiq-desktop-nav a{font-size:10px;white-space:nowrap;padding-inline:0}
+ body:has(.fiq-team-page) .fiq-header .menu-trigger{display:none!important}
+ body:has(.fiq-team-page) .recommend-button,body:has(.fiq-team-page) .fiq-header-actions>.profile-dot,body:has(.fiq-team-page) .fiq-header-actions>.icon-only{display:none}
+ body:has(.fiq-team-page) .fiq-header-actions{flex:none;gap:4px;margin-left:0}
+ body:has(.fiq-team-page) .fiq-fullscreen-button span{display:none}
+ .fiq-team-page .fiq-transfer-trigger{display:flex;align-items:center;justify-content:center;gap:4px;height:34px;padding:4px 8px;border:1px solid #9ce9f4;border-radius:7px;background:#08667e;color:#fff;font-size:10px;font-weight:900}
+ .fiq-team-page .fiq-transfer-trigger[aria-expanded="true"]{background:#164d62;border-color:#e4faff}
+ .fiq-team-page .fiq-transfer-heading{grid-template-columns:minmax(0,1fr) auto}
+ .fiq-team-page .fiq-transfer-heading .fiq-transfer-close{display:none}
+}
+@media(min-width:601px) and (min-height:601px) and (max-width:900px) and (orientation:portrait){
+ .fiq-team-page .fiq-team-workspace{position:relative}
+ .fiq-team-page .fiq-transfer-drawer{position:absolute;top:0;right:0;height:100%;padding:0;max-height:100%;width:79.2%;max-width:450px}
+ .fiq-team-page .fiq-team-toolbar{position:relative;z-index:121}
+}
