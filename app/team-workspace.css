@@ -539,3 +539,32 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-team-page .fiq-transfer-drawer{position:absolute;top:0;right:0;height:100%;padding:0;max-height:100%;width:79.2%;max-width:450px}
  .fiq-team-page .fiq-team-toolbar{position:relative;z-index:121}
 }
+
+/* Portrait markets stay below the command bar; the same toggle closes them. */
+@media(max-width:900px) and (orientation:portrait){
+ body:has(.fiq-team-page .fiq-transfer-drawer.is-open) .fiq-header{visibility:visible}
+ .fiq-team-page .fiq-team-workspace{position:relative}
+ .fiq-team-page .fiq-transfer-drawer{position:absolute;inset:0 0 auto auto;height:100%;max-height:100%;padding:0}
+ .fiq-team-page .fiq-team-toolbar{position:relative;z-index:121}
+ .fiq-team-page .fiq-market-backdrop{position:absolute;inset:0;touch-action:manipulation}
+ .fiq-team-page .fiq-transfer-heading{grid-template-columns:minmax(0,1fr) auto}
+ .fiq-team-page .fiq-transfer-heading .fiq-transfer-close{display:none}
+}
+/* A landscape phone always shows both columns, regardless of prior portrait state. */
+@media(orientation:landscape) and (max-height:600px){
+ .fiq-team-page.market-collapsed .fiq-team-workspace,.fiq-team-page .fiq-team-workspace{grid-template-columns:minmax(0,1fr) minmax(190px,30%)}
+ .fiq-team-page .fiq-transfer-drawer,.fiq-team-page.market-collapsed .fiq-transfer-drawer{display:block}
+ .fiq-team-page .fiq-team-actions .fiq-transfer-trigger,.fiq-team-page .fiq-transfer-heading .fiq-transfer-close{display:none}
+ .fiq-team-page .fiq-transfer-heading{grid-template-columns:minmax(0,1fr) auto}
+ .fiq-team-page .fiq-pitch-row[data-count="5"]{display:flex;justify-content:space-between;width:100%;gap:12px}
+ .fiq-team-page .fiq-pitch-row[data-count="5"]>.fiq-field-slot{flex:0 0 var(--fiq-card-width)}
+}
+.fiq-team-page .fiq-pitch-rails{position:relative;z-index:45}
+.fiq-team-page .fiq-formation-control{flex-shrink:0;min-width:66px}
+.fiq-team-page .fiq-formation-trigger{width:100%;min-width:62px;touch-action:manipulation;white-space:nowrap}
+.fiq-formation-dialog{position:fixed;inset:0;margin:auto;width:min(90vw,340px);max-height:85dvh;overflow:auto;padding:16px;border:1px solid #eacb75;border-radius:12px;background:#091824;color:#fff}
+.fiq-formation-dialog::backdrop{background:#000a}
+.fiq-formation-dialog>div{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.fiq-formation-dialog nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fiq-team-page .fiq-formation-dialog button{min-height:38px;height:auto;padding:8px;border:1px solid #d8b863;border-radius:6px;background:#06121c;font-size:14px;color:#fff}
+.fiq-team-page .fiq-formation-dialog button[aria-pressed="true"]{background:#ddbd65;color:#06121c}

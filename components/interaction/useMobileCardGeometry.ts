@@ -16,9 +16,10 @@ export function useMobileCardGeometry() {
    if (!compact && !tabletLandscape) { properties.forEach(p => document.body.style.removeProperty(p)); return; }
    const short = window.matchMedia("(orientation:landscape) and (max-height:600px)").matches;
    const { width, height } = squad.getBoundingClientRect();
+   const rowWidth=squad.querySelector(".fiq-pitch-formation")?.getBoundingClientRect().width??width*.79;
    // Reserve the rails, roof, status and gaps before allocating the four/five card rows.
    const cardHeight = short ? Math.max(24, Math.min(52, Math.floor((height - 64) / 5))) : Math.max(52, Math.min(tabletLandscape ? 92 : 104, Math.floor((height - 110) / 5)));
-   const cardWidth = short ? Math.max(26, Math.min(46, Math.floor((width - 8) * .79 / 5 - 16))) : Math.max(44, Math.min(tabletLandscape ? 72 : 76, Math.floor(width * .92 / 5 - 7)));
+   const cardWidth = short ? Math.max(22, Math.min(40, Math.floor((rowWidth - 4 * 24) / 5))) : Math.max(44, Math.min(tabletLandscape ? 72 : 76, Math.floor(width * .92 / 5 - 7)));
    const phonePortrait = window.matchMedia("(max-width:600px) and (orientation:portrait)").matches;
    document.body.style.setProperty(properties[0], `${phonePortrait ? Math.round(cardWidth * .9) : cardWidth}px`);
    document.body.style.setProperty(properties[1], `${phonePortrait ? Math.round(cardHeight * .9) : cardHeight}px`);

@@ -18,3 +18,17 @@ body:has(.fiq-home) .fiq-desktop-nav a.active{border-bottom-color:#f3ce73}
 .home-rule-chips p{font-size:13px}.home-rule-chips b{font-size:12px}.home-match{font-size:13px}.home-match small{font-size:9px}.home-panel-title>a{font-size:11px}.home-standings{font-size:13px}.home-data-note{font-size:10px}.home-shield svg{opacity:.8;transform:scale(1.1) translateY(3px)}
 @media(min-width:1151px){.home-hero{min-height:460px}.home-stadium{height:410px}.home-panel-title h2{font-size:19px}.home-iq h3{font-size:27px}.home-match{min-height:63px}}
 @media(max-width:760px){.home-rule-chips p{font-size:9px}.home-rule-chips b{font-size:10px}.home-match{font-size:11px}.home-position-card{min-height:96px}.home-position-card h3{font-size:12px}.home-position-card p{font-size:9px}}
+
+/* Shared sticky navigation, left aligned on tablet-sized viewports. */
+body .fiq-header{position:sticky;top:0}
+@media(min-width:601px) and (min-height:601px){
+ body .fiq-header,body:has(.fiq-home) .fiq-header,body:has(.fiq-team-page) .fiq-header{justify-content:flex-start;gap:12px;padding-inline:8px}
+ body .fiq-header .fiq-desktop-nav,body:has(.fiq-home) .fiq-desktop-nav,body:has(.fiq-team-page) .fiq-desktop-nav{display:flex!important;justify-content:flex-start;flex:1;min-width:0;gap:12px}
+ body .fiq-header .menu-trigger{display:none!important}
+ body .fiq-header .fiq-logo{min-width:0;flex:none;font-size:16px}
+ body .fiq-header .fiq-logo em{display:none}
+ body .fiq-header .fiq-desktop-nav a{font-size:10px;white-space:nowrap}
+ body .fiq-header .recommend-button,body .fiq-header .profile-dot,body .fiq-header .icon-only{display:none}
+ body .fiq-header .fiq-header-actions{margin-left:auto;gap:4px;flex:none}
+ body .fiq-header .fiq-fullscreen-button span{display:none}
+}
