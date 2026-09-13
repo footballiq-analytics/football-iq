@@ -453,3 +453,14 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  body:has(.fiq-team-page) .fiq-card-name{font-size:11px;line-height:12px;height:24px}
  body:has(.fiq-team-page) .fiq-card-stats{font-size:10px;line-height:11px}
 }
+
+/* Resolve list height from its container in every viewport, not a nested percentage flex basis. */
+.fiq-team-page .fiq-transfer-panel{display:grid;grid-template-rows:auto minmax(0,1fr);height:100%;min-height:0;max-height:none}
+.fiq-team-page .fiq-transfer-results{height:auto;min-height:0;max-height:none;align-self:stretch;margin:0;padding-bottom:0;overflow-y:auto}
+.fiq-team-page .fiq-transfer-drawer{align-self:stretch}
+.fiq-team-page .fiq-empty-coach{display:grid;place-items:center;padding:0;border:1px dashed #f1d17e;border-radius:8px;background:#08172299;color:#ffe69c;font-size:14px;font-weight:900;touch-action:manipulation}
+.fiq-refresh-button{cursor:pointer;position:relative;z-index:2;pointer-events:auto;-webkit-tap-highlight-color:#f5d37966}
+.fiq-refresh-button svg{pointer-events:none}
+.fiq-refresh-button[aria-busy="true"] svg{animation:fiq-refresh-spin .7s linear infinite}
+@keyframes fiq-refresh-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.fiq-refresh-button[aria-busy="true"] svg{animation:none}}

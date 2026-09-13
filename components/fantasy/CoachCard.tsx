@@ -9,6 +9,7 @@ export default function CoachCard({coach,onRemove,onSelect}:{coach?:FantasyCoach
  const long=useLongPress(()=>{if(coach)setMode("detail")},{delay:500,moveTolerance:4});
  useEffect(()=>{if(mode&&!dialog.current?.open)dialog.current?.showModal();},[mode]);
  const close=()=>{dialog.current?.close();setMode(null)};
+ if(!coach)return <div className="fiq-coach-card"><button type="button" className="fiq-empty-slot fiq-empty-coach" aria-label="Teknik direktör seç" onClick={onSelect}>TD</button></div>;
  return <div className="fiq-coach-card">
   <button type="button" className="fiq-coach-face" {...long} onClick={()=>coach?setMode("actions"):onSelect?.()} aria-label={coach?`${coach.name} teknik direktör kartı`:"Teknik direktör seç"}>
    <span className="fiq-coach-position">TD</span>

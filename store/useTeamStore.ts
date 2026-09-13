@@ -2,7 +2,8 @@ import { formatFantasyPrice } from "@/lib/fantasy-price";
 import { create } from "zustand";
 
 export type PlayerPosition = "GK" | "DEF" | "MID" | "FWD";
-export type Formation = "4-3-3" | "4-4-2" | "3-4-3" | "3-5-2" | "5-3-2";
+export const FORMATIONS = ["3-4-3", "3-5-2", "4-3-3", "4-4-2", "4-5-1", "5-3-2", "5-4-1"] as const;
+export type Formation = typeof FORMATIONS[number];
 export type JokerKey = "tripleCaptain" | "benchBoost" | "wildcard" | "goldenBench";
 export type Player = { id:string; name:string; club:string; position:PlayerPosition; price:number; points:number; matches?:number; selected?:number; photo?:string; clubLogo?:string; };
 export type StartingSlot={id:string;position:PlayerPosition;playerId:string|null};
@@ -16,7 +17,7 @@ type TeamStore={
  activateJoker:(joker:JokerKey)=>boolean;clearSquad:()=>void;
  autoArrangeSquad:(candidates:Player[],budget:number)=>boolean;swapStartingAndBench:(startingPlayerId:string,benchPlayerId:string)=>boolean;swapFieldPositions:(player1Id:string,player2Id:string)=>boolean;swapBenchPlayers:(player1Id:string,player2Id:string)=>boolean;movePlayerToEmptySlot:(playerId:string,sourceSlotId:string,targetSlotId:string)=>boolean;addPlayerFromTransfer:(player:Player,targetSlotId:string)=>boolean;removePlayer:(playerId:string)=>void;
 };
-export const FORMATION_POSITIONS:Record<Formation,PlayerPosition[]>={"4-3-3":["FWD","FWD","FWD","MID","MID","MID","DEF","DEF","DEF","DEF","GK"],"4-4-2":["FWD","FWD","MID","MID","MID","MID","DEF","DEF","DEF","DEF","GK"],"3-4-3":["FWD","FWD","FWD","MID","MID","MID","MID","DEF","DEF","DEF","GK"],"3-5-2":["FWD","FWD","MID","MID","MID","MID","MID","DEF","DEF","DEF","GK"],"5-3-2":["FWD","FWD","MID","MID","MID","DEF","DEF","DEF","DEF","DEF","GK"]};
+export const FORMATION_POSITIONS:Record<Formation,PlayerPosition[]>={"4-3-3":["FWD","FWD","FWD","MID","MID","MID","DEF","DEF","DEF","DEF","GK"],"4-4-2":["FWD","FWD","MID","MID","MID","MID","DEF","DEF","DEF","DEF","GK"],"3-4-3":["FWD","FWD","FWD","MID","MID","MID","MID","DEF","DEF","DEF","GK"],"3-5-2":["FWD","FWD","MID","MID","MID","MID","MID","DEF","DEF","DEF","GK"],"5-3-2":["FWD","FWD","MID","MID","MID","DEF","DEF","DEF","DEF","DEF","GK"],"4-5-1":["FWD","MID","MID","MID","MID","MID","DEF","DEF","DEF","DEF","GK"],"5-4-1":["FWD","MID","MID","MID","MID","DEF","DEF","DEF","DEF","DEF","GK"]};
 const BENCH_POSITIONS:PlayerPosition[]=["GK","DEF","MID","FWD"];
 const POSITIONS:PlayerPosition[]=["GK","DEF","MID","FWD"];
 const MAX_BUDGET=100;
