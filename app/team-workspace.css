@@ -48,9 +48,9 @@ body:has(.fiq-team-page) .fiq-card-captain{top:22px;left:auto;right:-5px;width:2
 .fiq-team-page .fiq-empty-slot{width:var(--fiq-card-width);height:var(--fiq-card-height);min-width:0;max-width:none}
 .fiq-team-page .fiq-dugout{position:relative;isolation:isolate;flex:none;margin-top:4px;padding:3px 0 5px;border:1px solid #d2b26c;border-radius:8px;background:#07131b;overflow:visible}
 .fiq-dugout-art>img{top:0;left:-22%;width:144%;height:100%;object-fit:fill}
-.fiq-dugout>.relative{margin:0}
-.fiq-dugout>.relative>b{font-size:14px;line-height:20px;letter-spacing:.08em;color:#ffe89a;text-shadow:0 2px 3px #000,0 0 10px #e8b83a80}
-.fiq-dugout>.relative>small{display:none}
+.fiq-dugout>.fiq-dugout-heading{margin:0}
+.fiq-dugout>.fiq-dugout-heading>b{font-size:14px;line-height:20px;letter-spacing:.08em;color:#ffe89a;text-shadow:0 2px 3px #000,0 0 10px #e8b83a80}
+.fiq-dugout>.fiq-dugout-heading>small{display:none}
 .fiq-coach-label{display:block;visibility:hidden}
 .fiq-team-page .fiq-bench-grid{display:block;height:var(--fiq-card-height);margin:2px 0 0}
 .fiq-team-page .fiq-bench-grid>*{position:absolute;bottom:0;transform:translateX(-50%);margin:0;width:var(--fiq-card-width)}
@@ -154,8 +154,8 @@ body:has(.fiq-team-page) .fiq-card-captain{top:22px;left:auto;right:-5px;width:2
  .fiq-team-page .fiq-pitch-row[data-position="GK"]{width:18%;margin-right:auto;margin-top:14px}
  .fiq-team-page .fiq-dugout{position:absolute;right:3px;bottom:4px;width:79%;height:76px;margin:0;padding:0;border-radius:6px}
  .fiq-dugout-art>img{left:-48%;width:170%}
- .fiq-dugout>.relative{grid-template-columns:1fr auto;padding:0 3px;height:19px}
- .fiq-dugout>.relative>b{font-size:10px;line-height:13px;letter-spacing:0}
+ .fiq-dugout>.fiq-dugout-heading{grid-template-columns:1fr auto;padding:0 3px;height:19px}
+ .fiq-dugout>.fiq-dugout-heading>b{font-size:10px;line-height:13px;letter-spacing:0}
  .fiq-coach-label{display:block;visibility:visible;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;color:white}
  .fiq-team-page .fiq-bench-grid>:first-child{display:none}
  .fiq-team-page .fiq-bench-grid>:nth-child(2){left:calc(12.5% - var(--fiq-card-width)/2)}
@@ -186,7 +186,7 @@ body:has(.fiq-team-page) .fiq-logo b{color:#f5d379}
  body:has(.fiq-team-page){--fiq-header-h:30px;--fiq-nav-h:0px}
  .fiq-team-metrics>div{min-height:32px}
  .fiq-team-actions button{height:26px}
- .fiq-team-page .fiq-dugout>.relative>b{font-size:12px;line-height:18px}
+ .fiq-team-page .fiq-dugout>.fiq-dugout-heading>b{font-size:12px;line-height:18px}
 }
 /* Preserve the existing six-item navigation on the other mobile pages too. */
 
@@ -304,7 +304,7 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
 .fiq-clear-filters:disabled{opacity:.35}
 .fiq-league-modal{max-height:85dvh;overflow:auto;overscroll-behavior:contain}
 @media(orientation:landscape) and (max-height:600px){
- .fiq-team-page .fiq-dugout>.relative{grid-template-columns:1fr}
+ .fiq-team-page .fiq-dugout>.fiq-dugout-heading{grid-template-columns:1fr}
  .fiq-team-page .fiq-coach-label{display:none}
  .fiq-team-page .fiq-bench-grid>:nth-child(1){left:10%}
  .fiq-team-page .fiq-bench-grid>:nth-child(2){left:calc(30% - var(--fiq-card-width)/2)}
@@ -320,7 +320,7 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
 @media(orientation:landscape) and (max-height:600px){
  body:has(.fiq-team-page){--fiq-header-h:24px}
  .fiq-team-page{gap:2px}
- .fiq-team-workspace{grid-template-columns:minmax(0,1fr) minmax(190px,30%);gap:4px}
+ .fiq-team-workspace{grid-template-columns:minmax(0,1fr) minmax(210px,32%);gap:4px}
  .fiq-team-metrics>div{min-height:26px;padding:1px 4px}
  .fiq-team-metrics small{font-size:8px;line-height:9px}
  .fiq-team-metrics strong{font-size:11px;line-height:13px}
@@ -333,8 +333,8 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-team-page .fiq-pitch-row{width:100%;min-height:0}
  .fiq-team-page .fiq-pitch-row[data-position="GK"]{align-self:end;margin:0;width:18%;justify-self:start}
  .fiq-team-page .fiq-dugout{height:calc(var(--fiq-card-height) + 18px);bottom:4px}
- .fiq-team-page .fiq-dugout>.relative{height:15px}
- .fiq-team-page .fiq-dugout>.relative>b{font-size:9px;line-height:12px}
+ .fiq-team-page .fiq-dugout>.fiq-dugout-heading{height:15px}
+ .fiq-team-page .fiq-dugout>.fiq-dugout-heading>b{font-size:9px;line-height:12px}
  .fiq-team-page .fiq-bench-grid{margin-top:1px}
  body:has(.fiq-team-page) .fiq-card-info{bottom:2px;padding:0 1px}
  body:has(.fiq-team-page) .fiq-card-name{font-size:10px;line-height:10px;height:20px;padding:0;text-align:center}
@@ -347,11 +347,11 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-coach-caption{font-size:4px;bottom:2px}
  .fiq-coach-position{top:1px;left:2px;font-size:8px}
  .fiq-team-status{height:24px;padding:5px 2px;font-size:9px;line-height:13px;pointer-events:none}
- .fiq-team-page .fiq-transfer-controls{gap:3px;padding:4px}
+ .fiq-team-page .fiq-transfer-controls{gap:2px;padding:3px}
  .fiq-team-page .fiq-transfer-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px}
  .fiq-team-page .fiq-transfer-heading>div:first-child>span{display:block;font-size:9px;line-height:11px}
  .fiq-team-page .fiq-transfer-budget{gap:2px}
- .fiq-team-page .fiq-transfer-budget>div{padding:1px 3px}
+ .fiq-team-page .fiq-transfer-budget>div{display:flex;align-items:center;gap:3px;padding:2px 3px;line-height:12px}
  .fiq-team-page .fiq-transfer-budget small{font-size:7px;line-height:9px}
  .fiq-team-page .fiq-transfer-budget b{font-size:10px;line-height:12px}
  .fiq-team-page .fiq-club-filter>button{height:26px;padding:1px 4px;font-size:9px}
@@ -361,15 +361,15 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-team-page #fiq-club-menu{top:29px;max-height:45dvh}
  .fiq-team-page .fiq-position-tabs{gap:2px}
  .fiq-team-page .fiq-position-tabs button{min-height:24px;font-size:9px;padding:1px 0}
- .fiq-team-page .fiq-position-tabs small{font-size:7px;display:block;margin:0;line-height:8px}
+ .fiq-team-page .fiq-position-tabs small{font-size:7px;display:inline;margin-left:2px;line-height:8px}
  .fiq-team-page .fiq-transfer-sort{grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);gap:2px}
  .fiq-team-page .fiq-transfer-sort button,.fiq-team-page .fiq-transfer-sort select{height:26px;min-height:26px;padding:1px 2px}
  .fiq-team-page .fiq-transfer-sort button span,.fiq-team-page .fiq-transfer-sort select{font-size:8px;line-height:10px}
  .fiq-clear-filters svg{width:17px;height:17px}
  .fiq-transfer-target{font-size:9px;padding:2px 4px}
  .fiq-transfer-target button{width:22px;height:22px;font-size:16px}
- .fiq-team-page .fiq-transfer-results{padding:3px}
- .fiq-team-page .fiq-transfer-row{padding:3px;margin-bottom:4px}
+ .fiq-team-page .fiq-transfer-results{height:0;max-height:none;min-height:0;flex:1 1 0%;padding:2px 3px 0;line-height:10px}
+ .fiq-team-page .fiq-transfer-row{padding:2px 3px;margin-bottom:2px;line-height:10px}
  .fiq-team-page .fiq-transfer-results>div>div{grid-template-columns:23px minmax(0,1fr) 34px 25px;column-gap:3px}
  .fiq-team-page .fiq-transfer-results strong{font-size:10px;line-height:12px}
  .fiq-team-page .fiq-transfer-results small{font-size:8px;line-height:10px}
@@ -388,3 +388,30 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  body:has(.fiq-team-page) .fiq-card-captain{width:13px;height:13px;top:13px;font-size:7px}
  .fiq-coach-name{font-size:7px;line-height:7px;bottom:6px}
 }
+
+/* Compact landscape controls; keep the established portrait dimensions. */
+@media (orientation:landscape) and (max-height:600px){
+ .fiq-team-actions .fiq-save-squad{display:inline-flex;align-items:center;justify-content:center;gap:3px;min-width:26px;padding:2px 5px;border-color:#65ed9a;background-color:#087438;color:#f1fff6}
+ .fiq-save-squad svg{flex:none;width:14px;height:14px}
+ .fiq-team-page .fiq-pitch-formation>div{min-height:0}
+ .fiq-team-page .fiq-dugout-art>img{left:0;width:100%;filter:brightness(1.38) saturate(1.08)}
+ .fiq-team-page .fiq-dugout{border-color:#ffe8a4;box-shadow:inset 0 2px 8px #fff5c75c,0 0 10px #d8eaff40}
+ .fiq-team-page .fiq-dugout-art::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#f4fcff40,transparent 36%);border-top:2px solid #e8f9ff;box-shadow:inset 0 6px 10px #bdeaff40}
+ .fiq-team-page .fiq-dugout-heading>b{color:#fff5ca;text-shadow:0 1px 2px #000,0 0 7px #ffe799}
+ .fiq-team-page #fiq-club-menu{right:auto;width:calc(200% + 2px);max-height:min(240px,60dvh);padding:4px}
+ .fiq-team-page #fiq-club-menu>button{min-height:24px;margin-bottom:2px;padding:3px 5px;font-size:9px;line-height:12px;border-radius:5px}
+ .fiq-team-page #fiq-club-menu>button:last-child{height:25px;margin-top:2px}
+ .fiq-team-page #fiq-club-menu>div{margin-bottom:3px}
+ .fiq-team-page #fiq-club-menu>button>span:first-child{min-width:0;overflow-wrap:anywhere}
+ .fiq-team-page #fiq-club-menu>button>span:last-child{flex-shrink:0;margin-left:4px}
+ .fiq-team-page .fiq-transfer-player-info{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:3px;padding:0;line-height:10px}
+ .fiq-team-page .fiq-transfer-player-info>div{grid-column:1/-1}
+ .fiq-team-page .fiq-transfer-player-info>.fiq-eligibility-badge{grid-column:2;grid-row:2;align-self:center;max-width:78px;white-space:normal;font-size:6px!important}
+ .fiq-team-page .fiq-transfer-player-info>small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .fiq-team-page .fiq-transfer-row .fiq-eligibility-badge{line-height:9px;vertical-align:top}
+ .fiq-team-page .fiq-coach-transfer-row{grid-template-columns:minmax(0,1fr) 25px;padding:3px;margin-bottom:2px;gap:3px}
+ .fiq-team-page .fiq-coach-transfer-row>div{min-width:0}
+ .fiq-team-page .fiq-coach-transfer-row button{height:25px;width:25px}
+}
+/* Save keeps the same action/validation behavior in every orientation. */
+.fiq-team-actions .fiq-save-squad{display:inline-flex;align-items:center;justify-content:center;gap:3px;border-color:#65ed9a;background-color:#087438;color:#f1fff6}
