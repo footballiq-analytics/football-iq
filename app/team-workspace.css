@@ -578,3 +578,13 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-team-page .fiq-transfer-trigger,.fiq-team-page .fiq-transfer-heading .fiq-transfer-close{display:none}
  .fiq-team-page .fiq-share-squad{display:flex;align-items:center;justify-content:center;gap:6px;border-color:#b3dfed;background:#155b72;color:#fff}
 }
+
+/* Use the complete field span, including on portrait phones with five defenders. */
+@media(max-width:600px) and (orientation:portrait), (orientation:landscape) and (max-height:600px){
+ .fiq-team-page .fiq-pitch-formation{left:4px;right:4px}
+ .fiq-team-page .fiq-pitch-row:is([data-count="3"],[data-count="4"],[data-count="5"]){display:flex;width:100%;margin-inline:0;justify-content:space-between;gap:0}
+ .fiq-team-page .fiq-pitch-row:is([data-count="3"],[data-count="4"],[data-count="5"])>.fiq-field-slot{flex:0 0 var(--fiq-card-width)}
+}
+@media(orientation:landscape) and (max-height:600px){
+ .fiq-team-page .fiq-team-workspace,.fiq-team-page.market-collapsed .fiq-team-workspace{grid-template-columns:minmax(0,1fr) minmax(160px,24%)}
+}
