@@ -17,15 +17,19 @@ export function useMobileCardGeometry() {
    const short = window.matchMedia("(orientation:landscape) and (max-height:600px)").matches;
    const { width, height } = squad.getBoundingClientRect();
    const rowWidth=squad.querySelector(".fiq-pitch-formation")?.getBoundingClientRect().width??width*.79;
-   // Reserve the rails, roof, status and gaps before allocating the four/five card rows.
-   const cardHeight = short ? Math.max(24, Math.min(52, Math.floor((height - 64) / 5))) : Math.max(52, Math.min(tabletLandscape ? 92 : 104, Math.floor((height - 110) / 5)));
-   const cardWidth = short ? Math.max(22, Math.min(40, Math.floor((rowWidth - 4 * 24) / 5))) : Math.max(44, Math.min(tabletLandscape ? 72 : 76, Math.floor(width * .92 / 5 - 7)));
+   const railsHeight=squad.querySelector(".fiq-pitch-rails")?.getBoundingClientRect().height??28;
+   const statusHeight=squad.querySelector(".fiq-team-status")?.getBoundingClientRect().height??14;
+   // Four field rows plus the bench, with room for the roof and vertical gaps.
+   const cardHeight = short ? Math.max(1, Math.min(57, Math.floor((height - railsHeight - statusHeight - 58) / 5))) : Math.max(52, Math.min(tabletLandscape ? 92 : 104, Math.floor((height - 110) / 5)));
+   const cardWidth = short ? Math.max(1, Math.min(44, Math.floor((rowWidth - 12) / 9))) : Math.max(44, Math.min(tabletLandscape ? 72 : 76, Math.floor(width * .92 / 5 - 7)));
    const phonePortrait = window.matchMedia("(max-width:600px) and (orientation:portrait)").matches;
-   document.body.style.setProperty(properties[0], `${short ? Math.round(cardWidth * 1.1 * 10)/10 : phonePortrait ? Math.round(cardWidth * .9) : cardWidth}px`);
-   document.body.style.setProperty(properties[1], `${short ? Math.round(cardHeight * 1.1 * 10)/10 : phonePortrait ? Math.round(cardHeight * .9) : cardHeight}px`);
+   document.body.style.setProperty(properties[0], `${short ? cardWidth : phonePortrait ? Math.round(cardWidth * .9) : cardWidth}px`);
+   document.body.style.setProperty(properties[1], `${short ? cardHeight : phonePortrait ? Math.round(cardHeight * .9) : cardHeight}px`);
   }
   const observer = new ResizeObserver(update);
   observer.observe(squad);
+  const field=squad.querySelector(".fiq-pitch-formation");
+  if(field)observer.observe(field);
   window.addEventListener("resize", update);
   update();
   return () => {
