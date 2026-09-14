@@ -23,17 +23,22 @@ export function useMobileCardGeometry() {
    const cardHeight = short ? Math.max(1, Math.min(57, Math.floor((height - railsHeight - statusHeight - 58) / 5))) : Math.max(52, Math.min(tabletLandscape ? 92 : 104, Math.floor((height - 110) / 5)));
    const cardWidth = short ? Math.max(1, Math.min(44, Math.floor((rowWidth - 12) / 9))) : Math.max(44, Math.min(tabletLandscape ? 72 : 76, Math.floor(width * .92 / 5 - 7)));
    const phonePortrait = window.matchMedia("(max-width:600px) and (orientation:portrait)").matches;
-   document.body.style.setProperty(properties[0], `${short ? Math.round(cardWidth * .95 * 10) / 10 : phonePortrait ? Math.round(cardWidth * .9) : cardWidth}px`);
+   const desiredWidth=short?Math.round(cardWidth*.95*10)/10:phonePortrait?Math.round(cardWidth*.9):cardWidth;
+   const largestRow=Math.max(1,...Array.from(squad.querySelectorAll<HTMLElement>(".fiq-pitch-row")).map(row=>Number(row.dataset.count)||1));
+   const fittingWidth=(short||phonePortrait)?Math.min(desiredWidth,Math.floor((rowWidth-12)/(largestRow+(largestRow-1)*.45))):desiredWidth;
+   document.body.style.setProperty(properties[0], `${Math.max(1,fittingWidth)}px`);
    document.body.style.setProperty(properties[1], `${short ? cardHeight : phonePortrait ? Math.round(cardHeight * .9) : cardHeight}px`);
   }
   const observer = new ResizeObserver(update);
   observer.observe(squad);
   const field=squad.querySelector(".fiq-pitch-formation");
   if(field)observer.observe(field);
+  const mutations=new MutationObserver(update);
+  if(field)mutations.observe(field,{childList:true,subtree:true,attributes:true,attributeFilter:["data-count"]});
   window.addEventListener("resize", update);
   update();
   return () => {
-   observer.disconnect();window.removeEventListener("resize", update);
+   observer.disconnect();mutations.disconnect();window.removeEventListener("resize", update);
    properties.forEach((p,i) => old[i] ? document.body.style.setProperty(p, old[i]) : document.body.style.removeProperty(p));
   };
  }, []);

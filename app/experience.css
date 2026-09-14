@@ -1,0 +1,96 @@
+/* Shared controls and theme, loaded after legacy page styles. */
+html{overscroll-behavior-y:none}
+html:not(.dark){--surface:#f5f8fc;--panel:#fff;--ink:#163348;--muted:#526e81;--line:#c7d5df;--accent:#97701e;color-scheme:light}
+html.dark{--surface:#102431;--panel:#173443;--ink:#edf5f9;--muted:#b0c5d2;--line:#416070;--accent:#f1d17c;color-scheme:dark}
+html body{background:var(--surface)!important;color:var(--ink)!important}
+body .fiq-header{background:var(--panel);border-bottom:1px solid var(--line);color:var(--ink);position:sticky;top:0;z-index:180;isolation:isolate}
+body .fiq-header a,body .fiq-header .fiq-logo{color:var(--ink)}
+body .fiq-header .fiq-desktop-nav a{color:var(--ink);border-radius:6px 6px 0 0;padding-inline:8px;font-weight:800}
+body .fiq-header .fiq-desktop-nav a.active{background:color-mix(in srgb,var(--accent) 14%,transparent);border-bottom-color:var(--accent);color:var(--accent)}
+body .fiq-header-actions{gap:6px;position:relative;z-index:2}
+.fiq-header-share,.fiq-theme-toggle,.fiq-menu-toggle{align-items:center;justify-content:center;gap:5px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-size:10px;font-weight:850;min-height:40px;touch-action:manipulation;cursor:pointer}
+.fiq-header-share,.fiq-theme-toggle{display:flex}
+.fiq-header-share{border-color:var(--accent)}
+.fiq-theme-toggle>span:first-child{font-size:21px;line-height:1}
+.fiq-menu-toggle{display:none;min-width:54px}
+body .mobile-drawer-backdrop{z-index:500;isolation:isolate;position:fixed;inset:0;background:#00132299}
+body .mobile-drawer{background:var(--panel);color:var(--ink);overflow:auto;max-height:100dvh;padding:18px;width:min(86vw,340px);border-color:var(--line)}
+body .mobile-drawer a,body .mobile-drawer>button{display:block;width:100%;min-height:44px;padding:12px;text-align:left;font-size:14px;font-weight:750;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;margin:3px 0}
+body .fiq-menu-heading button{min-width:44px;min-height:44px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;font-size:24px}
+.fiq-manual-share{position:fixed;inset:0;margin:auto;width:min(92vw,480px);max-height:85dvh;padding:20px;overflow:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--ink)}
+.fiq-manual-share::backdrop{background:#001322aa}
+.fiq-manual-share h2{font-size:20px;font-weight:850}.fiq-manual-share p{font-size:13px;line-height:1.5;margin:10px 0}
+.fiq-manual-share textarea{width:100%;height:160px;padding:10px;resize:vertical;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:7px;font-size:14px}
+.fiq-manual-share button{display:block;margin-top:10px;padding:10px;width:100%;background:var(--surface);border:1px solid var(--accent);border-radius:7px;color:var(--ink);font-weight:850}
+.fiq-pull-refresh{position:fixed;top:max(8px,env(safe-area-inset-top));left:50%;z-index:450;pointer-events:none;background:var(--panel);color:var(--ink);padding:9px 16px;border:1px solid var(--accent);border-radius:24px;font-size:12px;font-weight:750;box-shadow:0 5px 24px #0003;white-space:nowrap}
+.fiq-club-label{display:grid;gap:3px;min-width:0}
+.fiq-team-page #fiq-club-menu .fiq-club-fixture{display:block;font-size:10px;line-height:13px;font-weight:400;color:#aebdc9;white-space:normal}
+.fiq-club-fixture b{font-weight:600;color:#d4e3ee}
+.fiq-home{max-width:1400px;padding:0 24px 22px;color:var(--ink)}
+.fiq-home .home-hero{min-height:330px;padding:22px 8px 18px;gap:18px}
+.fiq-home .home-hero::before{background:linear-gradient(90deg,var(--surface) 15%,transparent),linear-gradient(0deg,var(--surface),transparent),var(--home-stadium) center/cover;opacity:.22;inset:0}
+.fiq-home .home-hero h1{font-size:clamp(30px,3.3vw,46px);line-height:1.08}
+.fiq-home .home-intro{font-size:16px;color:var(--muted)}
+.fiq-home .home-eyebrow{font-size:10px;color:var(--accent)}
+.fiq-home .home-stadium{height:300px}
+.fiq-home .home-stadium-motto{color:var(--muted);font-size:9px;top:-4px}
+.fiq-home .home-actions{margin:18px 0 14px;gap:8px}
+.fiq-home .home-actions a{padding:10px 14px;font-size:11px;background:var(--panel);color:var(--ink);border-color:var(--accent)}
+.fiq-home .home-actions a:first-child{min-width:170px;background:linear-gradient(#f4d991,#d9b85a);color:#182634}
+.fiq-home .home-rule-chips{gap:6px}
+.fiq-home .home-rule-chips>div{padding:7px;gap:6px;background:var(--panel);border-color:var(--line)}
+.fiq-home .home-rule-chips>div>span{font-size:21px;color:var(--accent)}
+.fiq-home .home-rule-chips p{font-size:10px}.fiq-home .home-rule-chips b{font-size:10px;color:var(--muted)}
+.fiq-home .home-panel{padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 7px 22px #16334808}
+.fiq-home .home-panel-title{padding-bottom:8px;margin-bottom:6px;border-color:var(--line)}
+.fiq-home .home-panel-title h2{font-size:15px}.fiq-home .home-panel-title svg{width:19px;height:19px;color:var(--accent)}
+.fiq-home .home-panel-title>a{font-size:10px;color:var(--muted)}
+.fiq-home .home-dashboard{grid-template-columns:1fr 1fr 1fr;gap:10px}
+.fiq-home .home-match{min-height:48px;font-size:11px;border-color:var(--line);grid-template-columns:minmax(0,1fr) 62px minmax(0,1fr)}
+.fiq-home .home-match small,.fiq-home .home-standings td,.fiq-home .home-standings thead,.fiq-home .home-data-note{color:var(--muted)}
+.fiq-home .home-match small b{color:var(--ink)}
+.fiq-home .home-club-mark{width:25px;height:25px;font-size:15px;background:var(--surface);color:var(--accent);border:1px solid var(--accent);box-shadow:none}
+.fiq-home .home-standings{font-size:11px}.fiq-home .home-standings td,.fiq-home .home-standings th{border-color:var(--line);padding:6px 4px}
+.fiq-home .home-iq h3{font-size:22px;margin:16px 0 8px}
+.fiq-home .home-iq>p{color:var(--muted);font-size:12px}
+.fiq-home .home-iq ul{margin-top:16px;gap:6px}.fiq-home .home-iq li{font-size:10px}.fiq-home .home-iq li>span{width:25px;height:25px;font-size:16px;color:var(--accent)}
+.fiq-home .home-players{margin:0 0 14px}
+.fiq-home .home-position-cards{gap:8px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.fiq-home .home-position-card{min-height:76px;padding-top:9px;padding-bottom:9px}
+.fiq-home .home-position-card h3{font-size:12px;color:#f5f8fa}.fiq-home .home-position-card p{font-size:9px}
+.fiq-home .home-position-card i{margin:6px 0}
+.fiq-home .home-next{margin:0 0 14px;gap:8px}
+.fiq-home .home-next h2{font-size:20px;margin:5px 0}.fiq-home .home-next p{color:var(--muted);font-size:11px}
+.fiq-home .home-next>a{padding:12px;background:var(--panel);color:var(--ink);border-color:var(--line);border-radius:10px}
+.fiq-home .home-next>a>b{font-size:20px;color:var(--accent)}.fiq-home .home-next>a>span{font-size:13px}.fiq-home .home-next strong{color:var(--muted);font-size:10px}
+.fiq-home .home-signoff{color:var(--muted)}
+html:not(.dark) .fiq-team-page{background:#dce7ef}
+html:not(.dark) .fiq-team-page>.pointer-events-none.fixed{opacity:.08}
+html:not(.dark) .fiq-league-page,html:not(.dark) .fiq-footer{color:var(--ink)}
+@media(max-width:1100px){.fiq-home .home-dashboard{grid-template-columns:1fr 1fr}.fiq-home .home-iq{grid-column:1/-1}.fiq-home .home-next{grid-template-columns:repeat(3,1fr)}.fiq-home .home-next>div{grid-column:1/-1}}
+@media(min-width:601px) and (min-height:601px){
+ body .fiq-header .fiq-desktop-nav{gap:4px;justify-content:flex-start}
+ body .fiq-header .fiq-desktop-nav a{padding-inline:5px;font-size:10px}
+ body .fiq-header-share span{display:none}
+ body .fiq-header .fiq-menu-toggle{display:none!important}
+}
+@media(max-width:600px) and (orientation:portrait), (orientation:landscape) and (max-height:600px){
+ body:has(.fiq-team-page){--fiq-header-h:48px}
+ body .fiq-header{min-height:48px;height:48px;gap:6px;padding-inline:max(6px,env(safe-area-inset-left)) max(6px,env(safe-area-inset-right))}
+ body .fiq-header .fiq-desktop-nav{display:none!important}
+ body .fiq-header .fiq-menu-toggle{display:flex!important;min-width:54px;width:auto;height:40px;min-height:40px;padding:5px 8px}
+ body .fiq-header .fiq-header-actions{gap:5px;margin-left:auto}
+ .fiq-header-share{min-width:38px;padding:7px}.fiq-header-share span{display:none}
+ .fiq-theme-toggle{min-width:38px;padding:6px}.fiq-theme-toggle>span:last-child{display:none}
+ .fiq-menu-toggle>span{font-size:9px}
+ body .fiq-header .fiq-logo span{font-size:14px}
+}
+@media(max-width:700px){
+ .fiq-home{padding-inline:12px}.fiq-home .home-hero{grid-template-columns:1fr;min-height:0;padding:20px 2px 12px;gap:10px}
+ .fiq-home .home-hero h1{font-size:34px}.fiq-home .home-intro{font-size:14px}
+ .fiq-home .home-stadium{height:250px;max-width:510px;width:100%;justify-self:center}
+ .fiq-home .home-dashboard{grid-template-columns:1fr}.fiq-home .home-iq{display:block;grid-column:auto}
+ .fiq-home .home-position-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .fiq-home .home-next{grid-template-columns:1fr}.fiq-home .home-next>a{padding:10px 12px}
+ .fiq-home .home-rule-chips>div{gap:4px;padding:6px 4px}.fiq-home .home-rule-chips>div>span{font-size:17px}
+}
