@@ -588,3 +588,15 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
 @media(orientation:landscape) and (max-height:600px){
  .fiq-team-page .fiq-team-workspace,.fiq-team-page.market-collapsed .fiq-team-workspace{grid-template-columns:minmax(0,1fr) minmax(160px,24%)}
 }
+
+/* Five defenders only: free 40px across the row, adding 10px to each gap. */
+@media(orientation:landscape) and (max-height:600px){
+ .fiq-team-page .fiq-pitch-row[data-position="DEF"][data-count="5"]{
+  --fiq-card-width:max(20px,calc(var(--fiq-mobile-card-width,44px) - 8px));
+  display:flex;width:100%;justify-content:space-between;gap:0;
+ }
+ /* The portal follows the same footprint while one of these defenders is dragged. */
+ body:has(.fiq-pitch-row[data-position="DEF"][data-count="5"] [data-fiq-dnd]>.opacity-0) .fiq-drag-frame.pointer-events-none{
+  --fiq-card-width:max(20px,calc(var(--fiq-mobile-card-width,44px) - 8px));
+ }
+}
