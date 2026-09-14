@@ -23,7 +23,7 @@ export function useMobileCardGeometry() {
    const cardHeight = short ? Math.max(1, Math.min(57, Math.floor((height - railsHeight - statusHeight - 58) / 5))) : Math.max(52, Math.min(tabletLandscape ? 92 : 104, Math.floor((height - 110) / 5)));
    const cardWidth = short ? Math.max(1, Math.min(44, Math.floor((rowWidth - 12) / 9))) : Math.max(44, Math.min(tabletLandscape ? 72 : 76, Math.floor(width * .92 / 5 - 7)));
    const phonePortrait = window.matchMedia("(max-width:600px) and (orientation:portrait)").matches;
-   document.body.style.setProperty(properties[0], `${short ? cardWidth : phonePortrait ? Math.round(cardWidth * .9) : cardWidth}px`);
+   document.body.style.setProperty(properties[0], `${short ? Math.round(cardWidth * .95 * 10) / 10 : phonePortrait ? Math.round(cardWidth * .9) : cardWidth}px`);
    document.body.style.setProperty(properties[1], `${short ? cardHeight : phonePortrait ? Math.round(cardHeight * .9) : cardHeight}px`);
   }
   const observer = new ResizeObserver(update);
