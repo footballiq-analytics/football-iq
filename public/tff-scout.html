@@ -85,8 +85,10 @@ th{position:sticky;top:0;background:#0d1b2a;z-index:1}
 </div>
 
 <script>
-const FBREF='https://fbref.com/en/comps/26/stats/Super-Lig-Stats';
+const FBREF='https://fbref.com/en/comps/26/stats/Super-Lig-Estatisticas';
 const PROXY='https://api.allorigins.win/raw?url='+encodeURIComponent(FBREF);
+const LOCAL_DATA='./data/tff-scout.json';
+const JINA='https://r.jina.ai/'+FBREF;
 const LS_DATA='fiq_tff_scout_data_v2',LS_TIME='fiq_tff_scout_time_v2';
 let players=[],squad=[];
 const el=id=>document.getElementById(id);
@@ -118,11 +120,37 @@ function parseCsvText(text){
 }
 async function fetchData(force=false){
   const ts=num(localStorage.getItem(LS_TIME));const cached=localStorage.getItem(LS_DATA);
-  if(!force&&cached&&Date.now()-ts<86400000){players=JSON.parse(cached).map(norm);renderAll();setStatus('24 saatlik yerel önbellek kullanılıyor.');return}
+  if(!force&&cached&&Date.now()-ts<86400000){
+    players=JSON.parse(cached).map(norm);renderAll();setStatus('24 saatlik yerel önbellek kullanılıyor.');return
+  }
   setLoading(true);
-  try{const res=await fetch(PROXY,{cache:'no-store'});if(!res.ok)throw new Error('Proxy HTTP '+res.status);const html=await res.text();players=parseHtml(html);save();renderAll();setStatus('FBref verisi başarıyla çekildi: '+players.length+' oyuncu.')}
-  catch(e){console.error(e);if(cached){players=JSON.parse(cached).map(norm);renderAll();setStatus('Canlı çekim başarısız; son yerel veri açıldı. CSV fallback alanı da hazır.','err')}else{el('csvPanel').classList.remove('hidden');setStatus('Canlı çekim başarısız. Boş ekran yerine manuel CSV fallback açıldı.','err')}}
-  finally{setLoading(false)}
+  try{
+    const local=await fetch(LOCAL_DATA+'?v='+Date.now(),{cache:'no-store'});
+    if(local.ok){
+      const data=await local.json();
+      if(Array.isArray(data.players)&&data.players.length>=11){
+        players=data.players.map(norm);save();renderAll();
+        setStatus((data.source||'Yerel canlı veri')+' yüklendi: '+players.length+' oyuncu.');
+        return;
+      }
+    }
+    throw new Error('Yerel canlı veri bulunamadı');
+  }catch(localErr){
+    try{
+      const res=await fetch(PROXY,{cache:'no-store'});
+      if(!res.ok)throw new Error('Proxy HTTP '+res.status);
+      const html=await res.text();players=parseHtml(html);save();renderAll();
+      setStatus('FBref verisi başarıyla çekildi: '+players.length+' oyuncu.');
+    }catch(proxyErr){
+      if(cached){
+        players=JSON.parse(cached).map(norm);renderAll();
+        setStatus('Canlı kaynak geçici olarak erişilemiyor; son doğrulanmış veri kullanılıyor.','err');
+      }else{
+        el('csvPanel').classList.remove('hidden');
+        setStatus('Canlı kaynak erişilemiyor. Manuel CSV fallback açıldı.','err');
+      }
+    }
+  }finally{setLoading(false)}
 }
 function renderAll(){players=players.map(norm);el('playerCount').textContent=players.length;refreshTeams();renderTable();if(squad.length)buildSquad()}
 function refreshTeams(){const cur=el('teamFilter').value;const teams=[...new Set(players.map(p=>p.team).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));el('teamFilter').innerHTML='<option value="">Tüm takımlar</option>'+teams.map(t=>'<option>'+esc(t)+'</option>').join('');el('teamFilter').value=teams.includes(cur)?cur:''}
