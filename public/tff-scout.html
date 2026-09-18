@@ -166,7 +166,7 @@ el('parseCsv').onclick=()=>{try{players=parseCsvText(el('csvInput').value);if(!p
 el('sampleCsv').onclick=()=>el('csvInput').value='Player,Team,Pos,MP,Min,Gls,Ast,xG,xA,xG90,xA90,Price,Penalty,Corner,Form4Plus\n';
 el('squadBtn').onclick=buildSquad;el('formation').onchange=()=>{if(players.length)buildSquad()};
 el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
-(function init(){const cached=localStorage.getItem(LS_DATA),ts=num(localStorage.getItem(LS_TIME));if(cached){try{players=JSON.parse(cached).map(norm);renderAll();el('lastUpdate').textContent=ts?new Date(ts).toLocaleString('tr-TR'):'—'}catch{}}fetchData(false)})();
+(function init(){const cached=localStorage.getItem(LS_DATA),ts=num(localStorage.getItem(LS_TIME));if(cached){try{players=JSON.parse(cached).map(norm);renderAll();el('lastUpdate').textContent=ts?new Date(ts).toLocaleString('tr-TR'):'—'}catch{}}fetchData(false);setInterval(()=>fetchData(true),86400000)})();
 </script>
 </body>
 </html>
