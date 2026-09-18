@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#07111f"/>
+<title>FUTBOL IQ - TFF Fantezi Otomatik Kadro Kurucu</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{iq:"#f4c542",night:"#07111f",panel:"#0d1b2a"}}}}
+</script>
+<style>
+html{background:#07111f;color-scheme:dark}body{min-height:100vh;background:radial-gradient(circle at 20% 0,#16304b 0,transparent 34%),linear-gradient(180deg,#07111f,#050b12 68%);color:#eef4fa}
+.glass{background:rgba(10,24,38,.82);border:1px solid rgba(255,255,255,.1);box-shadow:0 18px 50px rgba(0,0,0,.25);backdrop-filter:blur(14px)}
+.pitch{background:repeating-linear-gradient(0deg,#0f6a3d 0 44px,#0c5d36 44px 88px);position:relative;overflow:hidden}
+.pitch:before{content:"";position:absolute;inset:3%;border:2px solid #ffffff88;border-radius:10px}
+.pitch:after{content:"";position:absolute;left:50%;top:3%;bottom:3%;border-left:2px solid #ffffff88}
+.line-circle{position:absolute;width:34%;aspect-ratio:1;border:2px solid #ffffff88;border-radius:50%;left:33%;top:33%}
+.player-card{position:absolute;transform:translate(-50%,-50%);width:112px;max-width:24vw;background:linear-gradient(145deg,rgba(4,13,24,.96),rgba(17,41,59,.96));border:1px solid #f4c54299;border-radius:14px;padding:7px 8px;text-align:center;box-shadow:0 8px 22px #0008}
+.player-card b{font-size:11px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-card small{font-size:9px;color:#b8c8d8;display:block}.player-card strong{font-size:10px;color:#f4c542}
+.spinner{width:20px;height:20px;border:2px solid #ffffff33;border-top-color:#f4c542;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+input,select,textarea{background:#07111f!important;color:#eef4fa!important;border-color:#ffffff22!important}
+th{position:sticky;top:0;background:#0d1b2a;z-index:1}
+@media(max-width:900px){.player-card{width:84px;padding:5px}.player-card small{font-size:8px}.player-card b{font-size:9px}}
+</style>
+</head>
+<body>
+<div class="max-w-[1500px] mx-auto p-3 sm:p-5 lg:p-7">
+<header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
+  <div><div class="text-iq font-black tracking-[.22em] text-xl">FUTBOL IQ</div><h1 class="text-2xl sm:text-4xl font-black tracking-tight mt-1">TFF Fantezi Otomatik Kadro Kurucu</h1><p class="text-slate-400 mt-1">TFF Fantezi Lig · Canlı Scout · 100M bütçe</p></div>
+  <div class="text-xs text-slate-400">Kaynak: FBref + manuel CSV · Son veri: <span id="lastUpdate">—</span></div>
+</header>
+
+<section class="grid md:grid-cols-3 gap-3 mb-4">
+  <button id="fetchBtn" class="glass rounded-2xl p-4 text-left hover:border-iq/60 transition"><span class="text-iq font-black">01</span><b class="block text-lg mt-1">Veriyi Çek / Yenile</b><small class="text-slate-400">FBref → AllOrigins → otomatik parse</small></button>
+  <button id="csvBtn" class="glass rounded-2xl p-4 text-left hover:border-iq/60 transition"><span class="text-iq font-black">02</span><b class="block text-lg mt-1">Manuel CSV Yapıştır</b><small class="text-slate-400">Export CSV içeriğini buraya yapıştır</small></button>
+  <button id="squadBtn" class="rounded-2xl p-4 text-left bg-iq text-slate-950 shadow-xl hover:brightness-110 transition"><span class="font-black">03</span><b class="block text-lg mt-1">EN İYİ 11'İ GETİR</b><small class="text-slate-800">Skor + verim + bütçe optimizasyonu</small></button>
+</section>
+
+<div id="status" class="glass rounded-xl px-4 py-3 mb-4 text-sm flex items-center gap-3"><span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span id="statusText">Hazır. Önce canlı veriyi çekebilir veya CSV yapıştırabilirsin.</span></div>
+
+<section id="csvPanel" class="hidden glass rounded-2xl p-4 mb-4">
+  <div class="flex items-center justify-between gap-3"><div><h2 class="font-black text-lg">Manuel Veri Yapıştır</h2><p class="text-xs text-slate-400">FBref Export CSV. Team/Squad, xA/xAG ve xA90/xAG90 adları otomatik eşleştirilir.</p></div><button id="closeCsv" class="px-3 py-2 rounded-lg border border-white/10">Kapat</button></div>
+  <textarea id="csvInput" rows="8" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Player,Team,Pos,MP,Min,Gls,Ast,xG,xA,xG90,xA90,Price,Penalty,Corner,Form4Plus"></textarea>
+  <div class="flex flex-wrap gap-2 mt-3"><button id="parseCsv" class="bg-iq text-slate-950 font-black px-4 py-2 rounded-lg">CSV'Yİ PARSE ET</button><button id="sampleCsv" class="border border-white/10 px-4 py-2 rounded-lg">Örnek başlık ekle</button></div>
+</section>
+
+<section class="grid xl:grid-cols-[minmax(0,1.08fr)_minmax(520px,.92fr)] gap-4">
+  <div class="space-y-4">
+    <div class="glass rounded-2xl p-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div><h2 class="text-xl font-black">Otomatik İlk 11</h2><p class="text-xs text-slate-400">Kaleci seçiminde GS / FB / BJK takım önceliği bir clean-sheet sezgisi olarak kullanılır.</p></div>
+        <select id="formation" class="rounded-lg border px-3 py-2 text-sm"><option value="442">4-4-2</option><option value="352">3-5-2</option></select>
+      </div>
+      <div class="mt-4">
+        <div class="flex items-center justify-between text-xs mb-1"><span>Bütçe</span><b><span id="budgetUsed">0.0</span>M / 100M</b></div>
+        <div class="h-3 bg-slate-800 rounded-full overflow-hidden"><div id="budgetBar" class="h-full bg-iq transition-all" style="width:0%"></div></div>
+      </div>
+      <div id="pitch" class="pitch rounded-2xl mt-4 min-h-[610px] sm:min-h-[680px] border border-white/10"><div class="line-circle"></div><div id="emptyPitch" class="absolute inset-0 grid place-items-center text-center p-8"><div><div class="text-5xl mb-2">⚽</div><b>Henüz kadro kurulmadı</b><p class="text-sm text-white/70 mt-1">Veriyi yükle ve “EN İYİ 11'İ GETİR” butonuna bas.</p></div></div></div>
+    </div>
+    <div class="glass rounded-2xl p-4">
+      <div class="flex items-center justify-between gap-3"><div><h2 class="font-black">Skor Formülü</h2><p class="text-xs text-slate-400">TFF_SKOR = xG90×6 + xA90×4 + Form4+ + Penaltı×1.5 + Korner×1</p></div><button id="embedBtn" class="text-xs border border-iq/30 text-iq px-3 py-2 rounded-lg">Web sitene göm</button></div>
+      <p class="text-xs text-slate-500 mt-3">Not: “Son 5 maçta 4+ ilk 11” FBref standart tabloda doğrudan gelmediği için <b>Form4+</b> sütunu manuel düzenlenebilir. Fiyat yoksa 6M varsayılır.</p>
+    </div>
+  </div>
+
+  <div class="glass rounded-2xl overflow-hidden">
+    <div class="p-4 border-b border-white/10">
+      <div class="flex flex-wrap items-center justify-between gap-2"><div><h2 class="text-xl font-black">Oyuncu Sıralaması</h2><p class="text-xs text-slate-400"><span id="playerCount">0</span> oyuncu</p></div><div id="loading" class="hidden spinner"></div></div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
+        <select id="posFilter" class="rounded-lg border px-2 py-2 text-xs"><option value="">Tüm mevkiler</option><option>GK</option><option>DF</option><option>MF</option><option>FW</option></select>
+        <select id="teamFilter" class="rounded-lg border px-2 py-2 text-xs"><option value="">Tüm takımlar</option></select>
+        <select id="sortBy" class="rounded-lg border px-2 py-2 text-xs"><option value="score">TFF Skor</option><option value="eff">Verim</option><option value="xg90">xG90</option><option value="xa90">xA90</option></select>
+        <input id="search" class="rounded-lg border px-2 py-2 text-xs" placeholder="Oyuncu ara"/>
+      </div>
+    </div>
+    <div class="overflow-auto max-h-[1010px]">
+      <table class="w-full text-xs min-w-[850px]">
+        <thead><tr class="text-slate-400"><th class="text-left p-2">#</th><th class="text-left p-2">Oyuncu</th><th class="text-left p-2">Takım</th><th class="p-2">Pos</th><th class="p-2">xG90</th><th class="p-2">xA90</th><th class="p-2">Skor</th><th class="p-2">Fiyat</th><th class="p-2">Verim</th><th class="p-2">Pen.</th><th class="p-2">Kor.</th><th class="p-2">Form4+</th></tr></thead>
+        <tbody id="playersBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</div>
+
+<script>
+const FBREF='https://fbref.com/en/comps/26/stats/Super-Lig-Stats';
+const PROXY='https://api.allorigins.win/raw?url='+encodeURIComponent(FBREF);
+const LS_DATA='fiq_tff_scout_data_v2',LS_TIME='fiq_tff_scout_time_v2';
+let players=[],squad=[];
+const el=id=>document.getElementById(id);
+const num=v=>{const n=parseFloat(String(v??'').replace(',','.').replace(/[^0-9.+-]/g,''));return Number.isFinite(n)?n:0};
+const posNorm=p=>{p=String(p||'').toUpperCase();if(p.includes('GK'))return'GK';if(p.includes('DF')||p.includes('FB')||p.includes('CB'))return'DF';if(p.includes('MF')||p.includes('DM')||p.includes('AM')||p.includes('CM'))return'MF';if(p.includes('FW')||p.includes('ST')||p.includes('LW')||p.includes('RW'))return'FW';return p.slice(0,2)};
+function calc(p){p.price=num(p.price)||6;p.xg90=num(p.xg90);p.xa90=num(p.xa90);p.penalty=!!p.penalty;p.corner=!!p.corner;p.form4=!!p.form4;p.score=p.xg90*6+p.xa90*4+(p.form4?1:0)+(p.penalty?1.5:0)+(p.corner?1:0);p.eff=p.score/p.price;return p}
+function norm(raw,i=0){return calc({id:raw.id||('p'+i+'-'+String(raw.player||raw.Player||'').replace(/\W/g,'')),player:raw.player||raw.Player||'Bilinmeyen',team:raw.team||raw.Team||raw.Squad||'',pos:posNorm(raw.pos||raw.Pos),mp:num(raw.mp??raw.MP),min:num(raw.min??raw.Min),gls:num(raw.gls??raw.Gls),ast:num(raw.ast??raw.Ast),xg:num(raw.xg??raw.xG),xa:num(raw.xa??raw.xA??raw.xAG),xg90:num(raw.xg90??raw['xG90']??raw['xG/90']),xa90:num(raw.xa90??raw['xA90']??raw['xA/90']??raw['xAG90']??raw['xAG/90']),price:num(raw.price??raw.Price)||6,penalty:/^(1|true|yes|evet)$/i.test(raw.penalty??raw.Penalty??''),corner:/^(1|true|yes|evet)$/i.test(raw.corner??raw.Corner??''),form4:/^(1|true|yes|evet)$/i.test(raw.form4??raw.Form4Plus??'')})}
+function save(){localStorage.setItem(LS_DATA,JSON.stringify(players));localStorage.setItem(LS_TIME,String(Date.now()));el('lastUpdate').textContent=new Date().toLocaleString('tr-TR')}
+function setStatus(msg,type='ok'){el('statusText').textContent=msg;el('statusDot').className='w-2.5 h-2.5 rounded-full '+(type==='err'?'bg-red-400':type==='load'?'bg-iq animate-pulse':'bg-emerald-400')}
+function setLoading(v){el('loading').classList.toggle('hidden',!v);el('fetchBtn').disabled=v;if(v)setStatus('Canlı veri çekiliyor ve stats_standard tablosu ayrıştırılıyor…','load')}
+function parseHtml(html){
+  const clean=html.replace(/<!--/g,'').replace(/-->/g,'');
+  const doc=new DOMParser().parseFromString(clean,'text/html');
+  let table=doc.querySelector('table#stats_standard');
+  if(!table){table=[...doc.querySelectorAll('table')].find(t=>t.querySelector('[data-stat="player"]'))}
+  if(!table)throw new Error('stats_standard tablosu bulunamadı');
+  const rows=[...table.querySelectorAll('tbody tr')].filter(r=>r.querySelector('[data-stat="player"]'));
+  const val=(r,k)=>r.querySelector('[data-stat="'+k+'"]')?.textContent?.trim()||'';
+  const out=rows.map((r,i)=>norm({Player:val(r,'player'),Team:val(r,'team')||val(r,'squad'),Pos:val(r,'position'),MP:val(r,'games'),Min:val(r,'minutes'),Gls:val(r,'goals'),Ast:val(r,'assists'),xG:val(r,'xg'),xA:val(r,'xg_assist'),xG90:val(r,'xg_per90'),xA90:val(r,'xg_assist_per90')},i)).filter(p=>p.player&&p.pos);
+  if(!out.length)throw new Error('Oyuncu satırı bulunamadı');
+  return out;
+}
+function parseCsvText(text){
+  const lines=text.trim().split(/\r?\n/);if(lines.length<2)throw new Error('CSV en az başlık + 1 satır içermeli');
+  const csvLine=s=>{let a=[],x='',q=false;for(let i=0;i<s.length;i++){const c=s[i];if(c==='"'){if(q&&s[i+1]==='"'){x+='"';i++}else q=!q}else if(c===','&&!q){a.push(x);x=''}else x+=c}a.push(x);return a};
+  const headers=csvLine(lines[0]).map(h=>h.trim().replace(/^"|"$/g,''));
+  const rows=lines.slice(1).filter(Boolean).map((line,i)=>{const vals=csvLine(line),o={};headers.forEach((h,j)=>o[h]=vals[j]??'');return norm(o,i)});
+  return rows.filter(p=>p.player&&['GK','DF','MF','FW'].includes(p.pos));
+}
+async function fetchData(force=false){
+  const ts=num(localStorage.getItem(LS_TIME));const cached=localStorage.getItem(LS_DATA);
+  if(!force&&cached&&Date.now()-ts<86400000){players=JSON.parse(cached).map(norm);renderAll();setStatus('24 saatlik yerel önbellek kullanılıyor.');return}
+  setLoading(true);
+  try{const res=await fetch(PROXY,{cache:'no-store'});if(!res.ok)throw new Error('Proxy HTTP '+res.status);const html=await res.text();players=parseHtml(html);save();renderAll();setStatus('FBref verisi başarıyla çekildi: '+players.length+' oyuncu.')}
+  catch(e){console.error(e);if(cached){players=JSON.parse(cached).map(norm);renderAll();setStatus('Canlı çekim başarısız; son yerel veri açıldı. CSV fallback alanı da hazır.','err')}else{el('csvPanel').classList.remove('hidden');setStatus('Canlı çekim başarısız. Boş ekran yerine manuel CSV fallback açıldı.','err')}}
+  finally{setLoading(false)}
+}
+function renderAll(){players=players.map(norm);el('playerCount').textContent=players.length;refreshTeams();renderTable();if(squad.length)buildSquad()}
+function refreshTeams(){const cur=el('teamFilter').value;const teams=[...new Set(players.map(p=>p.team).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));el('teamFilter').innerHTML='<option value="">Tüm takımlar</option>'+teams.map(t=>'<option>'+esc(t)+'</option>').join('');el('teamFilter').value=teams.includes(cur)?cur:''}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function renderTable(){
+ const pos=el('posFilter').value,team=el('teamFilter').value,q=el('search').value.toLocaleLowerCase('tr'),sort=el('sortBy').value;
+ const key={score:'score',eff:'eff',xg90:'xg90',xa90:'xa90'}[sort];
+ const arr=players.filter(p=>(!pos||p.pos===pos)&&(!team||p.team===team)&&(!q||p.player.toLocaleLowerCase('tr').includes(q))).sort((a,b)=>b[key]-a[key]);
+ el('playersBody').innerHTML=arr.map((p,i)=>'<tr class="border-t border-white/5 hover:bg-white/[.03]"><td class="p-2 text-slate-500">'+(i+1)+'</td><td class="p-2 font-bold">'+esc(p.player)+'</td><td class="p-2 text-slate-400">'+esc(p.team)+'</td><td class="p-2 text-center">'+p.pos+'</td><td class="p-2 text-center">'+p.xg90.toFixed(2)+'</td><td class="p-2 text-center">'+p.xa90.toFixed(2)+'</td><td class="p-2 text-center font-black text-iq">'+p.score.toFixed(2)+'</td><td class="p-2"><input data-id="'+p.id+'" data-k="price" type="number" min="1" step=".1" value="'+p.price.toFixed(1)+'" class="w-16 rounded border px-1 py-1 text-center"/></td><td class="p-2 text-center">'+p.eff.toFixed(3)+'</td><td class="p-2 text-center"><input data-id="'+p.id+'" data-k="penalty" type="checkbox" '+(p.penalty?'checked':'')+'/></td><td class="p-2 text-center"><input data-id="'+p.id+'" data-k="corner" type="checkbox" '+(p.corner?'checked':'')+'/></td><td class="p-2 text-center"><input data-id="'+p.id+'" data-k="form4" type="checkbox" '+(p.form4?'checked':'')+'/></td></tr>').join('');
+}
+function quotas(){return el('formation').value==='352'?{GK:1,DF:3,MF:5,FW:2}:{GK:1,DF:4,MF:4,FW:2}}
+function buildSquad(){
+ if(!players.length){setStatus('Önce veri yüklemelisin.','err');return}
+ const q=quotas(),selected=[];
+ for(const [pos,count] of Object.entries(q)){
+   let pool=players.filter(p=>p.pos===pos).sort((a,b)=>{if(pos==='GK'){const pref=t=>['Galatasaray','Fenerbahçe','Beşiktaş'].includes(t)?1:0;const d=pref(b.team)-pref(a.team);if(d)return d}return b.score-a.score||b.eff-a.eff});
+   selected.push(...pool.slice(0,count));
+ }
+ if(selected.length!==11){setStatus('Bu formasyon için yeterli mevki verisi yok. CSV içeriğini kontrol et.','err');return}
+ let total=()=>selected.reduce((s,p)=>s+p.price,0),guard=0;
+ while(total()>100&&guard++<100){
+   let best=null;
+   selected.forEach((cur,idx)=>{
+     const candidates=players.filter(p=>p.pos===cur.pos&&!selected.some(s=>s.id===p.id)&&p.price<cur.price).sort((a,b)=>b.eff-a.eff||b.score-a.score);
+     for(const alt of candidates){const save=cur.price-alt.price;if(save<=0)continue;const loss=Math.max(0,cur.score-alt.score);const metric=loss/save;if(!best||metric<best.metric)best={idx,alt,metric};break}
+   });
+   if(!best)break;selected[best.idx]=best.alt;
+ }
+ if(total()>100){setStatus('100M bütçeye sığan 11 bulunamadı. Oyuncu fiyatlarını kontrol et.','err');return}
+ squad=selected;renderPitch();setStatus('En iyi 11 kuruldu. Bütçe: '+total().toFixed(1)+'M / 100M')}
+function renderPitch(){
+ const pitch=el('pitch');[...pitch.querySelectorAll('.player-card')].forEach(n=>n.remove());el('emptyPitch').classList.add('hidden');
+ const q=quotas(),rows=[['GK',q.GK],['DF',q.DF],['MF',q.MF],['FW',q.FW]],ys={GK:88,DF:68,MF:43,FW:17};
+ rows.forEach(([pos,count])=>{const arr=squad.filter(p=>p.pos===pos);arr.forEach((p,i)=>{const x=(i+1)*100/(arr.length+1);const c=document.createElement('div');c.className='player-card';c.style.left=x+'%';c.style.top=ys[pos]+'%';c.innerHTML='<b>'+esc(p.player)+'</b><small>'+esc(p.team)+' · '+p.pos+'</small><small>xG90 '+p.xg90.toFixed(2)+' · xA90 '+p.xa90.toFixed(2)+'</small><strong>Skor '+p.score.toFixed(2)+' · '+p.price.toFixed(1)+'M</strong>';pitch.appendChild(c)})});
+ const used=squad.reduce((s,p)=>s+p.price,0);el('budgetUsed').textContent=used.toFixed(1);el('budgetBar').style.width=Math.min(100,used)+'%';
+}
+document.addEventListener('change',e=>{const t=e.target;if(t.matches('[data-id]')){const p=players.find(x=>x.id===t.dataset.id);if(p){p[t.dataset.k]=t.type==='checkbox'?t.checked:num(t.value);calc(p);save();renderAll()}}});
+['posFilter','teamFilter','sortBy'].forEach(id=>el(id).addEventListener('change',renderTable));el('search').addEventListener('input',renderTable);
+el('fetchBtn').onclick=()=>fetchData(true);el('csvBtn').onclick=()=>el('csvPanel').classList.toggle('hidden');el('closeCsv').onclick=()=>el('csvPanel').classList.add('hidden');
+el('parseCsv').onclick=()=>{try{players=parseCsvText(el('csvInput').value);if(!players.length)throw new Error('Uyumlu oyuncu bulunamadı');save();renderAll();el('csvPanel').classList.add('hidden');setStatus('CSV başarıyla parse edildi: '+players.length+' oyuncu.')}catch(e){setStatus('CSV hatası: '+e.message,'err')}};
+el('sampleCsv').onclick=()=>el('csvInput').value='Player,Team,Pos,MP,Min,Gls,Ast,xG,xA,xG90,xA90,Price,Penalty,Corner,Form4Plus\n';
+el('squadBtn').onclick=buildSquad;el('formation').onchange=()=>{if(players.length)buildSquad()};
+el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
+(function init(){const cached=localStorage.getItem(LS_DATA),ts=num(localStorage.getItem(LS_TIME));if(cached){try{players=JSON.parse(cached).map(norm);renderAll();el('lastUpdate').textContent=ts?new Date(ts).toLocaleString('tr-TR'):'—'}catch{}}fetchData(false)})();
+</script>
+</body>
+</html>
