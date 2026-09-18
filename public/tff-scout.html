@@ -74,8 +74,9 @@ th{position:sticky;top:0;background:#0d1b2a;z-index:1}
       </div>
     </div>
     <div class="glass rounded-2xl p-4">
-      <div class="flex items-center justify-between gap-3"><div><h2 class="font-black">Skor Formülü</h2><p class="text-xs text-slate-400">TFF_SKOR = xG90×6 + xA90×4 + Form4+ + Penaltı×1.5 + Korner×1</p></div><button id="embedBtn" class="text-xs border border-iq/30 text-iq px-3 py-2 rounded-lg">Web sitene göm</button></div>
-      <p class="text-xs text-slate-500 mt-3">Not: “Son 5 maçta 4+ ilk 11” FBref standart tabloda doğrudan gelmediği için <b>Form4+</b> sütunu manuel düzenlenebilir. Fiyat yoksa 6M varsayılır.</p>
+      <div class="flex items-center justify-between gap-3"><div><h2 class="font-black">FUTBOL IQ Scout Skoru</h2><p class="text-xs text-slate-400">Seçim metriği = xG90×6 + xA90×4 + Form4+ + Penaltı×1.5 + Korner×1</p></div><button id="embedBtn" class="text-xs border border-iq/30 text-iq px-3 py-2 rounded-lg">Web sitene göm</button></div>
+      <p class="text-xs text-slate-500 mt-3">Bu değer <b>resmî TFF maç puanı değil</b>; en verimli kadroyu seçmek için FUTBOL IQ projeksiyonudur. TFF kadro kısıtları ayrı olarak eksiksiz uygulanır. Fiyat yoksa 6M varsayılır.</p>
+      <div class="grid sm:grid-cols-2 gap-2 mt-3 text-xs text-slate-400"><div class="border border-white/10 rounded-xl p-3"><b class="text-white">Kaptan</b><br>C = 2×. Kaptan 0 dakika oynarsa yardımcı kaptan/C2 devralır.</div><div class="border border-white/10 rounded-xl p-3"><b class="text-white">Yedek sırası</b><br>Yedek GK ayrı; saha yedekleri 1→2→3 önceliğiyle, formasyon geçerliyse otomatik devreye girer.</div></div>
     </div>
   </div>
 
@@ -85,7 +86,7 @@ th{position:sticky;top:0;background:#0d1b2a;z-index:1}
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
         <select id="posFilter" class="rounded-lg border px-2 py-2 text-xs"><option value="">Tüm mevkiler</option><option>GK</option><option>DF</option><option>MF</option><option>FW</option></select>
         <select id="teamFilter" class="rounded-lg border px-2 py-2 text-xs"><option value="">Tüm takımlar</option></select>
-        <select id="sortBy" class="rounded-lg border px-2 py-2 text-xs"><option value="score">TFF Skor</option><option value="eff">Verim</option><option value="xg90">xG90</option><option value="xa90">xA90</option></select>
+        <select id="sortBy" class="rounded-lg border px-2 py-2 text-xs"><option value="score">IQ Scout Skoru</option><option value="eff">Verim</option><option value="xg90">xG90</option><option value="xa90">xA90</option></select>
         <input id="search" class="rounded-lg border px-2 py-2 text-xs" placeholder="Oyuncu ara"/>
       </div>
     </div>
@@ -231,7 +232,8 @@ function buildSquad(){
  if(!players.length){setStatus('Önce veri yüklemelisin.','err');return}
  const avail={GK:0,DF:0,MF:0,FW:0};players.forEach(p=>avail[p.pos]=(avail[p.pos]||0)+1);
  for(const k of Object.keys(SQUAD_QUOTAS)){if(avail[k]<SQUAD_QUOTAS[k]){setStatus('TFF kadrosu için '+k+' mevkiinde yeterli oyuncu yok.','err');return}}
- const orders=[['GK','DF','MF','FW'],['GK','FW','DF','MF'],['FW','MF','DF','GK'],['DF','MF','FW','GK'],['MF','FW','DF','GK'],['GK','MF','DF','FW']];
+ const perms=a=>a.length<2?[a]:a.flatMap((x,i)=>perms(a.filter((_,j)=>j!==i)).map(rest=>[x,...rest]));
+ const orders=perms(Object.keys(SQUAD_QUOTAS));
  let best=null;
  for(const lambda of [0,.15,.35,.6,1,1.5,2.2]){
    for(const order of orders){
@@ -254,9 +256,9 @@ function chooseStartingXI(){
    const arr=squad.filter(p=>p.pos===pos).sort((a,b)=>b.score-a.score||b.eff-a.eff);
    starters.push(...arr.slice(0,count));
  }
- bench=squad.filter(p=>!starters.some(s=>s.id===p.id)).sort((a,b)=>{
-   const po={GK:0,DF:1,MF:2,FW:3};return po[a.pos]-po[b.pos]||b.score-a.score
- });
+ const reserveGK=squad.filter(p=>p.pos==='GK'&&!starters.some(s=>s.id===p.id)).sort((a,b)=>b.score-a.score);
+ const reserveOut=squad.filter(p=>p.pos!=='GK'&&!starters.some(s=>s.id===p.id)).sort((a,b)=>b.score-a.score||b.eff-a.eff);
+ bench=[...reserveGK,...reserveOut];
  const capPool=[...starters].sort((a,b)=>b.score-a.score||b.eff-a.eff);
  captain=capPool[0]||null;viceCaptain=capPool[1]||null;
 }
@@ -281,7 +283,7 @@ function renderPitch(){
  const used=totalCost(squad);el('budgetUsed').textContent=used.toFixed(1);el('budgetBar').style.width=Math.min(100,used)+'%';
 }
 function renderBench(){
- el('bench').innerHTML=bench.map((p,i)=>'<div class="bench-card"><div class="text-[9px] text-iq font-black mb-1">YEDEK '+(i+1)+'</div>'+cardHtml(p)+'</div>').join('');
+ el('bench').innerHTML=bench.map((p,i)=>'<div class="bench-card"><div class="text-[9px] text-iq font-black mb-1">'+(p.pos==='GK'?'YEDEK KALECİ':'YEDEK '+i)+'</div>'+cardHtml(p)+'</div>').join('');
  el('captainInfo').innerHTML=(captain?'<span class="badge-c">C</span>'+esc(captain.player):'')+(viceCaptain?' &nbsp; <span class="badge-c2">C2</span>'+esc(viceCaptain.player):'');
 }
 document.addEventListener('change',e=>{const t=e.target;if(t.matches('[data-id]')){const p=players.find(x=>x.id===t.dataset.id);if(p){p[t.dataset.k]=t.type==='checkbox'?t.checked:num(t.value);calc(p);save();renderAll()}}});
