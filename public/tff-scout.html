@@ -16,7 +16,13 @@ html{background:#07111f;color-scheme:dark}body{min-height:100vh;background:radia
 .pitch:before{content:"";position:absolute;inset:3%;border:2px solid #ffffff88;border-radius:10px}
 .pitch:after{content:"";position:absolute;left:50%;top:3%;bottom:3%;border-left:2px solid #ffffff88}
 .line-circle{position:absolute;width:34%;aspect-ratio:1;border:2px solid #ffffff88;border-radius:50%;left:33%;top:33%}
-.player-card{position:absolute;transform:translate(-50%,-50%);width:112px;max-width:24vw;background:linear-gradient(145deg,rgba(4,13,24,.96),rgba(17,41,59,.96));border:1px solid #f4c54299;border-radius:14px;padding:7px 8px;text-align:center;box-shadow:0 8px 22px #0008}
+.player-card{position:absolute;transform:translate(-50%,-50%);width:118px;max-width:25vw;text-align:center;filter:drop-shadow(0 10px 16px #0008)}
+.player-card .kit-shell{position:relative;padding-top:4px}
+.player-card .jersey{position:relative;width:86px;height:78px;margin:0 auto 4px;clip-path:polygon(20% 0,36% 10%,64% 10%,80% 0,100% 19%,88% 39%,79% 33%,79% 100%,21% 100%,21% 33%,12% 39%,0 19%);background:linear-gradient(135deg,var(--kit1,#1e293b) 0 48%,var(--kit2,#334155) 48% 100%);border:1px solid rgba(255,255,255,.18)}
+.player-card .jersey:after{content:"";position:absolute;inset:8px 30px auto;height:8px;border-radius:0 0 10px 10px;background:#07111f99}
+.player-card .face{position:absolute;left:50%;top:9px;transform:translateX(-50%);width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #f4c542;background:#13283b;z-index:2}
+.player-card .face-fallback{position:absolute;left:50%;top:9px;transform:translateX(-50%);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;border:2px solid #f4c542;background:#13283b;font-size:12px;font-weight:900;z-index:2}
+.player-card .card-meta{background:linear-gradient(145deg,rgba(4,13,24,.96),rgba(17,41,59,.96));border:1px solid #f4c54266;border-radius:12px;padding:5px 6px}
 .player-card b{font-size:11px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-card small{font-size:9px;color:#b8c8d8;display:block}.player-card strong{font-size:10px;color:#f4c542}
 .spinner{width:20px;height:20px;border:2px solid #ffffff33;border-top-color:#f4c542;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 input,select,textarea{background:#07111f!important;color:#eef4fa!important;border-color:#ffffff22!important}
@@ -24,13 +30,13 @@ th{position:sticky;top:0;background:#0d1b2a;z-index:1}
 .bench-card{background:linear-gradient(145deg,rgba(7,17,31,.98),rgba(17,41,59,.92));border:1px solid rgba(244,197,66,.38);border-radius:14px;padding:10px;min-width:0}
 .bench-card b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bench-card small{font-size:10px;color:#94a3b8}.badge-c,.badge-c2{display:inline-grid;place-items:center;width:23px;height:23px;border-radius:50%;font-size:10px;font-weight:900;margin-right:4px}.badge-c{background:#f4c542;color:#07111f}.badge-c2{background:#38bdf8;color:#07111f}
 .rule-ok{border-color:rgba(52,211,153,.35);color:#a7f3d0;background:rgba(16,185,129,.08)}
-@media(max-width:900px){.player-card{width:84px;padding:5px}.player-card small{font-size:8px}.player-card b{font-size:9px}}
+@media(max-width:900px){.player-card{width:92px}.player-card .jersey{width:70px;height:64px}.player-card .face,.player-card .face-fallback{width:40px;height:40px;top:8px}.player-card small{font-size:7.5px}.player-card b{font-size:9px}}
 </style>
 </head>
 <body>
 <div class="max-w-[1500px] mx-auto p-3 sm:p-5 lg:p-7">
 <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
-  <div><div class="flex items-center gap-2"><div class="text-iq font-black tracking-[.22em] text-xl">FUTBOL IQ</div><span class="text-[10px] px-2 py-1 rounded-full border border-emerald-400/30 text-emerald-300 bg-emerald-400/5">FULL-ROSTER V1</span></div><h1 class="text-2xl sm:text-4xl font-black tracking-tight mt-1">TFF Fantezi Otomatik Kadro Kurucu</h1><p class="text-slate-400 mt-1">TFF Fantezi Lig · Canlı Scout · 100M bütçe</p></div>
+  <div><div class="flex items-center gap-2"><div class="text-iq font-black tracking-[.22em] text-xl">FUTBOL IQ</div><span class="text-[10px] px-2 py-1 rounded-full border border-emerald-400/30 text-emerald-300 bg-emerald-400/5">FULL-ROSTER 360 · FORMA V2</span></div><h1 class="text-2xl sm:text-4xl font-black tracking-tight mt-1">TFF Fantezi Otomatik Kadro Kurucu</h1><p class="text-slate-400 mt-1">TFF Fantezi Lig · Canlı Scout · 100M bütçe</p></div>
   <div class="text-xs text-slate-400">Kaynak: FBref + manuel CSV · Son veri: <span id="lastUpdate">—</span></div>
 </header>
 
@@ -153,7 +159,7 @@ const WIKI_SQUADS={
  'Samsunspor':'https://en.wikipedia.org/wiki/Samsunspor',
  'Trabzonspor':'https://en.wikipedia.org/wiki/Trabzonspor'
 };
-const LS_DATA='fiq_tff_scout_data_v13',LS_TIME='fiq_tff_scout_time_v13';
+const LS_DATA='fiq_tff_scout_data_v14',LS_TIME='fiq_tff_scout_time_v14';
 let players=[],squad=[],starters=[],bench=[],captain=null,viceCaptain=null;
 const SQUAD_QUOTAS={GK:2,DF:5,MF:5,FW:3};
 const FORMATIONS={433:{GK:1,DF:4,MF:3,FW:3},442:{GK:1,DF:4,MF:4,FW:2},343:{GK:1,DF:3,MF:4,FW:3},352:{GK:1,DF:3,MF:5,FW:2},532:{GK:1,DF:5,MF:3,FW:2}};
@@ -623,10 +629,22 @@ function showWhy(p){
  const mode={safe:'Güvenli',balanced:'Dengeli',differential:'Diferansiyel'}[el('strategy').value]||'Dengeli';
  el('whyContent').innerHTML='<div class="font-black text-white">'+esc(p.player)+' · '+mode+' mod</div><div class="mt-2 flex flex-wrap gap-2">'+explainPlayer(p).map(r=>'<span class="px-2 py-1 rounded-full border border-iq/20 bg-iq/5 text-slate-300">'+esc(r)+'</span>').join('')+'</div><div class="mt-2 text-xs text-slate-500">xP '+p.xp.toFixed(2)+' · Verim '+p.eff.toFixed(2)+' · Başlama %'+Math.round(p.startProb*100)+' · Fiyat '+p.price.toFixed(1)+'M</div>';
 }
+function teamKit(team){
+ const kits={
+  'Galatasaray':['#facc15','#b91c1c'],'Fenerbahçe':['#facc15','#1d4ed8'],'Beşiktaş':['#f8fafc','#111827'],
+  'Trabzonspor':['#7f1d1d','#38bdf8'],'Alanyaspor':['#f97316','#166534'],'Amed SK':['#16a34a','#dc2626'],
+  'İstanbul Başakşehir':['#f97316','#1d4ed8'],'Çorum FK':['#dc2626','#111827'],'Erzurumspor':['#38bdf8','#f8fafc'],
+  'Eyüpspor':['#facc15','#7c3aed'],'Gaziantep':['#dc2626','#111827'],'Gençlerbirliği':['#dc2626','#111827'],
+  'Göztepe':['#facc15','#dc2626'],'Kasımpaşa':['#2563eb','#f8fafc'],'Kocaelispor':['#16a34a','#111827'],
+  'Konyaspor':['#16a34a','#f8fafc'],'Çaykur Rizespor':['#2563eb','#16a34a'],'Samsunspor':['#dc2626','#f8fafc']
+ };
+ return kits[team]||['#1e293b','#334155'];
+}
 function cardHtml(p){
  const badge=p.id===captain?.id?'<span class="badge-c">C</span>':p.id===viceCaptain?.id?'<span class="badge-c2">C2</span>':'';
- const face=p.photo?'<img src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" style="width:42px;height:42px;border-radius:50%;object-fit:cover;margin:0 auto 4px;border:1px solid rgba(255,255,255,.18)">':'<div style="width:42px;height:42px;border-radius:50%;display:grid;place-items:center;margin:0 auto 4px;background:#13283b;border:1px solid rgba(255,255,255,.12);font-size:11px;font-weight:900">'+esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''))+'</div>';
- return face+badge+'<b>'+esc(p.player)+'</b><small>'+esc(p.team)+' · '+p.pos+'</small><small>'+(p.home===true?'EV ':p.home===false?'D ':'')+esc(p.opponent)+' · baş '+Math.round(p.startProb*100)+'%</small><small>'+(p.suspended?'CEZALI':p.unavailable?'SAKAT':p.doubtful?'ŞÜPHELİ':'UYGUN')+'</small><strong>xP '+p.xp.toFixed(2)+' · '+p.price.toFixed(1)+'M</strong><button data-why="'+esc(p.id)+'" class="mt-1 text-[9px] underline text-sky-300">Neden?</button>';
+ const kit=teamKit(p.team),initials=esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''));
+ const face=p.photo?'<img class="face" src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="face-fallback" style="display:none">'+initials+'</div>':'<div class="face-fallback">'+initials+'</div>';
+ return '<div class="kit-shell" style="--kit1:'+kit[0]+';--kit2:'+kit[1]+'"><div class="jersey"></div>'+face+'</div><div class="card-meta">'+badge+'<b>'+esc(p.player)+'</b><small>'+esc(p.team)+' · '+p.pos+'</small><small>'+(p.home===true?'EV ':p.home===false?'D ':'')+esc(p.opponent)+' · baş '+Math.round(p.startProb*100)+'%</small><small>'+(p.suspended?'CEZALI':p.unavailable?'SAKAT':p.doubtful?'ŞÜPHELİ':'UYGUN')+'</small><strong>xP '+p.xp.toFixed(2)+' · '+p.price.toFixed(1)+'M</strong><button data-why="'+esc(p.id)+'" class="mt-1 text-[9px] underline text-sky-300">Neden?</button></div>';
 }
 function renderPitch(){
  const pitch=el('pitch');[...pitch.querySelectorAll('.player-card')].forEach(n=>n.remove());el('emptyPitch').classList.add('hidden');
