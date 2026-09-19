@@ -761,25 +761,36 @@ function renderWeekly(){
  const btn=el('applyWeeklyXI');
  if(btn)btn.onclick=()=>applyWeeklyXI(xi,mode);
 }
-function applyWeeklyXI(xi,mode){
- const built=generateSquadFor(mode);
- if(!built){setStatus('15 kişilik tamamlayıcı kadro üretilemedi.','err');return}
- // Force weekly XI into starters when possible; fill bench from valid generated squad.
- const ids=new Set(xi.map(p=>p.id));
- const merged=[...xi,...built.filter(p=>!ids.has(p.id))];
- // Keep exact 15 and validate club/position quotas; otherwise fall back to generated squad.
- squad=validFullSquad(merged.slice(0,15))?merged.slice(0,15):built;
- el('strategy').value=mode;
- chooseStartingXI();
- // Prefer weekly XI as starters if formation composition matches exactly.
- const q=quotas(),weeklyPos={GK:0,DF:0,MF:0,FW:0};xi.forEach(p=>weeklyPos[p.pos]++);
- if(Object.keys(q).every(k=>weeklyPos[k]===q[k])){
-   starters=[...xi];
-   bench=squad.filter(p=>!ids.has(p.id));
-   const caps=weeklyCaptainCandidates(starters,mode);captain=caps[0]||null;viceCaptain=caps[1]||null;
+function completeWeeklySquad(xi,mode){
+ const selected=[...xi],counts=clubCounts(selected),need={GK:2,DF:5,MF:5,FW:3};
+ const have={GK:0,DF:0,MF:0,FW:0};selected.forEach(p=>have[p.pos]=(have[p.pos]||0)+1);
+ for(const pos of Object.keys(need)){
+   const missing=need[pos]-have[pos];
+   if(missing<=0)continue;
+   const pool=players.filter(p=>p.pos===pos&&!p.unavailable&&!p.suspended&&!selected.some(s=>s.id===p.id))
+     .sort((a,b)=>strategyScore(b,mode)-strategyScore(a,mode)||b.eff-a.eff);
+   let added=0;
+   for(const p of pool){
+     if(added>=missing)break;
+     if((counts[p.team]||0)>=CLUB_LIMIT)continue;
+     selected.push(p);counts[p.team]=(counts[p.team]||0)+1;added++;
+   }
+   if(added<missing)return null;
  }
+ return repairBudget(selected,mode);
+}
+function applyWeeklyXI(xi,mode){
+ const completed=completeWeeklySquad(xi,mode);
+ if(!completed||!validFullSquad(completed)){
+   setStatus('Haftanın 11’i korunarak geçerli 15 kişilik kadro tamamlanamadı.','err');return;
+ }
+ squad=completed;el('strategy').value=mode;
+ const ids=new Set(xi.map(p=>p.id));
+ starters=[...xi];
+ bench=squad.filter(p=>!ids.has(p.id)).sort((a,b)=>strategyScore(b,mode)-strategyScore(a,mode)||b.xp-a.xp);
+ const caps=weeklyCaptainCandidates(starters,mode);captain=caps[0]||null;viceCaptain=caps[1]||null;
  renderPitch();renderBench();updateRuleBadges();hydrateSquadPhotos();
- setStatus('Haftanın 11’i kadrona uygulandı · '+totalCost(squad).toFixed(1)+'M / 100M');
+ setStatus('Haftanın 11’i korundu, 4 yedek kurallara göre tamamlandı · '+totalCost(squad).toFixed(1)+'M / 100M');
 }
 function dataConfidence(p){
  let n=0;
@@ -864,7 +875,7 @@ el('fetchBtn').onclick=()=>fetchData(true);el('csvBtn').onclick=()=>el('csvPanel
 el('parseCsv').onclick=()=>{try{players=parseCsvText(el('csvInput').value);if(!players.length)throw new Error('Uyumlu oyuncu bulunamadı');save();renderAll();el('csvPanel').classList.add('hidden');setStatus('CSV başarıyla parse edildi: '+players.length+' oyuncu.')}catch(e){setStatus('CSV hatası: '+e.message,'err')}};
 el('sampleCsv').onclick=()=>el('csvInput').value='Player,Team,Pos,MP,Min,Gls,Ast,xG,xA,xG90,xA90,Price,Penalty,Corner,Form4Plus\n';
 el('closePlayerModal').onclick=()=>el('playerModal').classList.add('hidden');el('playerModal').addEventListener('click',e=>{if(e.target===el('playerModal'))el('playerModal').classList.add('hidden')});
-el('squadBtn').onclick=buildSquad;el('compareBtn').onclick=compareAllStrategies;el('transferBtn').onclick=renderTransfers;el('weeklyBtn').onclick=renderWeekly;el('closeTransfer').onclick=()=>el('transferPanel').classList.add('hidden');el('closeCompare').onclick=()=>el('comparePanel').classList.add('hidden');el('formation').onchange=()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}if(!el('comparePanel').classList.contains('hidden'))compareAllStrategies()};
+el('squadBtn').onclick=buildSquad;el('compareBtn').onclick=compareAllStrategies;el('transferBtn').onclick=renderTransfers;el('weeklyBtn').onclick=renderWeekly;el('closeWeekly').onclick=()=>el('weeklyPanel').classList.add('hidden');el('closeTransfer').onclick=()=>el('transferPanel').classList.add('hidden');el('closeCompare').onclick=()=>el('comparePanel').classList.add('hidden');el('formation').onchange=()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}if(!el('comparePanel').classList.contains('hidden'))compareAllStrategies()};
 el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
 (function init(){fetchData(true);setInterval(()=>fetchData(true),86400000)})();
 </script>
