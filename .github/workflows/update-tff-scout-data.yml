@@ -6,9 +6,6 @@ on:
     - cron: "17 3 * * *"
   push:
     branches: [main]
-    paths:
-      - ".github/workflows/update-tff-scout-data.yml"
-      - "scripts/update_tff_scout.py"
 
 permissions:
   contents: write
