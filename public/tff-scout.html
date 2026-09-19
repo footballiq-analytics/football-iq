@@ -62,7 +62,7 @@ th{position:sticky;top:0;background:#111b2b;z-index:1;color:#9fb0c3}
 <body>
 <div class="max-w-[1500px] mx-auto p-3 sm:p-5 lg:p-7">
 <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
-  <div><div class="flex items-center gap-2"><div class="text-amber-200 font-black tracking-[.22em] text-xl">FUTBOL IQ</div><span class="text-[10px] px-2 py-1 rounded-full border border-emerald-400/30 text-emerald-300 bg-emerald-400/5">PRO UI V3 · 360 OYUNCU</span></div><h1 class="text-xl sm:text-3xl font-extrabold tracking-tight mt-1">TFF Fantezi Otomatik Kadro Kurucu</h1><p class="text-slate-400 mt-1">TFF Fantezi Lig · Canlı Scout · 100M bütçe</p></div>
+  <div><div class="flex items-center gap-2"><div class="text-amber-200 font-black tracking-[.22em] text-xl">FUTBOL IQ</div><span class="text-[10px] px-2 py-1 rounded-full border border-emerald-400/30 text-emerald-300 bg-emerald-400/5">PRO UI V4 · TRANSFER</span></div><h1 class="text-xl sm:text-3xl font-extrabold tracking-tight mt-1">TFF Fantezi Otomatik Kadro Kurucu</h1><p class="text-slate-400 mt-1">TFF Fantezi Lig · Canlı Scout · 100M bütçe</p></div>
   <div class="text-xs text-slate-400">Kaynak: FBref + manuel CSV · Son veri: <span id="lastUpdate">—</span></div>
 </header>
 
@@ -72,6 +72,7 @@ th{position:sticky;top:0;background:#111b2b;z-index:1;color:#9fb0c3}
   <div class="grid gap-2">
     <button id="squadBtn" class="compact-action soft-accent text-left hover:brightness-105 transition"><span class="font-black">03</span><b class="block text-lg mt-1">EN İYİ 15'Lİ KADROYU KUR</b><small class="text-slate-800">11 ilk + 4 yedek · 100M · kulüp başına max 3</small></button>
     <button id="compareBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-sky-300">3 MODU KARŞILAŞTIR</b><small class="block text-slate-400">Güvenli · Dengeli · Diferansiyel</small></button>
+    <button id="transferBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-emerald-300">TRANSFER ÖNERİLERİ</b><small class="block text-slate-400">ÇIKAR → AL · bütçe ve kulüp limiti korunur</small></button>
   </div>
 </section>
 
@@ -80,6 +81,15 @@ th{position:sticky;top:0;background:#111b2b;z-index:1;color:#9fb0c3}
   <div class="flex items-center justify-between gap-3"><div><h2 class="text-xl font-black">3 KADRO KARŞILAŞTIRMASI</h2><p class="text-xs text-slate-400">Aynı veri, bütçe ve TFF kurallarıyla üç farklı risk profili.</p></div><button id="closeCompare" class="px-3 py-2 rounded-lg border border-white/10 text-xs">Kapat</button></div>
   <div id="compareCards" class="grid lg:grid-cols-3 gap-3 mt-4"></div>
   <div id="compareOverlap" class="mt-4 text-xs text-slate-400"></div>
+</section>
+
+<section id="transferPanel" class="hidden glass rounded-2xl p-4 mb-4">
+  <div class="flex items-center justify-between gap-3">
+    <div><h2 class="section-title font-extrabold">Transfer Önerileri</h2><p class="text-xs text-slate-400">Mevcut 15'lin için aynı mevki içinde kurallara uygun ÇIKAR → AL seçenekleri.</p></div>
+    <button id="closeTransfer" class="px-3 py-1.5 rounded-lg border border-white/10 text-xs">Kapat</button>
+  </div>
+  <div id="transferSummary" class="text-xs text-slate-400 mt-3"></div>
+  <div id="transferCards" class="grid md:grid-cols-2 xl:grid-cols-3 gap-2 mt-3"></div>
 </section>
 
 <section id="csvPanel" class="hidden glass rounded-2xl p-4 mb-4">
@@ -508,16 +518,16 @@ function validFullSquad(list){
  if(Object.keys(SQUAD_QUOTAS).some(k=>q[k]!==SQUAD_QUOTAS[k]))return false;
  return Object.values(clubCounts(list)).every(n=>n<=CLUB_LIMIT)
 }
-function repairBudget(selected){
+function repairBudget(selected,mode){
  let guard=0;
  while(totalCost(selected)>BUDGET&&guard++<100){
    const counts=clubCounts(selected);let best=null;
    selected.forEach((cur,idx)=>{
      const alts=players.filter(p=>p.pos===cur.pos&&!p.unavailable&&!p.suspended&&!selected.some(s=>s.id===p.id)&&p.price<cur.price&&((counts[p.team]||0)+(p.team===cur.team?0:1)<=CLUB_LIMIT))
-       .sort((a,b)=>b.eff-a.eff||b.xp-a.xp);
+       .sort((a,b)=>strategyScore(b,mode)-strategyScore(a,mode)||b.eff-a.eff);
      for(const alt of alts){
        const save=cur.price-alt.price;if(save<=0)continue;
-       const loss=Math.max(0,cur.xp-alt.xp),metric=loss/save;
+       const loss=Math.max(0,strategyScore(cur,mode)-strategyScore(alt,mode)),metric=loss/save;
        if(!best||metric<best.metric)best={idx,alt,metric};
        break;
      }
@@ -532,9 +542,7 @@ function buildCandidate(lambda,order,mode){
  for(const pos of order){
    const need=SQUAD_QUOTAS[pos];
    const pool=players.filter(p=>p.pos===pos&&!p.unavailable&&!p.suspended).sort((a,b)=>{
-     const gkA=pos==='GK'&&['Galatasaray','Fenerbahçe','Beşiktaş'].includes(a.team)?0.45:0;
-     const gkB=pos==='GK'&&['Galatasaray','Fenerbahçe','Beşiktaş'].includes(b.team)?0.45:0;
-     const ra=strategyScore(a,mode)+lambda*a.eff*7+gkA,rb=strategyScore(b,mode)+lambda*b.eff*7+gkB;
+     const ra=strategyScore(a,mode)+lambda*a.eff*7,rb=strategyScore(b,mode)+lambda*b.eff*7;
      return rb-ra||b.xp-a.xp;
    });
    let added=0;
@@ -545,7 +553,7 @@ function buildCandidate(lambda,order,mode){
    }
    if(added<need)return null;
  }
- return repairBudget(selected);
+ return repairBudget(selected,mode);
 }
 function generateSquadFor(mode){
  const avail={GK:0,DF:0,MF:0,FW:0};players.filter(p=>!p.unavailable&&!p.suspended).forEach(p=>avail[p.pos]=(avail[p.pos]||0)+1);
@@ -613,12 +621,13 @@ function applyComparedMode(mode){
 }
 function chooseStartingXI(){
  const q=quotas();starters=[];
+ const mode=el('strategy').value;
  for(const [pos,count] of Object.entries(q)){
-   const arr=squad.filter(p=>p.pos===pos).sort((a,b)=>b.xp-a.xp||b.eff-a.eff);
+   const arr=squad.filter(p=>p.pos===pos).sort((a,b)=>strategyScore(b,mode)-strategyScore(a,mode)||b.xp-a.xp);
    starters.push(...arr.slice(0,count));
  }
- const reserveGK=squad.filter(p=>p.pos==='GK'&&!starters.some(s=>s.id===p.id)).sort((a,b)=>b.xp-a.xp||b.eff-a.eff);
- const reserveOut=squad.filter(p=>p.pos!=='GK'&&!starters.some(s=>s.id===p.id)).sort((a,b)=>b.xp-a.xp||b.eff-a.eff);
+ const reserveGK=squad.filter(p=>p.pos==='GK'&&!starters.some(s=>s.id===p.id)).sort((a,b)=>strategyScore(b,mode)-strategyScore(a,mode)||b.xp-a.xp);
+ const reserveOut=squad.filter(p=>p.pos!=='GK'&&!starters.some(s=>s.id===p.id)).sort((a,b)=>strategyScore(b,mode)-strategyScore(a,mode)||b.xp-a.xp);
  bench=[...reserveGK,...reserveOut];
  const capPool=[...starters].sort((a,b)=>strategyScore(b)-strategyScore(a)||b.xp-a.xp);
  captain=capPool[0]||null;viceCaptain=capPool[1]||null;
@@ -655,6 +664,54 @@ function showWhy(p){
  const mode={safe:'Güvenli',balanced:'Dengeli',differential:'Diferansiyel'}[el('strategy').value]||'Dengeli';
  el('whyContent').innerHTML='<div class="font-black text-white">'+esc(p.player)+' · '+mode+' mod</div><div class="mt-2 flex flex-wrap gap-2">'+explainPlayer(p).map(r=>'<span class="px-2 py-1 rounded-full border border-iq/20 bg-iq/5 text-slate-300">'+esc(r)+'</span>').join('')+'</div><div class="mt-2 text-xs text-slate-500">xP '+p.xp.toFixed(2)+' · Verim '+p.eff.toFixed(2)+' · Başlama %'+Math.round(p.startProb*100)+' · Fiyat '+p.price.toFixed(1)+'M</div>';
 }
+function dataConfidence(p){
+ let n=0;
+ if(p.mp>=3)n+=2; else if(p.mp>0)n+=1;
+ if(p.xg90>0||p.xa90>0)n+=2;
+ if(p.priceVerified)n+=1;
+ if(p.ownershipVerified)n+=1;
+ return n>=4?'Yüksek':n>=2?'Orta':'Düşük';
+}
+function validSwap(outP,inP){
+ if(!outP||!inP||outP.pos!==inP.pos||outP.id===inP.id)return false;
+ if(inP.unavailable||inP.suspended||squad.some(p=>p.id===inP.id))return false;
+ const next=squad.map(p=>p.id===outP.id?inP:p);
+ return validFullSquad(next);
+}
+function transferSuggestions(){
+ if(squad.length!==15)return[];
+ const mode=el('strategy').value,out=[];
+ for(const outP of squad){
+   for(const inP of players){
+     if(!validSwap(outP,inP))continue;
+     const gain=strategyScore(inP,mode)-strategyScore(outP,mode);
+     const xpGain=inP.xp-outP.xp;
+     const costDelta=inP.price-outP.price;
+     if(gain<=.01)continue;
+     out.push({outP,inP,gain,xpGain,costDelta,confidence:dataConfidence(inP)});
+   }
+ }
+ return out.sort((a,b)=>b.gain-a.gain||b.xpGain-a.xpGain).slice(0,9);
+}
+function renderTransfers(){
+ if(squad.length!==15){
+   el('transferSummary').textContent='Önce 15 kişilik bir kadro kur.';
+   el('transferCards').innerHTML='';el('transferPanel').classList.remove('hidden');return;
+ }
+ const list=transferSuggestions(),mode=el('strategy').value;
+ el('transferSummary').innerHTML='Mod: <b class="text-white">'+esc({safe:'Güvenli',balanced:'Dengeli',differential:'Diferansiyel'}[mode]||mode)+'</b> · Mevcut bütçe: <b class="text-white">'+totalCost(squad).toFixed(1)+'M</b> · '+list.length+' güçlü seçenek';
+ el('transferCards').innerHTML=list.length?list.map((x,i)=>'<div class="rounded-xl border border-white/10 bg-black/10 p-3"><div class="text-[10px] text-slate-500">#'+(i+1)+' · Veri güveni: '+x.confidence+'</div><div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 mt-2"><div><b class="text-red-300 text-xs">ÇIKAR</b><div class="font-bold text-sm">'+esc(x.outP.player)+'</div><small class="text-slate-400">'+esc(x.outP.team)+' · '+x.outP.pos+' · '+x.outP.price.toFixed(1)+'M</small></div><div class="text-slate-500">→</div><div><b class="text-emerald-300 text-xs">AL</b><div class="font-bold text-sm">'+esc(x.inP.player)+'</div><small class="text-slate-400">'+esc(x.inP.team)+' · '+x.inP.pos+' · '+x.inP.price.toFixed(1)+'M</small></div></div><div class="grid grid-cols-3 gap-1 mt-3 text-[10px]"><div class="rounded bg-white/5 p-2">Strateji<br><b class="text-emerald-300">+'+x.gain.toFixed(2)+'</b></div><div class="rounded bg-white/5 p-2">xP farkı<br><b class="'+(x.xpGain>=0?'text-emerald-300':'text-amber-300')+'">'+(x.xpGain>=0?'+':'')+x.xpGain.toFixed(2)+'</b></div><div class="rounded bg-white/5 p-2">Maliyet<br><b>'+(x.costDelta>=0?'+':'')+x.costDelta.toFixed(1)+'M</b></div></div><button data-transfer-out="'+esc(x.outP.id)+'" data-transfer-in="'+esc(x.inP.id)+'" class="w-full mt-2 rounded-lg border border-emerald-400/20 px-3 py-1.5 text-xs font-bold text-emerald-200 hover:bg-emerald-400/5">TRANSFERİ UYGULA</button></div>').join(''):'<div class="text-sm text-slate-400">Bu kadro için kurallara uygun ve pozitif katkılı tekli transfer bulunamadı.</div>';
+ el('transferPanel').classList.remove('hidden');
+ el('transferPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function applyTransfer(outId,inId){
+ const outP=squad.find(p=>p.id===outId),inP=players.find(p=>p.id===inId);
+ if(!validSwap(outP,inP)){setStatus('Transfer artık geçerli değil; kadro veya bütçe değişmiş olabilir.','err');return}
+ squad=squad.map(p=>p.id===outId?inP:p);
+ chooseStartingXI();renderPitch();renderBench();updateRuleBadges();renderTransfers();
+ setStatus(outP.player+' → '+inP.player+' transferi uygulandı. Yeni bütçe: '+totalCost(squad).toFixed(1)+'M');
+ hydrateSquadPhotos();
+}
 function teamKit(team){
  const kits={
   'Galatasaray':['#facc15','#b91c1c'],'Fenerbahçe':['#facc15','#1d4ed8'],'Beşiktaş':['#f8fafc','#111827'],
@@ -682,14 +739,14 @@ function renderBench(){
  el('bench').innerHTML=bench.map((p,i)=>'<div class="bench-card"><div class="text-[9px] text-iq font-black mb-1">'+(p.pos==='GK'?'YEDEK KALECİ':'YEDEK '+i)+'</div>'+cardHtml(p)+'</div>').join('');
  el('captainInfo').innerHTML=(captain?'<span class="badge-c">C</span>'+esc(captain.player):'')+(viceCaptain?' &nbsp; <span class="badge-c2">C2</span>'+esc(viceCaptain.player):'');
 }
-document.addEventListener('click',e=>{const b=e.target.closest('[data-why]');if(b){e.stopPropagation();const p=players.find(x=>x.id===b.dataset.why);if(p)showWhy(p)}const a=e.target.closest('[data-apply-mode]');if(a)applyComparedMode(a.dataset.applyMode)});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-why]');if(b){e.stopPropagation();const p=players.find(x=>x.id===b.dataset.why);if(p)showWhy(p)}const a=e.target.closest('[data-apply-mode]');if(a)applyComparedMode(a.dataset.applyMode);const tr=e.target.closest('[data-transfer-out]');if(tr)applyTransfer(tr.dataset.transferOut,tr.dataset.transferIn)});
 document.addEventListener('change',e=>{const t=e.target;if(t.matches('[data-id]')){const p=players.find(x=>x.id===t.dataset.id);if(p){p[t.dataset.k]=t.type==='checkbox'?t.checked:num(t.value);if(t.dataset.k==='price'){p.priceVerified=false;p.priceSource='Manuel düzenleme'}calc(p);save();renderAll()}}});
 ['posFilter','teamFilter','availabilityFilter','sortBy'].forEach(id=>el(id).addEventListener('change',renderTable));
 el('strategy').addEventListener('change',()=>{if(players.length)buildSquad()});el('search').addEventListener('input',renderTable);
 el('fetchBtn').onclick=()=>fetchData(true);el('csvBtn').onclick=()=>el('csvPanel').classList.toggle('hidden');el('closeCsv').onclick=()=>el('csvPanel').classList.add('hidden');
 el('parseCsv').onclick=()=>{try{players=parseCsvText(el('csvInput').value);if(!players.length)throw new Error('Uyumlu oyuncu bulunamadı');save();renderAll();el('csvPanel').classList.add('hidden');setStatus('CSV başarıyla parse edildi: '+players.length+' oyuncu.')}catch(e){setStatus('CSV hatası: '+e.message,'err')}};
 el('sampleCsv').onclick=()=>el('csvInput').value='Player,Team,Pos,MP,Min,Gls,Ast,xG,xA,xG90,xA90,Price,Penalty,Corner,Form4Plus\n';
-el('squadBtn').onclick=buildSquad;el('compareBtn').onclick=compareAllStrategies;el('closeCompare').onclick=()=>el('comparePanel').classList.add('hidden');el('formation').onchange=()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}if(!el('comparePanel').classList.contains('hidden'))compareAllStrategies()};
+el('squadBtn').onclick=buildSquad;el('compareBtn').onclick=compareAllStrategies;el('transferBtn').onclick=renderTransfers;el('closeTransfer').onclick=()=>el('transferPanel').classList.add('hidden');el('closeCompare').onclick=()=>el('comparePanel').classList.add('hidden');el('formation').onchange=()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}if(!el('comparePanel').classList.contains('hidden'))compareAllStrategies()};
 el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
 (function init(){fetchData(true);setInterval(()=>fetchData(true),86400000)})();
 </script>
