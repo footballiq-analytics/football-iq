@@ -105,8 +105,9 @@ export default function TeamBuilderPage(){useMobileCardGeometry();const{formatio
    });
    hydrateTeam(players,formation,ordered,benchIds);
    const findByName=(name:string|null|undefined)=>name?players.find(p=>starterIds.includes(p.id)&&normalizeScoutText(p.name)===normalizeScoutText(name))?.id??null:null;
-   const importedCaptain=findByName(imported.captain);
-   const importedVice=findByName(imported.viceCaptain);
+   const rankedStarters=starterIds.map(id=>players.find(p=>p.id===id)).filter((p):p is StorePlayer=>Boolean(p)).sort((a,b)=>b.points-a.points||b.price-a.price);
+   const importedCaptain=findByName(imported.captain)??rankedStarters[0]?.id??null;
+   const importedVice=(findByName(imported.viceCaptain)??rankedStarters.find(p=>p.id!==importedCaptain)?.id)??null;
    setCaptain(importedCaptain);
    setViceCaptain(importedVice);
    if(ordered.every(Boolean)&&benchIds.every(Boolean)){
