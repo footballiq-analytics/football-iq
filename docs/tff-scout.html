@@ -68,26 +68,36 @@ th{position:sticky;top:0;background:#111b2b;z-index:1;color:#9fb0c3}
 <body>
 <div class="max-w-[1500px] mx-auto p-3 sm:p-5 lg:p-7">
 <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
-  <div><div class="flex items-center gap-2"><div class="text-amber-200 font-black tracking-[.22em] text-xl">FUTBOL IQ</div><span class="text-[10px] px-2 py-1 rounded-full border border-emerald-400/30 text-emerald-300 bg-emerald-400/5">PRO UI V6 · WEEKLY XI</span></div><h1 class="text-xl sm:text-3xl font-extrabold tracking-tight mt-1">TFF Fantezi Otomatik Kadro Kurucu</h1><p class="text-slate-400 mt-1">TFF Fantezi Lig · Canlı Scout · 100M bütçe</p></div>
+  <div><div class="flex items-center gap-2"><div class="text-amber-200 font-black tracking-[.22em] text-xl">FUTBOL IQ</div><span class="text-[10px] px-2 py-1 rounded-full border border-emerald-400/30 text-emerald-300 bg-emerald-400/5">PRO UI V7 · HEALTH</span></div><h1 class="text-xl sm:text-3xl font-extrabold tracking-tight mt-1">TFF Fantezi Otomatik Kadro Kurucu</h1><p class="text-slate-400 mt-1">TFF Fantezi Lig · Canlı Scout · 100M bütçe</p></div>
   <div class="text-xs text-slate-400">Kaynak: FBref + manuel CSV · Son veri: <span id="lastUpdate">—</span></div>
 </header>
 
 <section class="grid md:grid-cols-3 gap-2 mb-3">
   <button id="fetchBtn" class="glass compact-action text-left hover:border-slate-500/50 transition"><span class="text-iq font-black">01</span><b class="block text-lg mt-1">Veriyi Çek / Yenile</b><small class="text-slate-400">FBref → AllOrigins → otomatik parse</small></button>
-  <button id="csvBtn" class="glass rounded-2xl p-4 text-left hover:border-iq/60 transition"><span class="text-iq font-black">02</span><b class="block text-lg mt-1">Manuel CSV Yapıştır</b><small class="text-slate-400">Export CSV içeriğini buraya yapıştır</small></button>
+  
   <div class="grid gap-2">
     <button id="squadBtn" class="compact-action soft-accent text-left hover:brightness-105 transition"><span class="font-black">03</span><b class="block text-lg mt-1">EN İYİ 15'Lİ KADROYU KUR</b><small class="text-slate-800">11 ilk + 4 yedek · 100M · kulüp başına max 3</small></button>
     <button id="compareBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-sky-300">3 MODU KARŞILAŞTIR</b><small class="block text-slate-400">Güvenli · Dengeli · Diferansiyel</small></button>
     <button id="transferBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-emerald-300">TRANSFER ÖNERİLERİ</b><small class="block text-slate-400">ÇIKAR → AL · bütçe ve kulüp limiti korunur</small></button>
     <button id="weeklyBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-amber-200">HAFTANIN 11'İ</b><small class="block text-slate-400">Top 5 · kaptan · tek dokunuşla uygula</small></button>
+    <button id="healthBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-cyan-200">KADRO SAĞLIĞI</b><small class="block text-slate-400">Veri kalitesi · fiyat · risk · eksikler</small></button>
   </div>
 </section>
 
-<div id="status" class="glass rounded-xl px-4 py-3 mb-4 text-sm flex items-center gap-3"><span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span id="statusText">Hazır. Önce canlı veriyi çekebilir veya CSV yapıştırabilirsin.</span></div>
+<div id="status" class="glass rounded-xl px-4 py-3 mb-4 text-sm flex items-center gap-3"><span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span id="statusText">Hazır. Oyuncu havuzunu yükle ve kadronu oluştur.</span></div>
 <section id="comparePanel" class="hidden glass rounded-2xl p-4 mb-4">
   <div class="flex items-center justify-between gap-3"><div><h2 class="text-xl font-black">3 KADRO KARŞILAŞTIRMASI</h2><p class="text-xs text-slate-400">Aynı veri, bütçe ve TFF kurallarıyla üç farklı risk profili.</p></div><button id="closeCompare" class="px-3 py-2 rounded-lg border border-white/10 text-xs">Kapat</button></div>
   <div id="compareCards" class="grid lg:grid-cols-3 gap-3 mt-4"></div>
   <div id="compareOverlap" class="mt-4 text-xs text-slate-400"></div>
+</section>
+
+<section id="healthPanel" class="hidden glass rounded-2xl p-4 mb-4">
+  <div class="flex items-center justify-between gap-3">
+    <div><h2 class="section-title font-extrabold">Kadro Sağlığı</h2><p class="text-xs text-slate-400">Oyuncu havuzunun veri kalitesini ve mevcut 15'linin risklerini tek ekranda gösterir.</p></div>
+    <button id="closeHealth" class="px-3 py-1.5 rounded-lg border border-white/10 text-xs">Kapat</button>
+  </div>
+  <div id="healthSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3"></div>
+  <div id="healthIssues" class="grid lg:grid-cols-2 gap-2 mt-3"></div>
 </section>
 
 <section id="weeklyPanel" class="hidden glass rounded-2xl p-4 mb-4">
@@ -117,12 +127,6 @@ th{position:sticky;top:0;background:#111b2b;z-index:1;color:#9fb0c3}
     <div id="playerModalBody" class="p-4"></div>
   </div>
 </div>
-
-<section id="csvPanel" class="hidden glass rounded-2xl p-4 mb-4">
-  <div class="flex items-center justify-between gap-3"><div><h2 class="font-black text-lg">Manuel Veri Yapıştır</h2><p class="text-xs text-slate-400">FBref Export CSV. Team/Squad, xA/xAG ve xA90/xAG90 adları otomatik eşleştirilir.</p></div><button id="closeCsv" class="px-3 py-2 rounded-lg border border-white/10">Kapat</button></div>
-  <textarea id="csvInput" rows="8" class="mt-3 w-full rounded-xl border p-3 text-xs font-mono" placeholder="Player,Team,Pos,MP,Min,Gls,Ast,xG,xA,xG90,xA90,Price,Penalty,Corner,Form4Plus"></textarea>
-  <div class="flex flex-wrap gap-2 mt-3"><button id="parseCsv" class="bg-iq text-slate-950 font-black px-4 py-2 rounded-lg">CSV'Yİ PARSE ET</button><button id="sampleCsv" class="border border-white/10 px-4 py-2 rounded-lg">Örnek başlık ekle</button></div>
-</section>
 
 <section class="grid xl:grid-cols-[minmax(0,1.08fr)_minmax(520px,.92fr)] gap-4">
   <div class="space-y-4">
@@ -724,6 +728,32 @@ function showPlayerProfile(p){
  '<div class="grid grid-cols-2 gap-2 mt-3 text-xs"><div class="metric-card"><small>Penaltı</small><b>'+(p.penalty?'Evet':'Hayır')+'</b></div><div class="metric-card"><small>Korner / duran top</small><b>'+(p.corner?'Evet':'Hayır')+'</b></div></div>';
  el('playerModal').classList.remove('hidden');
 }
+function renderHealth(){
+ const total=players.length;
+ const priceKnown=players.filter(p=>p.priceVerified).length;
+ const statRich=players.filter(p=>p.mp>=3&&(p.xg90>0||p.xa90>0)).length;
+ const photos=players.filter(p=>p.photo).length;
+ const risky=players.filter(p=>p.unavailable||p.suspended||p.doubtful).length;
+ const currentRisk=squad.filter(p=>p.unavailable||p.suspended||p.doubtful);
+ const weakData=squad.filter(p=>dataConfidence(p)==='Düşük');
+ const unverified=squad.filter(p=>!p.priceVerified);
+ const cards=[
+  ['Oyuncu havuzu',total,'18 takım'],
+  ['Doğrulanmış fiyat',priceKnown,Math.round(priceKnown/Math.max(1,total)*100)+'%'],
+  ['Güçlü istatistik',statRich,Math.round(statRich/Math.max(1,total)*100)+'%'],
+  ['Yüz fotoğrafı',photos,Math.round(photos/Math.max(1,total)*100)+'%']
+ ];
+ el('healthSummary').innerHTML=cards.map(x=>'<div class="metric-card"><small>'+x[0]+'</small><b>'+x[1]+'</b><div class="text-[9px] text-slate-500 mt-1">'+x[2]+'</div></div>').join('');
+ const issueBlocks=[
+  ['Mevcut kadro riski',currentRisk,currentRisk.length?'Sakat/cezalı/şüpheli oyuncular':'Risk görünmüyor'],
+  ['Düşük veri güveni',weakData,weakData.length?'İstatistiği sınırlı oyuncular':'Veri güveni iyi'],
+  ['Doğrulanmamış fiyat',unverified,unverified.length?'Varsayılan/manuel fiyat kullananlar':'Fiyatlar doğrulanmış'],
+  ['Havuz riskleri',players.filter(p=>p.unavailable||p.suspended||p.doubtful).slice(0,12),risky+' oyuncu işaretli']
+ ];
+ el('healthIssues').innerHTML=issueBlocks.map(([title,list,sub])=>'<div class="rounded-xl border border-white/10 bg-black/10 p-3"><div class="flex items-center justify-between gap-2"><b class="text-sm">'+title+'</b><span class="text-[10px] text-slate-500">'+sub+'</span></div><div class="mt-2 space-y-1">'+(list.length?list.slice(0,8).map(p=>'<button data-profile="'+esc(p.id)+'" class="w-full flex items-center justify-between rounded-lg px-2 py-1.5 bg-white/[.025] text-left"><span class="text-xs">'+esc(p.player)+'</span><span class="text-[9px] text-slate-500">'+esc(p.team)+'</span></button>').join(''):'<div class="text-xs text-emerald-300">Sorun yok</div>')+'</div></div>').join('');
+ el('healthPanel').classList.remove('hidden');
+ el('healthPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
 function bestXIFromPool(mode){
  const q=quotas(),pool=players.filter(p=>!p.unavailable&&!p.suspended),xi=[],counts={};
  for(const [pos,need] of Object.entries(q)){
@@ -871,11 +901,9 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-why]');if(
 document.addEventListener('change',e=>{const t=e.target;if(t.matches('[data-id]')){const p=players.find(x=>x.id===t.dataset.id);if(p){p[t.dataset.k]=t.type==='checkbox'?t.checked:num(t.value);if(t.dataset.k==='price'){p.priceVerified=false;p.priceSource='Manuel düzenleme'}calc(p);save();renderAll()}}});
 ['posFilter','teamFilter','availabilityFilter','sortBy'].forEach(id=>el(id).addEventListener('change',renderTable));
 el('strategy').addEventListener('change',()=>{if(players.length)buildSquad()});el('search').addEventListener('input',renderTable);
-el('fetchBtn').onclick=()=>fetchData(true);el('csvBtn').onclick=()=>el('csvPanel').classList.toggle('hidden');el('closeCsv').onclick=()=>el('csvPanel').classList.add('hidden');
-el('parseCsv').onclick=()=>{try{players=parseCsvText(el('csvInput').value);if(!players.length)throw new Error('Uyumlu oyuncu bulunamadı');save();renderAll();el('csvPanel').classList.add('hidden');setStatus('CSV başarıyla parse edildi: '+players.length+' oyuncu.')}catch(e){setStatus('CSV hatası: '+e.message,'err')}};
-el('sampleCsv').onclick=()=>el('csvInput').value='Player,Team,Pos,MP,Min,Gls,Ast,xG,xA,xG90,xA90,Price,Penalty,Corner,Form4Plus\n';
+el('fetchBtn').onclick=()=>fetchData(true);
 el('closePlayerModal').onclick=()=>el('playerModal').classList.add('hidden');el('playerModal').addEventListener('click',e=>{if(e.target===el('playerModal'))el('playerModal').classList.add('hidden')});
-el('squadBtn').onclick=buildSquad;el('compareBtn').onclick=compareAllStrategies;el('transferBtn').onclick=renderTransfers;el('weeklyBtn').onclick=renderWeekly;el('closeWeekly').onclick=()=>el('weeklyPanel').classList.add('hidden');el('closeTransfer').onclick=()=>el('transferPanel').classList.add('hidden');el('closeCompare').onclick=()=>el('comparePanel').classList.add('hidden');el('formation').onchange=()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}if(!el('comparePanel').classList.contains('hidden'))compareAllStrategies()};
+el('squadBtn').onclick=buildSquad;el('compareBtn').onclick=compareAllStrategies;el('transferBtn').onclick=renderTransfers;el('weeklyBtn').onclick=renderWeekly;el('healthBtn').onclick=renderHealth;el('closeHealth').onclick=()=>el('healthPanel').classList.add('hidden');el('closeWeekly').onclick=()=>el('weeklyPanel').classList.add('hidden');el('closeTransfer').onclick=()=>el('transferPanel').classList.add('hidden');el('closeCompare').onclick=()=>el('comparePanel').classList.add('hidden');el('formation').onchange=()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}if(!el('comparePanel').classList.contains('hidden'))compareAllStrategies()};
 el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
 (function init(){fetchData(true);setInterval(()=>fetchData(true),86400000)})();
 </script>
