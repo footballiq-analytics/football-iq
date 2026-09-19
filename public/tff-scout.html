@@ -1016,14 +1016,36 @@ function renderBench(){
  el('bench').innerHTML=bench.map((p,i)=>'<div class="bench-card"><div class="text-[9px] text-iq font-black mb-1">'+(p.pos==='GK'?'YEDEK KALECİ':'YEDEK '+i)+'</div>'+cardHtml(p)+'</div>').join('');
  el('captainInfo').innerHTML=(captain?'<span class="badge-c">C</span>'+esc(captain.player):'')+(viceCaptain?' &nbsp; <span class="badge-c2">C2</span>'+esc(viceCaptain.player):'');
 }
+async function ensurePlayerData(){
+ if(players.length)return true;
+ await fetchData(true);
+ return players.length>0;
+}
+async function runAction(label,fn,{needsData=true}={}){
+ try{
+   if(needsData&&!(await ensurePlayerData())){setStatus(label+' için oyuncu verisi yüklenemedi.','err');return}
+   setStatus(label+' hazırlanıyor…','load');
+   await fn();
+ }catch(err){
+   console.error(label,err);
+   setStatus(label+' çalıştırılamadı: '+(err?.message||err),'err');
+ }
+}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-why]');if(b){e.stopPropagation();const p=players.find(x=>x.id===b.dataset.why);if(p)showWhy(p)}const a=e.target.closest('[data-apply-mode]');if(a)applyComparedMode(a.dataset.applyMode);const tr=e.target.closest('[data-transfer-out]');if(tr)applyTransfer(tr.dataset.transferOut,tr.dataset.transferIn);const pr=e.target.closest('[data-profile]');if(pr){const p=players.find(x=>x.id===pr.dataset.profile);if(p){renderSideProfile(p);if(innerWidth<=1200)showPlayerProfile(p)}}const dt=e.target.closest('[data-detail]');if(dt){const p=players.find(x=>x.id===dt.dataset.detail);if(p)showPlayerProfile(p)}const st=e.target.closest('[data-side-transfer]');if(st){const p=players.find(x=>x.id===st.dataset.sideTransfer);if(p){renderSideProfile(p);renderTransfers();setStatus(p.player+' için transfer alternatifleri açıldı.')}}});
 document.addEventListener('change',e=>{const t=e.target;if(t.matches('[data-id]')){const p=players.find(x=>x.id===t.dataset.id);if(p){p[t.dataset.k]=t.type==='checkbox'?t.checked:num(t.value);if(t.dataset.k==='price'){p.priceVerified=false;p.priceSource='Manuel düzenleme'}calc(p);save();renderAll()}}});
 ['posFilter','teamFilter','availabilityFilter','sortBy'].forEach(id=>el(id).addEventListener('change',renderTable));
-el('strategy').addEventListener('change',()=>{if(players.length)buildSquad()});el('search').addEventListener('input',renderTable);
-el('fetchBtn').onclick=()=>fetchData(true);
+el('strategy').addEventListener('change',()=>runAction('Strateji güncelleme',()=>buildSquad()));el('search').addEventListener('input',renderTable);
+el('fetchBtn').onclick=()=>runAction('Veri yenileme',()=>fetchData(true),{needsData:false});
 el('closePlayerModal').onclick=()=>el('playerModal').classList.add('hidden');el('playerModal').addEventListener('click',e=>{if(e.target===el('playerModal'))el('playerModal').classList.add('hidden')});
-el('squadBtn').onclick=buildSquad;el('compareBtn').onclick=compareAllStrategies;el('transferBtn').onclick=renderTransfers;el('weeklyBtn').onclick=renderWeekly;el('healthBtn').onclick=renderHealth;el('radarBtn').onclick=renderRadar;el('closeRadar').onclick=()=>el('radarPanel').classList.add('hidden');el('closeHealth').onclick=()=>el('healthPanel').classList.add('hidden');el('closeWeekly').onclick=()=>el('weeklyPanel').classList.add('hidden');el('closeTransfer').onclick=()=>el('transferPanel').classList.add('hidden');el('closeCompare').onclick=()=>el('comparePanel').classList.add('hidden');el('formation').onchange=()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}if(!el('comparePanel').classList.contains('hidden'))compareAllStrategies()};
-if(el('healthMiniOpen'))el('healthMiniOpen').onclick=renderHealth;if(el('radarMiniOpen'))el('radarMiniOpen').onclick=renderRadar;if(el('mobileMenuBtn'))el('mobileMenuBtn').onclick=()=>el('mobileMenu').classList.toggle('open');if(el('mobileMore'))el('mobileMore').onclick=()=>el('mobileMenu').classList.toggle('open');
+el('squadBtn').onclick=()=>runAction('En iyi 15',()=>buildSquad());
+el('compareBtn').onclick=()=>runAction('3 mod karşılaştırma',()=>compareAllStrategies());
+el('transferBtn').onclick=()=>runAction('Transfer önerileri',()=>{if(squad.length!==15)buildSquad();renderTransfers()});
+el('weeklyBtn').onclick=()=>runAction('Haftanın 11’i',()=>renderWeekly());
+el('healthBtn').onclick=()=>runAction('Kadro sağlığı',()=>renderHealth());
+el('radarBtn').onclick=()=>runAction('Fikstür radarı',()=>renderRadar());
+el('closeRadar').onclick=()=>el('radarPanel').classList.add('hidden');el('closeHealth').onclick=()=>el('healthPanel').classList.add('hidden');el('closeWeekly').onclick=()=>el('weeklyPanel').classList.add('hidden');el('closeTransfer').onclick=()=>el('transferPanel').classList.add('hidden');el('closeCompare').onclick=()=>el('comparePanel').classList.add('hidden');
+el('formation').onchange=()=>runAction('Diziliş güncelleme',()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}if(!el('comparePanel').classList.contains('hidden'))compareAllStrategies()});
+if(el('healthMiniOpen'))el('healthMiniOpen').onclick=()=>runAction('Kadro sağlığı',()=>renderHealth());if(el('radarMiniOpen'))el('radarMiniOpen').onclick=()=>runAction('Fikstür radarı',()=>renderRadar());if(el('mobileMenuBtn'))el('mobileMenuBtn').onclick=()=>el('mobileMenu').classList.toggle('open');if(el('mobileMore'))el('mobileMore').onclick=()=>el('mobileMenu').classList.toggle('open');
 el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
 (function init(){fetchData(true);setInterval(()=>fetchData(true),86400000)})();
 </script>
