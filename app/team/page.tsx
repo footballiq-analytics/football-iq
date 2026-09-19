@@ -142,7 +142,6 @@ export default function TeamBuilderPage(){useMobileCardGeometry();const{formatio
  function openLongPressDetail(p:FantasyPlayer){setActionPlayer(null);setDetailPlayer(p);haptic()}
  function save(){if(!squadValid){setValidationOpen(true);return}const state=useTeamStore.getState();try{persistSquad(localStorage,STORAGE_KEY,{formation:state.formation,startingIds:state.startingSlots.map(s=>s.playerId),benchIds:state.benchSlots.map(s=>s.playerId),captain,viceCaptain,coachId:selectedCoachId});setSaveResult(true);setToast("Kadro başarıyla kaydedildi.");haptic()}catch{setSaveResult(false);setToast("Kadro kaydedilemedi.")}}
  function removeCardPlayer(p:FantasyPlayer){const id=String(p.id);removePlayer(id);if(captain===id)setCaptain(null);if(viceCaptain===id)setViceCaptain(null);setActionPlayer(null);setDetailPlayer(null);haptic()}
- function clearAll(){clearSquad();setCaptain(null);setViceCaptain(null);setToast("Çalışma kadrosu temizlendi. Son kaydın korunuyor; yenileyerek geri yükleyebilirsin.")}
  const fantasyPlayers=players.map(toFantasyPlayer);
  const shareRef=useRef<()=>Promise<void>>(async()=>{});
  useEffect(()=>{const share=(event:Event)=>{event.preventDefault();void shareRef.current()};window.addEventListener("fiq-share-squad",share);return()=>window.removeEventListener("fiq-share-squad",share)},[]);
