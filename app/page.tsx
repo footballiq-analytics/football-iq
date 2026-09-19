@@ -2,10 +2,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { ScoutVisualButton } from "@/components/site-shell";
 const base=process.env.NEXT_PUBLIC_BASE_PATH??"";
-const fixtures=[["Galatasaray","Beşiktaş"],["Fenerbahçe","Trabzonspor"],["Samsunspor","Başakşehir"]];
-const clubs=["Beşiktaş","Fenerbahçe","Galatasaray","Trabzonspor"];
 const positions=["Kaleci","Defans","Orta Saha","Forvet"];
-function Mark({name}:{name:string}){return <span className="home-club-mark" aria-hidden="true">{name[0]}</span>}
 function Symbol({kind}:{kind:"calendar"|"cup"|"iq"|"star"}){const paths={calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6m10-6v6M3 11h18M7 15h3m4 0h3"/></>,cup:<><path d="M8 3h8v7a4 4 0 0 1-8 0V3ZM8 5H4v3a4 4 0 0 0 4 4m8-7h4v3a4 4 0 0 1-4 4M12 14v6m-5 1h10"/></>,iq:<><path d="M8 17c0-4-3-5-3-8a7 7 0 0 1 14 0c0 3-3 4-3 8ZM9 21h6m-3-9V7"/></>,star:<path d="m12 2 3 6 7 1-5 5 1 8-6-4-6 4 1-8-5-5 7-1Z"/>};return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">{paths[kind]}</svg>}
 function PanelTitle({kind,title,href,action}:{kind:"calendar"|"cup"|"star";title:string;href:string;action:string}){return <div className="home-panel-title"><h2><Symbol kind={kind}/>{title}</h2><Link href={href}>{action} <span aria-hidden="true">→</span></Link></div>}
 function Shield({style}:{style?:CSSProperties}){return <div className="home-shield" style={style}><svg viewBox="0 0 50 60" aria-hidden="true"><circle cx="25" cy="19" r="8"/><path d="M9 50v-9c0-14 32-14 32 0v9Z"/></svg></div>}
