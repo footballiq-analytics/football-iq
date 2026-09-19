@@ -632,3 +632,10 @@ body:has(.fiq-team-page) .fiq-card-stats>span:first-child::after{content:"·";ma
  .fiq-team-metrics-v27>div small{font-size:6px!important}
  .fiq-team-metrics-v27>div strong{font-size:12px!important}
 }
+
+.fiq-team-mobile-nav{display:none}
+@media(max-width:900px) and (orientation:portrait){
+ .fiq-team-mobile-nav{position:fixed;left:10px;right:10px;bottom:max(8px,env(safe-area-inset-bottom));z-index:115;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:6px;border:1px solid #263449;border-radius:14px;background:rgba(15,23,36,.96);box-shadow:0 10px 28px rgba(0,0,0,.35);backdrop-filter:blur(10px)}
+ .fiq-team-mobile-nav button,.fiq-team-mobile-nav a{display:grid;place-items:center;min-height:46px;border-radius:9px;border:1px solid transparent;background:#111827;color:#93a4b8;font-size:9px;font-weight:900;letter-spacing:.04em;text-decoration:none;touch-action:manipulation}
+ .fiq-team-mobile-nav .active{border-color:#d7b86a66;color:#efd68d;background:#172033}
+}
