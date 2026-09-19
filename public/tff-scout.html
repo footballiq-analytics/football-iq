@@ -119,7 +119,27 @@ const PROXY='https://api.allorigins.win/raw?url='+encodeURIComponent(FBREF);
 const LOCAL_DATA='./data/tff-scout.json';
 const JINA_URLS=['https://r.jina.ai/'+FBREF,'https://r.jina.ai/'+FBREF_ALT];
 const FANTASY_TOTAL=593;
-const LS_DATA='fiq_tff_scout_data_v6',LS_TIME='fiq_tff_scout_time_v6';
+const WIKI_SQUADS={
+ 'Alanyaspor':'https://en.wikipedia.org/wiki/Alanyaspor',
+ 'Amedspor':'https://en.wikipedia.org/wiki/Amed_S.K.',
+ 'Başakşehir':'https://en.wikipedia.org/wiki/%C4%B0stanbul_Ba%C5%9Fak%C5%9Fehir_F.K.',
+ 'Beşiktaş':'https://en.wikipedia.org/wiki/Be%C5%9Fikta%C5%9F_J.K.',
+ 'Çorum FK':'https://en.wikipedia.org/wiki/%C3%87orum_F.K.',
+ 'Erzurumspor':'https://en.wikipedia.org/wiki/Erzurumspor_F.K.',
+ 'Eyüpspor':'https://en.wikipedia.org/wiki/Ey%C3%BCpspor',
+ 'Fenerbahçe':'https://en.wikipedia.org/wiki/Fenerbah%C3%A7e_S.K._(football)',
+ 'Galatasaray':'https://en.wikipedia.org/wiki/Galatasaray_S.K._(football)',
+ 'Gaziantep':'https://en.wikipedia.org/wiki/Gaziantep_F.K.',
+ 'Gençlerbirliği':'https://en.wikipedia.org/wiki/Gen%C3%A7lerbirli%C4%9Fi_S.K.',
+ 'Göztepe':'https://en.wikipedia.org/wiki/G%C3%B6ztepe_S.K.',
+ 'Kasımpaşa':'https://en.wikipedia.org/wiki/Kas%C4%B1mpa%C5%9Fa_S.K.',
+ 'Kocaelispor':'https://en.wikipedia.org/wiki/Kocaelispor',
+ 'Konyaspor':'https://en.wikipedia.org/wiki/Konyaspor',
+ 'Rizespor':'https://en.wikipedia.org/wiki/%C3%87aykur_Rizespor',
+ 'Samsunspor':'https://en.wikipedia.org/wiki/Samsunspor',
+ 'Trabzonspor':'https://en.wikipedia.org/wiki/Trabzonspor'
+};
+const LS_DATA='fiq_tff_scout_data_v7',LS_TIME='fiq_tff_scout_time_v7';
 let players=[],squad=[],starters=[],bench=[],captain=null,viceCaptain=null;
 const SQUAD_QUOTAS={GK:2,DF:5,MF:5,FW:3};
 const FORMATIONS={433:{GK:1,DF:4,MF:3,FW:3},442:{GK:1,DF:4,MF:4,FW:2},343:{GK:1,DF:3,MF:4,FW:3},352:{GK:1,DF:3,MF:5,FW:2},532:{GK:1,DF:5,MF:3,FW:2}};
@@ -160,7 +180,7 @@ function strategyScore(p){
  }
  return p.xp+(p.eff*1.35)-(p.injuryRisk*2);
 }
-function norm(raw,i=0){return calc({id:raw.id||('p'+i+'-'+String(raw.player||raw.Player||'').replace(/\W/g,'')),player:raw.player||raw.Player||'Bilinmeyen',team:raw.team||raw.Team||raw.Squad||'',opponent:raw.opponent||'—',home:raw.home??null,pos:posNorm(raw.pos||raw.Pos),mp:num(raw.mp??raw.MP),min:num(raw.min??raw.Min),starts:num(raw.starts),startRate:num(raw.startRate),minutesPerMatch:num(raw.minutesPerMatch),gls:num(raw.gls??raw.Gls),ast:num(raw.ast??raw.Ast),xg:num(raw.xg??raw.xG),xa:num(raw.xa??raw.xA??raw.xAG),xg90:num(raw.xg90??raw['xG90']??raw['xG/90']),xa90:num(raw.xa90??raw['xA90']??raw['xA/90']??raw['xAG90']??raw['xAG/90']),price:num(raw.price??raw.Price)||6,priceVerified:!!raw.priceVerified,priceSource:raw.priceSource||'Varsayılan/manuel',ownership:raw.ownership==null?null:num(raw.ownership),ownershipVerified:!!raw.ownershipVerified,ownershipSource:raw.ownershipSource||'Bilinmiyor',penalty:/^(1|true|yes|evet)$/i.test(raw.penalty??raw.Penalty??''),corner:/^(1|true|yes|evet)$/i.test(raw.corner??raw.Corner??''),form4:/^(1|true|yes|evet)$/i.test(raw.form4??raw.Form4Plus??''),injuryRisk:num(raw.injuryRisk),unavailable:!!raw.unavailable,doubtful:!!raw.doubtful,suspended:!!raw.suspended,injuryNote:raw.injuryNote||'',startProb:raw.startProb})}
+function norm(raw,i=0){return calc({id:raw.id||('p'+i+'-'+String(raw.player||raw.Player||'').replace(/\W/g,'')),player:raw.player||raw.Player||'Bilinmeyen',rosterOnly:!!raw.rosterOnly,team:raw.team||raw.Team||raw.Squad||'',opponent:raw.opponent||'—',home:raw.home??null,pos:posNorm(raw.pos||raw.Pos),mp:num(raw.mp??raw.MP),min:num(raw.min??raw.Min),starts:num(raw.starts),startRate:num(raw.startRate),minutesPerMatch:num(raw.minutesPerMatch),gls:num(raw.gls??raw.Gls),ast:num(raw.ast??raw.Ast),xg:num(raw.xg??raw.xG),xa:num(raw.xa??raw.xA??raw.xAG),xg90:num(raw.xg90??raw['xG90']??raw['xG/90']),xa90:num(raw.xa90??raw['xA90']??raw['xA/90']??raw['xAG90']??raw['xAG/90']),price:num(raw.price??raw.Price)||6,priceVerified:!!raw.priceVerified,priceSource:raw.priceSource||'Varsayılan/manuel',ownership:raw.ownership==null?null:num(raw.ownership),ownershipVerified:!!raw.ownershipVerified,ownershipSource:raw.ownershipSource||'Bilinmiyor',penalty:/^(1|true|yes|evet)$/i.test(raw.penalty??raw.Penalty??''),corner:/^(1|true|yes|evet)$/i.test(raw.corner??raw.Corner??''),form4:/^(1|true|yes|evet)$/i.test(raw.form4??raw.Form4Plus??''),injuryRisk:num(raw.injuryRisk),unavailable:!!raw.unavailable,doubtful:!!raw.doubtful,suspended:!!raw.suspended,injuryNote:raw.injuryNote||'',startProb:raw.startProb})}
 function save(){localStorage.setItem(LS_DATA,JSON.stringify(players));localStorage.setItem(LS_TIME,String(Date.now()));el('lastUpdate').textContent=new Date().toLocaleString('tr-TR')}
 function setStatus(msg,type='ok'){el('statusText').textContent=msg;el('statusDot').className='w-2.5 h-2.5 rounded-full '+(type==='err'?'bg-red-400':type==='load'?'bg-iq animate-pulse':'bg-emerald-400')}
 function setLoading(v){el('loading').classList.toggle('hidden',!v);el('fetchBtn').disabled=v;if(v)setStatus('Canlı veri çekiliyor ve stats_standard tablosu ayrıştırılıyor…','load')}
@@ -233,6 +253,41 @@ async function loadFullPublicPool(){
  }catch(e){lastErr=e}
  throw lastErr||new Error('Tam kamuya açık oyuncu havuzu alınamadı');
 }
+function parseWikiSquad(text,team){
+ const lines=text.split(/\r?\n/),out=[],seen=new Set();
+ let inSquad=false;
+ for(const line of lines){
+   if(/current squad|first-team squad|players/i.test(line)&&!inSquad){inSquad=true;continue}
+   if(!inSquad||!line.includes('|'))continue;
+   const clean=line.replace(/\[([^\]]+)\]\([^)]*\)/g,'$1').replace(/\*\*/g,'');
+   const cells=clean.split('|').map(x=>x.trim()).filter(Boolean);
+   const posIndex=cells.findIndex(x=>/^(GK|DF|MF|FW)$/.test(x));
+   if(posIndex<0)continue;
+   const pos=cells[posIndex],name=(cells.slice(posIndex+1).find(x=>x&&!/^[A-Z]{2,3}$/.test(x)&&!/^[0-9]+$/.test(x))||'').replace(/\[[^\]]+\]/g,'').trim();
+   if(!name||name.length<2)continue;
+   const key=(name+'|'+team).toLocaleLowerCase('tr');if(seen.has(key))continue;seen.add(key);
+   out.push(norm({id:'roster-'+team+'-'+name,Player:name,Team:team,Pos:pos,MP:0,Min:0,xG90:0,xA90:0,price:6,startProb:.25,rosterOnly:true},out.length));
+ }
+ return out;
+}
+async function loadRosterOnlyCatalog(){
+ const jobs=Object.entries(WIKI_SQUADS).map(async([team,url])=>{
+   try{
+     const r=await fetch('https://r.jina.ai/'+url,{cache:'no-store'});
+     if(!r.ok)return[];
+     return parseWikiSquad(await r.text(),team);
+   }catch{return[]}
+ });
+ const groups=await Promise.all(jobs);return groups.flat();
+}
+function mergePools(stats,rosters){
+ const out=[...stats],seen=new Set(stats.map(p=>(p.player+'|'+p.team).toLocaleLowerCase('tr')));
+ for(const p of rosters){
+   const k=(p.player+'|'+p.team).toLocaleLowerCase('tr');
+   if(seen.has(k))continue;seen.add(k);out.push(p);
+ }
+ return out;
+}
 function parseCsvText(text){
   const lines=text.trim().split(/\r?\n/);if(lines.length<2)throw new Error('CSV en az başlık + 1 satır içermeli');
   const csvLine=s=>{let a=[],x='',q=false;for(let i=0;i<s.length;i++){const c=s[i];if(c==='"'){if(q&&s[i+1]==='"'){x+='"';i++}else q=!q}else if(c===','&&!q){a.push(x);x=''}else x+=c}a.push(x);return a};
@@ -254,13 +309,16 @@ async function fetchData(force=false){
  }catch{}
  try{
    const expanded=await loadFullPublicPool();
+   const rosterOnly=await loadRosterOnlyCatalog();
+   const combined=mergePools(expanded,rosterOnly);
    const manual=new Map((localData?.players||[]).map(x=>[(x.player+'|'+x.team).toLocaleLowerCase('tr'),x]));
-   players=expanded.map(p=>{
+   players=combined.map(p=>{
      const m=manual.get((p.player+'|'+p.team).toLocaleLowerCase('tr'));
      return norm(m?{...p,price:m.price,priceVerified:m.priceVerified,priceSource:m.priceSource,ownership:m.ownership,ownershipVerified:m.ownershipVerified,ownershipSource:m.ownershipSource,penalty:m.penalty||p.penalty,corner:m.corner,opponent:m.opponent,home:m.home,unavailable:m.unavailable,doubtful:m.doubtful,suspended:m.suspended,injuryRisk:m.injuryRisk,startProb:m.startProb}:p)
    });
    save();renderAll();
-   setStatus('FBref tam kamuya açık oyuncu havuzu yüklendi: '+players.length+' oyuncu. Fantasy toplamı 593; giriş arkasındaki oyuncular ayrıca işaretleniyor.');
+   const rosterCount=players.filter(p=>p.rosterOnly).length;
+   setStatus('Geniş havuz yüklendi: '+players.length+' oyuncu ('+rosterCount+' roster-only). Fantasy referansı 593.');
    return;
  }catch(fullErr){
    if(localData?.players?.length>=15){
@@ -388,6 +446,7 @@ function explainPlayer(p){
  if(p.corner)reasons.push('duran top/korner rolü');
  if(p.ownershipVerified&&p.ownership!=null&&p.ownership<=10)reasons.push('diferansiyel: %'+p.ownership.toFixed(1)+' sahiplik');
  if(p.eff>=.8)reasons.push('fiyat/xP verimi yüksek');
+ if(p.rosterOnly)reasons.push('kadroda kayıtlı; henüz güçlü maç istatistiği yok');
  if(p.home===true)reasons.push('iç saha avantajı');
  if(p.doubtful)reasons.push('risk: şüpheli');
  if(!reasons.length)reasons.push('mevki kotası + bütçe + kulüp limiti içinde en iyi kombinasyon');
