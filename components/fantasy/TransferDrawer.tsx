@@ -10,7 +10,7 @@ export default function TransferDrawer({open,portrait,dragging,onClose,children}
   if(!dismissible)return;
   function outside(event:PointerEvent){
    const target=event.target;
-   if(!(target instanceof Node)||panel.current?.contains(target)||document.getElementById("fiq-transfer-trigger")?.contains(target))return;
+   if(!(target instanceof Node)||panel.current?.contains(target)||document.getElementById("fiq-transfer-trigger")?.contains(target)||(target instanceof Element&&!!target.closest(".fiq-team-mobile-nav")))return;
    closeRef.current();
   }
   function key(event:KeyboardEvent){if(event.key==="Escape"){event.preventDefault();closeRef.current();document.getElementById("fiq-transfer-trigger")?.focus()}}
