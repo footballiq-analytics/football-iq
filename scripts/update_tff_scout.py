@@ -14,6 +14,8 @@ STANDARD_URLS = [
 ]
 PLAYING_URL = "https://fbref.com/en/comps/26/playingtime/Super-Lig-Stats"
 INJURY_URL = "https://lineupstoday.com/super-lig/injuries/"
+FOTMOB_LEAGUE = "https://www.fotmob.com/api/leagues?id=71&ccode3=TUR&season=2026%2F2027"
+FOTMOB_TEAM = "https://www.fotmob.com/api/teams?id={team_id}&tab=squad&type=team"
 FANTASY_HOME = "https://www.fantasysuperlig.com/"
 FANTASY_BLOGS = [
  "https://www.fantasysuperlig.com/blog/gw5-en-iyi-fantasy-oyunculari-form-raporu",
@@ -77,6 +79,81 @@ def player_table(html, table_id):
         if cand.select_one('[data-stat="player"]'):
             return cand
     raise RuntimeError(f"{table_id} player table not found")
+
+def fetch_json(url):
+    r=requests.get(url,headers={**HEADERS,"Accept":"application/json","Referer":"https://www.fotmob.com/"},timeout=35)
+    if not r.ok:
+        raise RuntimeError(f"{url}: HTTP {r.status_code}")
+    return r.json()
+
+def fotmob_pos(section_title, role=None):
+    s=(section_title or "").lower()
+    rk=((role or {}).get("key") or "").lower() if isinstance(role,dict) else ""
+    text=f"{s} {rk}"
+    if "keeper" in text or rk=="goalkeeper": return "GK"
+    if "defend" in text: return "DF"
+    if "midfield" in text: return "MF"
+    if "attack" in text or "forward" in text: return "FW"
+    return ""
+
+def parse_fotmob_rosters():
+    players=[]
+    try:
+        league=fetch_json(FOTMOB_LEAGUE)
+    except Exception as e:
+        print(f"FotMob league skipped: {e}",file=sys.stderr)
+        return players
+    table=league.get("table") or {}
+    teams=table.get("all") or []
+    if not teams and isinstance(table.get("data"),dict):
+        teams=(table["data"].get("table") or {}).get("all") or []
+    seen=set()
+    for t in teams:
+        tid=t.get("id"); team=t.get("name") or t.get("shortName") or ""
+        if not tid or not team: continue
+        try:
+            data=fetch_json(FOTMOB_TEAM.format(team_id=tid))
+            sections=((data.get("squad") or {}).get("squad") or [])
+        except Exception as e:
+            print(f"FotMob squad skipped {team}: {e}",file=sys.stderr)
+            continue
+        for section in sections:
+            if str(section.get("title","")).lower()=="coach": continue
+            for m in section.get("members") or []:
+                name=m.get("name") or ""
+                if not name: continue
+                pos=fotmob_pos(section.get("title"),m.get("role"))
+                if pos not in {"GK","DF","MF","FW"}: continue
+                key=(norm_key(name),norm_key(team))
+                if key in seen: continue
+                seen.add(key)
+                players.append({
+                    "id":f"fotmob-{m.get('id') or norm_key(team)+'-'+norm_key(name)}",
+                    "player":name,"team":team,"pos":pos,
+                    "shirtNumber":m.get("shirtNumber"),"age":m.get("age"),
+                    "rosterOnly":True,"mp":0,"min":0,"starts":0,"startRate":0,"minutesPerMatch":0,
+                    "gls":n(m.get("goals")),"ast":n(m.get("assists")),
+                    "xg":0,"xa":0,"xg90":0,"xa90":0,"yellow":n(m.get("ycards")),"red":n(m.get("rcards")),
+                    "pk":0,"pkAtt":0
+                })
+        time.sleep(0.35)
+    return players
+
+def merge_roster_and_stats(rosters, stats):
+    out=[]
+    stats_map={(norm_key(p.get("player")),norm_key(p.get("team"))):p for p in stats}
+    matched=set()
+    for r in rosters:
+        key=(norm_key(r.get("player")),norm_key(r.get("team")))
+        s=stats_map.get(key)
+        if s:
+            out.append({**r,**s,"rosterOnly":False}); matched.add(key)
+        else:
+            out.append(r)
+    for s in stats:
+        key=(norm_key(s.get("player")),norm_key(s.get("team")))
+        if key not in matched: out.append(s)
+    return out
 
 def previous_data():
     if not os.path.exists(OUT): return {},{}
@@ -226,7 +303,7 @@ injuries=parse_injuries()
 fixtures=parse_current_fixtures()
 public_market=parse_public_fantasy_market()
 table=player_table(std_html,"stats_standard")
-players=[]
+stats_players=[]
 
 for i,row in enumerate(table.select("tbody tr")):
     player=txt(row,"player")
@@ -284,7 +361,7 @@ if len(players)<250:
     raise SystemExit(f"Too few player rows parsed: {len(players)}")
 
 out={
-    "source":"FBref standard + playing time + LineupsToday availability",
+    "source":"FotMob full squads + FBref stats + LineupsToday availability",
     "sourceUrl":used,
     "playingTimeUrl":PLAYING_URL,
     "injuryUrl":INJURY_URL,
@@ -293,6 +370,8 @@ out={
     "updatedAt":datetime.now(timezone.utc).isoformat(),
     "season":"2026-2027",
     "count":len(players),
+    "rosterCount":len(roster_players),
+    "statsCount":len(stats_players),
     "automation":{
         "stats":"daily",
         "playingTime":"daily",
