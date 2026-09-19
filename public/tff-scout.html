@@ -46,9 +46,9 @@ button{cursor:pointer}
 .quick-action .qa-icon{color:var(--qa,#5AA8E8);border:1px solid color-mix(in srgb,var(--qa,#5AA8E8) 42%,transparent);background:color-mix(in srgb,var(--qa,#5AA8E8) 12%,#101827)}
 .action-refresh{--qa:#38C98D}.action-best{--qa:#D7B86A}.action-compare{--qa:#5AA8E8}.action-transfer{--qa:#38C98D}.action-weekly{--qa:#E8C76E}.action-health{--qa:#E35D6A}.action-radar{--qa:#52D39C}
 .action-refresh:hover,.action-transfer:hover,.action-radar:hover{border-color:#38C98D88}.action-best:hover,.action-weekly:hover{border-color:#D7B86A88}.action-health:hover{border-color:#E35D6A88}.action-compare:hover{border-color:#5AA8E888}
-.back-home{justify-self:center;display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 13px;border:1px solid #34445c;border-radius:10px;background:#101a2a;color:#dce6ef;text-decoration:none;font-size:11px;font-weight:800}
+.back-home{justify-self:center;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;min-width:176px;padding:0 16px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;border:1px solid #34445c;border-radius:10px;background:#101a2a;color:#dce6ef;text-decoration:none;font-size:11px;font-weight:800}
 .back-home:hover{border-color:#D7B86A88;color:#f0d78b;background:#172033}
-.export-team-btn{min-height:34px;padding:0 10px;border-radius:8px;border:1px solid #38C98D77;background:#38C98D12;color:#8ce3bd;font-size:8px;font-weight:900;letter-spacing:.03em}
+.export-team-btn{min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;padding:0 10px;border-radius:8px;border:1px solid #38C98D77;background:#38C98D12;color:#8ce3bd;font-size:8px;font-weight:900;letter-spacing:.03em}
 .export-team-btn:hover{background:#38C98D22;border-color:#38C98D}
 
 .quick-action.primary{border-color:#d7b86a66;background:linear-gradient(145deg,#1b2027,#171a20)}
@@ -128,20 +128,20 @@ tbody tr:hover{background:#ffffff05}
 /* V10 fantasy photo cards */
 .player-card{width:96px;height:128px;max-width:none;border-radius:13px;overflow:visible;filter:drop-shadow(0 8px 14px #0008)}
 .player-card .fantasy-card{position:relative;width:100%;height:100%;overflow:hidden;border-radius:13px;border:1px solid rgba(215,184,106,.42);background:linear-gradient(155deg,var(--kit1,#1e293b),var(--kit2,#334155));box-shadow:inset 0 0 0 1px #ffffff0b,0 7px 16px #0008}
-.player-card .fantasy-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.player-card .fantasy-photo{position:absolute;left:12%;right:12%;top:7%;width:76%;height:54%;object-fit:cover;object-position:center 18%;display:block;border-radius:50% 50% 42% 42%/44% 44% 56% 56%;filter:saturate(.98) contrast(1.04);transform:scale(1.08)}
 .player-card .fantasy-fallback{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 20%,color-mix(in srgb,var(--kit1) 78%,white),var(--kit2));font-size:24px;font-weight:900;color:#ffffffd8}
-.player-card .fantasy-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,9,16,.04) 15%,rgba(4,9,16,.10) 34%,rgba(4,9,16,.68) 69%,rgba(4,9,16,.97) 100%)}
+.player-card .fantasy-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,9,16,.02) 0%,rgba(4,9,16,.08) 34%,rgba(4,9,16,.50) 58%,rgba(4,9,16,.96) 78%,rgba(4,9,16,.99) 100%)}
 .player-card .fantasy-top{position:absolute;inset:6px 6px auto;display:flex;align-items:flex-start;justify-content:space-between;z-index:3}
 .player-card .fantasy-pos{display:grid;place-items:center;min-width:21px;height:21px;padding:0 5px;border-radius:6px;background:rgba(8,15,25,.82);border:1px solid #ffffff28;color:#fff;font-size:8px;font-weight:900;backdrop-filter:blur(4px)}
 .player-card .fantasy-badge{display:flex;gap:3px}
 .player-card .fantasy-meta{position:absolute;z-index:3;left:6px;right:6px;bottom:6px;text-align:left;color:#fff}
-.player-card .fantasy-name{font-size:9px;font-weight:900;line-height:1.08;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 5px #000}
-.player-card .fantasy-team{font-size:6.8px;color:#c9d5df;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-card .fantasy-name{font-size:8px;font-weight:900;line-height:1.08;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 5px #000}
+.player-card .fantasy-team{font-size:6.2px;color:#c9d5df;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .player-card .fantasy-stats{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:4px}
 .player-card .fantasy-stat{border-radius:5px;background:rgba(8,15,25,.68);border:1px solid #ffffff16;padding:3px 4px;backdrop-filter:blur(3px)}
-.player-card .fantasy-stat span{display:block;font-size:5.5px;color:#92a6ba;line-height:1}
-.player-card .fantasy-stat b{display:block;font-size:7px;color:#fff;line-height:1.15;margin-top:1px}
-.player-card .fantasy-foot{display:flex;align-items:center;justify-content:space-between;gap:3px;margin-top:3px;font-size:5.8px;color:#b9c7d4}
+.player-card .fantasy-stat span{display:block;font-size:4.8px;color:#92a6ba;line-height:1}
+.player-card .fantasy-stat b{display:block;font-size:6.4px;color:#fff;line-height:1.15;margin-top:1px}
+.player-card .fantasy-foot{display:flex;align-items:center;justify-content:space-between;gap:3px;margin-top:3px;font-size:5.2px;color:#b9c7d4}
 .player-card .fantasy-foot .ok{color:#72d9ad}.player-card .fantasy-foot .risk{color:#f0b35c}.player-card .fantasy-foot .bad{color:#ee7b86}
 .player-card [data-profile]{position:absolute;inset:0;z-index:4;border:0;background:transparent;border-radius:13px}
 .player-card [data-profile]:focus-visible{outline:2px solid #f0d278;outline-offset:2px}
@@ -180,7 +180,7 @@ tbody tr:hover{background:#ffffff05}
       <div>
         <div class="brand-title">FUTBOL <span style="color:var(--gold)">IQ</span></div>
         <div class="brand-sub">TFF Fantezi Lig · Canlı Scout</div>
-        <span class="version-badge">PRO UI V10.1 · FANTASY BRIDGE</span>
+        <span class="version-badge">PRO UI V10.2 · HEADSHOT CARDS</span>
       </div>
     </div>
     <a id="backToFantasy" class="back-home" href="./">← Web sitesine geri dön</a>
