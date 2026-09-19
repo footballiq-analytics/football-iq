@@ -14,7 +14,7 @@ import { shareOrCopy } from "@/lib/share";
 
 const navigation=[["Ana Sayfa","/"],["Kadrom","/team"]] as const;
 
-function ScoutVisualButton({compact=false}:{compact?:boolean}){
+export function ScoutVisualButton({compact=false}:{compact?:boolean}){
  const base=process.env.NEXT_PUBLIC_BASE_PATH??"";
  return <a href={`${base}/tff-scout.html`} className={compact?"fiq-scout-visual fiq-scout-visual-compact":"fiq-scout-visual"} aria-label="FUTBOL IQ analiz ve Scout sayfasını aç">
   <span className="fiq-scout-orb" aria-hidden="true">
