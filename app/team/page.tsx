@@ -19,7 +19,9 @@ import{SUPER_LIG_COACHES_2026_27,type FantasyCoach}from"@/data/superlig-coaches-
 import{FANTASY_PLAYER_POOL,INITIAL_BENCH_IDS,INITIAL_LINEUP_IDS,SQUAD_STORAGE_KEY}from"@/data/fantasy-player-pool";
 import{useTeamStore,FORMATIONS,type Formation,type Player as StorePlayer}from"@/store/useTeamStore";
 
-const BUDGET=100;const STORAGE_KEY=SQUAD_STORAGE_KEY;const DEFAULT_COACH_ID="coach-galatasaray";
+const BUDGET=100;const STORAGE_KEY=SQUAD_STORAGE_KEY;const DEFAULT_COACH_ID="coach-galatasaray";const SCOUT_IMPORT_KEY="futbol-iq-scout-xi-import-v1";
+const normalizeScoutText=(value:string)=>value.toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9ğüşöçıİ]+/gi," ").replace(/\s+/g," ").trim();
+const clubAlias=(value:string)=>{const x=normalizeScoutText(value);const aliases:Record<string,string>={"istanbul basaksehir":"istanbul basaksehir fk","basaksehir":"istanbul basaksehir fk","gaziantep":"gaziantep fk","erzurumspor":"erzurumspor fk"};return aliases[x]??x};
 const players:StorePlayer[]=FANTASY_PLAYER_POOL;const initialLineup:(string|null)[]=INITIAL_LINEUP_IDS;const initialBench:(string|null)[]=INITIAL_BENCH_IDS;const toFantasyPlayer=(p:StorePlayer):FantasyPlayer=>p;const positionName=(p:PlayerPosition)=>p==="FWD"?"Forvet":p==="MID"?"Orta saha":p==="DEF"?"Defans":"Kaleci";
 const transferCollisionDetection:CollisionDetection=args=>args.pointerCoordinates?pointerWithin(args):rectIntersection(args);
 const transferOverlayAnchor:Modifier=({active,activatorEvent,activeNodeRect,overlayNodeRect,transform})=>{
@@ -40,7 +42,35 @@ export default function TeamBuilderPage(){useMobileCardGeometry();const{formatio
  function selectEmptySlot(id:string){const state=useTeamStore.getState();const slot=[...state.startingSlots,...state.benchSlots].find(s=>s.id===id&&!s.playerId);if(!slot)return;setActionPlayer(null);setTargetSlotId(id);setTransferOpen(true);setToast(`${state.benchSlots.some(s=>s.id===id)?"Yedek":"İlk 11"} ${positionName(slot.position)} hedefi seçildi · listeden oyuncu seç.`);haptic()}
  function selectBenchPlayer(p:FantasyPlayer){if(!targetSlotId){setActionPlayer(p);return}const state=useTeamStore.getState();const target=state.startingSlots.find(s=>s.id===targetSlotId&&!s.playerId);const source=state.benchSlots.find(s=>s.playerId===String(p.id));if(!target||!source){setTargetSlotId(null);setToast("Hedef veya yedek değişti · boş mevkiyi tekrar seç.");return}if(target.position!==p.position){setToast(`Bu hedef için ${positionName(target.position)} seçmelisin.`);return}if(state.movePlayerToEmptySlot(String(p.id),source.id,target.id)){setTargetSlotId(null);haptic()}}
 
- useEffect(()=>{try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const s=JSON.parse(raw)as{formation?:Formation;startingIds?:(string|null)[];benchIds?:(string|null)[];captain?:string|null;viceCaptain?:string|null;coachId?:string|null};hydrateTeam(players,s.formation??"4-3-3",s.startingIds??initialLineup,s.benchIds??initialBench);setCaptain(s.captain??"gs-victor-osimhen");setViceCaptain(s.viceCaptain??null);if(s.coachId===null)setSelectedCoachId(null);else if(s.coachId&&SUPER_LIG_COACHES_2026_27.some(c=>c.id===s.coachId))setSelectedCoachId(s.coachId)}else hydrateTeam(players,"4-3-3",initialLineup,initialBench)}catch{hydrateTeam(players,"4-3-3",initialLineup,initialBench);setToast("Kayıt okunamadı; başlangıç kadrosu yüklendi.")}finally{setHydrated(true)}},[hydrateTeam]);
+ useEffect(()=>{try{
+  const importRaw=localStorage.getItem(SCOUT_IMPORT_KEY);
+  if(importRaw){
+   const imported=JSON.parse(importRaw) as {formation?:Formation;starters?:Array<{name?:string;club?:string;position?:string}>;captain?:string|null;viceCaptain?:string|null};
+   const formation=(imported.formation&&FORMATIONS.includes(imported.formation))?imported.formation:"4-3-3";
+   const desired=FORMATION_POSITIONS[formation];
+   const used=new Set<string>();
+   const ordered:(string|null)[]=desired.map(position=>{
+    const scoutPos=position==="FWD"?"FW":position==="MID"?"MF":position;
+    const source=(imported.starters??[]).find(s=>(s.position??"")===scoutPos&&!used.has(normalizeScoutText(s.name??"")));
+    if(!source)return null;
+    const player=players.find(p=>!used.has(p.id)&&p.position===position&&normalizeScoutText(p.name)===normalizeScoutText(source.name??"")&&(clubAlias(p.club)===clubAlias(source.club??"")||!source.club));
+    if(!player)return null;
+    used.add(player.id);
+    return player.id;
+   });
+   hydrateTeam(players,formation,ordered,[null,null,null,null]);
+   const starterIds=ordered.filter((id):id is string=>Boolean(id));
+   const findByName=(name:string|null|undefined)=>name?players.find(p=>starterIds.includes(p.id)&&normalizeScoutText(p.name)===normalizeScoutText(name))?.id??null:null;
+   setCaptain(findByName(imported.captain));
+   setViceCaptain(findByName(imported.viceCaptain));
+   localStorage.removeItem(SCOUT_IMPORT_KEY);
+   const missing=ordered.filter(id=>!id).length;
+   setToast(missing?`Scout ilk 11 aktarıldı · ${missing} oyuncu ana fantezi havuzunda eşleşmedi.`:"Scout ilk 11 kadrona başarıyla uygulandı.");
+  }else{
+   const raw=localStorage.getItem(STORAGE_KEY);
+   if(raw){const s=JSON.parse(raw)as{formation?:Formation;startingIds?:(string|null)[];benchIds?:(string|null)[];captain?:string|null;viceCaptain?:string|null;coachId?:string|null};hydrateTeam(players,s.formation??"4-3-3",s.startingIds??initialLineup,s.benchIds??initialBench);setCaptain(s.captain??"gs-victor-osimhen");setViceCaptain(s.viceCaptain??null);if(s.coachId===null)setSelectedCoachId(null);else if(s.coachId&&SUPER_LIG_COACHES_2026_27.some(c=>c.id===s.coachId))setSelectedCoachId(s.coachId)}else hydrateTeam(players,"4-3-3",initialLineup,initialBench)
+  }
+ }catch{hydrateTeam(players,"4-3-3",initialLineup,initialBench);setToast("Kayıt okunamadı; başlangıç kadrosu yüklendi.")}finally{setHydrated(true)}},[hydrateTeam]);
  useEffect(()=>{if(!hydrated)return;const starters=new Set(startingSlots.map(s=>s.playerId).filter((id):id is string=>Boolean(id)));if(captain&&!starters.has(captain))setCaptain(null);if(viceCaptain&&(!starters.has(viceCaptain)||viceCaptain===captain))setViceCaptain(null)},[captain,hydrated,startingSlots,viceCaptain]);
  const selectedCoach=SUPER_LIG_COACHES_2026_27.find(c=>c.id===selectedCoachId)??null;const selectedIds=[...startingSlots,...benchSlots].map(s=>s.playerId).filter((id):id is string=>Boolean(id));const selectedPlayers=selectedIds.map(id=>playerMap[id]).filter(Boolean);const spent=selectedPlayers.reduce((t,p)=>t+p.price,0);const remaining=Math.round((BUDGET-spent)*100)/100;const invalidStartingSlots=startingSlots.filter(s=>s.playerId&&playerMap[s.playerId]?.position!==s.position);const hasInvalidPositions=invalidStartingSlots.length>0;const startersComplete=startingSlots.filter(s=>s.playerId).length===11;const squadComplete=selectedIds.length===15;const clubViolations=[...new Set(selectedPlayers.filter(p=>selectedPlayers.filter(x=>x.club===p.club).length>3).map(p=>p.club))];const validationErrors=[!startersComplete?`İlk 11 eksik: ${startingSlots.filter(s=>s.playerId).length}/11 futbolcu.`:"",hasInvalidPositions?`${invalidStartingSlots.length} oyuncu yanlış mevkide.`:"",remaining<0?`Bütçe ${formatFantasyPrice(Math.abs(remaining))}M aşıldı.`:"",...clubViolations.map(c=>`${c}: 3 oyuncu sınırı aşıldı.`),!captain?"Kaptan seçilmedi.":""].filter(Boolean);const squadValid=validationErrors.length===0;
  const pitchSlots:PitchSlot[]=useMemo(()=>startingSlots.map((s,index)=>({id:s.id,index,position:s.position,player:s.playerId?toFantasyPlayer(playerMap[s.playerId]):null,invalidPosition:Boolean(s.playerId&&playerMap[s.playerId]?.position!==s.position)})),[playerMap,startingSlots]);const pitchBenchSlots:BenchPitchSlot[]=useMemo(()=>benchSlots.map(s=>({id:s.id,position:s.position,player:s.playerId?toFantasyPlayer(playerMap[s.playerId]):null})),[benchSlots,playerMap]);
