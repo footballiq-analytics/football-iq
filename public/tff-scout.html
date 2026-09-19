@@ -129,6 +129,9 @@ const JINA_URLS=['https://r.jina.ai/'+FBREF,'https://r.jina.ai/'+FBREF_ALT];
 const FANTASY_TOTAL=593;
 const FOTMOB_LEAGUE='https://www.fotmob.com/api/leagues?id=71&ccode3=TUR&season=2026%2F2027';
 const FOTMOB_TEAM=id=>'https://www.fotmob.com/api/teams?id='+id+'&tab=squad&type=team';
+const WD_API='https://www.wikidata.org/w/api.php';
+const WD_SPARQL='https://query.wikidata.org/sparql';
+const PHOTO_CACHE_KEY='fiq_player_photos_v1';
 const viaProxy=url=>'https://api.allorigins.win/raw?url='+encodeURIComponent(url);
 const WIKI_SQUADS={
  'Alanyaspor':'https://en.wikipedia.org/wiki/Alanyaspor',
@@ -150,7 +153,7 @@ const WIKI_SQUADS={
  'Samsunspor':'https://en.wikipedia.org/wiki/Samsunspor',
  'Trabzonspor':'https://en.wikipedia.org/wiki/Trabzonspor'
 };
-const LS_DATA='fiq_tff_scout_data_v11',LS_TIME='fiq_tff_scout_time_v11';
+const LS_DATA='fiq_tff_scout_data_v12',LS_TIME='fiq_tff_scout_time_v12';
 let players=[],squad=[],starters=[],bench=[],captain=null,viceCaptain=null;
 const SQUAD_QUOTAS={GK:2,DF:5,MF:5,FW:3};
 const FORMATIONS={433:{GK:1,DF:4,MF:3,FW:3},442:{GK:1,DF:4,MF:4,FW:2},343:{GK:1,DF:3,MF:4,FW:3},352:{GK:1,DF:3,MF:5,FW:2},532:{GK:1,DF:5,MF:3,FW:2}};
@@ -199,7 +202,7 @@ function strategyScore(p,modeOverride){
  }
  return p.xp+(p.eff*1.35)-(p.injuryRisk*2);
 }
-function norm(raw,i=0){return calc({id:raw.id||('p'+i+'-'+String(raw.player||raw.Player||'').replace(/\W/g,'')),player:raw.player||raw.Player||'Bilinmeyen',rosterOnly:!!raw.rosterOnly,team:teamCanon(raw.team||raw.Team||raw.Squad||''),opponent:raw.opponent||'—',home:raw.home??null,pos:posNorm(raw.pos||raw.Pos),mp:num(raw.mp??raw.MP),min:num(raw.min??raw.Min),starts:num(raw.starts),startRate:num(raw.startRate),minutesPerMatch:num(raw.minutesPerMatch),gls:num(raw.gls??raw.Gls),ast:num(raw.ast??raw.Ast),xg:num(raw.xg??raw.xG),xa:num(raw.xa??raw.xA??raw.xAG),xg90:num(raw.xg90??raw['xG90']??raw['xG/90']),xa90:num(raw.xa90??raw['xA90']??raw['xA/90']??raw['xAG90']??raw['xAG/90']),price:num(raw.price??raw.Price)||6,priceVerified:!!raw.priceVerified,priceSource:raw.priceSource||'Varsayılan/manuel',ownership:raw.ownership==null?null:num(raw.ownership),ownershipVerified:!!raw.ownershipVerified,ownershipSource:raw.ownershipSource||'Bilinmiyor',penalty:/^(1|true|yes|evet)$/i.test(raw.penalty??raw.Penalty??''),corner:/^(1|true|yes|evet)$/i.test(raw.corner??raw.Corner??''),form4:/^(1|true|yes|evet)$/i.test(raw.form4??raw.Form4Plus??''),injuryRisk:num(raw.injuryRisk),unavailable:!!raw.unavailable,doubtful:!!raw.doubtful,suspended:!!raw.suspended,injuryNote:raw.injuryNote||'',startProb:raw.startProb})}
+function norm(raw,i=0){return calc({id:raw.id||('p'+i+'-'+String(raw.player||raw.Player||'').replace(/\W/g,'')),player:raw.player||raw.Player||'Bilinmeyen',photo:raw.photo||'',rosterOnly:!!raw.rosterOnly,team:teamCanon(raw.team||raw.Team||raw.Squad||''),opponent:raw.opponent||'—',home:raw.home??null,pos:posNorm(raw.pos||raw.Pos),mp:num(raw.mp??raw.MP),min:num(raw.min??raw.Min),starts:num(raw.starts),startRate:num(raw.startRate),minutesPerMatch:num(raw.minutesPerMatch),gls:num(raw.gls??raw.Gls),ast:num(raw.ast??raw.Ast),xg:num(raw.xg??raw.xG),xa:num(raw.xa??raw.xA??raw.xAG),xg90:num(raw.xg90??raw['xG90']??raw['xG/90']),xa90:num(raw.xa90??raw['xA90']??raw['xA/90']??raw['xAG90']??raw['xAG/90']),price:num(raw.price??raw.Price)||6,priceVerified:!!raw.priceVerified,priceSource:raw.priceSource||'Varsayılan/manuel',ownership:raw.ownership==null?null:num(raw.ownership),ownershipVerified:!!raw.ownershipVerified,ownershipSource:raw.ownershipSource||'Bilinmiyor',penalty:/^(1|true|yes|evet)$/i.test(raw.penalty??raw.Penalty??''),corner:/^(1|true|yes|evet)$/i.test(raw.corner??raw.Corner??''),form4:/^(1|true|yes|evet)$/i.test(raw.form4??raw.Form4Plus??''),injuryRisk:num(raw.injuryRisk),unavailable:!!raw.unavailable,doubtful:!!raw.doubtful,suspended:!!raw.suspended,injuryNote:raw.injuryNote||'',startProb:raw.startProb})}
 function save(){localStorage.setItem(LS_DATA,JSON.stringify(players));localStorage.setItem(LS_TIME,String(Date.now()));el('lastUpdate').textContent=new Date().toLocaleString('tr-TR')}
 function setStatus(msg,type='ok'){el('statusText').textContent=msg;el('statusDot').className='w-2.5 h-2.5 rounded-full '+(type==='err'?'bg-red-400':type==='load'?'bg-iq animate-pulse':'bg-emerald-400')}
 function setLoading(v){el('loading').classList.toggle('hidden',!v);el('fetchBtn').disabled=v;if(v)setStatus('Canlı veri çekiliyor ve stats_standard tablosu ayrıştırılıyor…','load')}
@@ -325,6 +328,72 @@ function mergeStatsIntoRoster(roster,stats){
  }
  return out;
 }
+async function wikidataSearchItem(name,footballOnly=false){
+ const u=WD_API+'?action=wbsearchentities&search='+encodeURIComponent(name)+'&language=en&uselang=en&type=item&limit=8&format=json&origin=*';
+ const r=await fetch(u,{cache:'force-cache'});if(!r.ok)return null;
+ const data=await r.json(),items=data.search||[];
+ return items.find(x=>!footballOnly||/football|soccer/i.test(x.description||''))||items[0]||null;
+}
+function wdPos(label){
+ const s=String(label||'').toLowerCase();
+ if(/goalkeeper|kaleci/.test(s))return'GK';
+ if(/defender|back|stoper|bek/.test(s))return'DF';
+ if(/midfield|orta saha|winger|kanat/.test(s))return'MF';
+ if(/forward|striker|centre-forward|santrfor|forvet/.test(s))return'FW';
+ return'';
+}
+async function loadWikidataRosterPool(){
+ const teamNames=Object.keys(WIKI_SQUADS),resolved=[];
+ for(const name of teamNames){
+   try{const x=await wikidataSearchItem(name,true);if(x?.id)resolved.push([name,x.id])}catch{}
+ }
+ if(resolved.length<14)throw new Error('Wikidata takım eşleşmesi eksik: '+resolved.length);
+ const values=resolved.map(([,q])=>'wd:'+q).join(' ');
+ const query=`SELECT ?player ?playerLabel ?club ?clubLabel ?image ?positionLabel WHERE {
+   VALUES ?club { ${values} }
+   ?player wdt:P31 wd:Q5;
+           p:P54 ?clubStatement.
+   ?clubStatement ps:P54 ?club.
+   FILTER NOT EXISTS { ?clubStatement pq:P582 ?endDate. }
+   OPTIONAL { ?player wdt:P18 ?image. }
+   OPTIONAL { ?player wdt:P413 ?position. }
+   SERVICE wikibase:label { bd:serviceParam wikibase:language "tr,en". }
+ }`;
+ const url=WD_SPARQL+'?format=json&query='+encodeURIComponent(query);
+ const r=await fetch(url,{headers:{Accept:'application/sparql-results+json'},cache:'no-store'});
+ if(!r.ok)throw new Error('Wikidata roster HTTP '+r.status);
+ const data=await r.json(),rows=data?.results?.bindings||[],out=[],seen=new Set();
+ const qToName=new Map(resolved.map(([n,q])=>[q,n]));
+ for(const row of rows){
+   const q=(row.club?.value||'').split('/').pop(),team=teamCanon(qToName.get(q)||row.clubLabel?.value||'');
+   const name=row.playerLabel?.value||'',p=wdPos(row.positionLabel?.value);
+   if(!name||!team||!p)continue;
+   const k=(name+'|'+team).toLocaleLowerCase('tr');if(seen.has(k))continue;seen.add(k);
+   out.push(norm({id:'wd-'+(row.player?.value||'').split('/').pop(),Player:name,Team:team,Pos:p,MP:0,Min:0,xG90:0,xA90:0,price:6,startProb:.25,rosterOnly:true,photo:row.image?.value||''}));
+ }
+ if(out.length<250)throw new Error('Wikidata roster eksik: '+out.length);
+ return out;
+}
+function readPhotoCache(){try{return JSON.parse(localStorage.getItem(PHOTO_CACHE_KEY)||'{}')}catch{return{}}}
+function writePhotoCache(x){try{localStorage.setItem(PHOTO_CACHE_KEY,JSON.stringify(x))}catch{}}
+async function resolvePlayerPhoto(p){
+ if(p.photo)return p.photo;
+ const cache=readPhotoCache();if(cache[p.player]){p.photo=cache[p.player];return p.photo}
+ try{
+   const x=await wikidataSearchItem(p.player,true);if(!x?.id)return'';
+   const u=WD_API+'?action=wbgetentities&ids='+x.id+'&props=claims&format=json&origin=*';
+   const r=await fetch(u,{cache:'force-cache'});if(!r.ok)return'';
+   const d=await r.json(),file=d.entities?.[x.id]?.claims?.P18?.[0]?.mainsnak?.datavalue?.value;
+   if(!file)return'';
+   const photo='https://commons.wikimedia.org/wiki/Special:Redirect/file/'+encodeURIComponent(file)+'?width=160';
+   cache[p.player]=photo;writePhotoCache(cache);p.photo=photo;return photo;
+ }catch{return''}
+}
+async function hydrateSquadPhotos(){
+ const list=[...new Map([...starters,...bench].map(p=>[p.id,p])).values()];
+ await Promise.all(list.map(resolvePlayerPhoto));
+ renderPitch();renderBench();
+}
 function parseWikiSquad(text,team){
  const lines=text.split(/\r?\n/),out=[],seen=new Set();
  let inSquad=false;
@@ -385,9 +454,12 @@ async function fetchData(force=false){
  try{
    const expanded=await loadFullPublicPool();
    let rosterOnly=[];
-   try{rosterOnly=await loadFotMobRosterPool()}catch(fotmobErr){
-     console.warn('FotMob roster fallback failed',fotmobErr);
-     rosterOnly=await loadRosterOnlyCatalog();
+   try{rosterOnly=await loadWikidataRosterPool()}catch(wdErr){
+     console.warn('Wikidata roster fallback failed',wdErr);
+     try{rosterOnly=await loadFotMobRosterPool()}catch(fotmobErr){
+       console.warn('FotMob roster fallback failed',fotmobErr);
+       rosterOnly=await loadRosterOnlyCatalog();
+     }
    }
    const combined=rosterOnly.length>=350?mergeStatsIntoRoster(rosterOnly,expanded):mergePools(expanded,rosterOnly);
    const manual=new Map((localData?.players||[]).map(x=>[(x.player+'|'+teamCanon(x.team)).toLocaleLowerCase('tr'),x]));
@@ -491,6 +563,7 @@ function buildSquad(){
  squad=built;chooseStartingXI();renderPitch();renderBench();updateRuleBadges();
  const label={safe:'Güvenli',balanced:'Dengeli',differential:'Diferansiyel'}[mode]||'Dengeli';
  setStatus(label+' TFF kadrosu kuruldu: 11 ilk + 4 yedek · '+totalCost(squad).toFixed(1)+'M / 100M');
+ hydrateSquadPhotos();
 }
 function squadMetrics(list,mode){
  const riskAvg=list.reduce((s,p)=>s+p.injuryRisk,0)/Math.max(1,list.length);
@@ -530,6 +603,7 @@ function applyComparedMode(mode){
  chooseStartingXI();renderPitch();renderBench();updateRuleBadges();
  el('comparePanel').classList.add('hidden');
  setStatus(({safe:'Güvenli',balanced:'Dengeli',differential:'Diferansiyel'}[mode])+' karşılaştırma kadrosu sahaya uygulandı.');
+ hydrateSquadPhotos();
 }
 function chooseStartingXI(){
  const q=quotas();starters=[];
@@ -577,7 +651,8 @@ function showWhy(p){
 }
 function cardHtml(p){
  const badge=p.id===captain?.id?'<span class="badge-c">C</span>':p.id===viceCaptain?.id?'<span class="badge-c2">C2</span>':'';
- return badge+'<b>'+esc(p.player)+'</b><small>'+esc(p.team)+' · '+p.pos+'</small><small>'+(p.home===true?'EV ':p.home===false?'D ':'')+esc(p.opponent)+' · baş '+Math.round(p.startProb*100)+'%</small><small>'+(p.suspended?'CEZALI':p.unavailable?'SAKAT':p.doubtful?'ŞÜPHELİ':'UYGUN')+'</small><strong>xP '+p.xp.toFixed(2)+' · '+p.price.toFixed(1)+'M</strong><button data-why="'+esc(p.id)+'" class="mt-1 text-[9px] underline text-sky-300">Neden?</button>';
+ const face=p.photo?'<img src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" style="width:42px;height:42px;border-radius:50%;object-fit:cover;margin:0 auto 4px;border:1px solid rgba(255,255,255,.18)">':'<div style="width:42px;height:42px;border-radius:50%;display:grid;place-items:center;margin:0 auto 4px;background:#13283b;border:1px solid rgba(255,255,255,.12);font-size:11px;font-weight:900">'+esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''))+'</div>';
+ return face+badge+'<b>'+esc(p.player)+'</b><small>'+esc(p.team)+' · '+p.pos+'</small><small>'+(p.home===true?'EV ':p.home===false?'D ':'')+esc(p.opponent)+' · baş '+Math.round(p.startProb*100)+'%</small><small>'+(p.suspended?'CEZALI':p.unavailable?'SAKAT':p.doubtful?'ŞÜPHELİ':'UYGUN')+'</small><strong>xP '+p.xp.toFixed(2)+' · '+p.price.toFixed(1)+'M</strong><button data-why="'+esc(p.id)+'" class="mt-1 text-[9px] underline text-sky-300">Neden?</button>';
 }
 function renderPitch(){
  const pitch=el('pitch');[...pitch.querySelectorAll('.player-card')].forEach(n=>n.remove());el('emptyPitch').classList.add('hidden');
