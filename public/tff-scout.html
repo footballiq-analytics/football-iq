@@ -127,6 +127,9 @@ const PROXY='https://api.allorigins.win/raw?url='+encodeURIComponent(FBREF);
 const LOCAL_DATA='./data/tff-scout.json';
 const JINA_URLS=['https://r.jina.ai/'+FBREF,'https://r.jina.ai/'+FBREF_ALT];
 const FANTASY_TOTAL=593;
+const FOTMOB_LEAGUE='https://www.fotmob.com/api/leagues?id=71&ccode3=TUR&season=2026%2F2027';
+const FOTMOB_TEAM=id=>'https://www.fotmob.com/api/teams?id='+id+'&tab=squad&type=team';
+const viaProxy=url=>'https://api.allorigins.win/raw?url='+encodeURIComponent(url);
 const WIKI_SQUADS={
  'Alanyaspor':'https://en.wikipedia.org/wiki/Alanyaspor',
  'Amedspor':'https://en.wikipedia.org/wiki/Amed_S.K.',
@@ -147,7 +150,7 @@ const WIKI_SQUADS={
  'Samsunspor':'https://en.wikipedia.org/wiki/Samsunspor',
  'Trabzonspor':'https://en.wikipedia.org/wiki/Trabzonspor'
 };
-const LS_DATA='fiq_tff_scout_data_v9',LS_TIME='fiq_tff_scout_time_v9';
+const LS_DATA='fiq_tff_scout_data_v10',LS_TIME='fiq_tff_scout_time_v10';
 let players=[],squad=[],starters=[],bench=[],captain=null,viceCaptain=null;
 const SQUAD_QUOTAS={GK:2,DF:5,MF:5,FW:3};
 const FORMATIONS={433:{GK:1,DF:4,MF:3,FW:3},442:{GK:1,DF:4,MF:4,FW:2},343:{GK:1,DF:3,MF:4,FW:3},352:{GK:1,DF:3,MF:5,FW:2},532:{GK:1,DF:5,MF:3,FW:2}};
@@ -267,6 +270,58 @@ async function loadFullPublicPool(){
  }catch(e){lastErr=e}
  throw lastErr||new Error('Tam kamuya açık oyuncu havuzu alınamadı');
 }
+function fotmobPos(section,member){
+ const text=((section?.title||'')+' '+(member?.role?.key||'')).toLowerCase();
+ if(text.includes('keeper'))return'GK';
+ if(text.includes('defend'))return'DF';
+ if(text.includes('midfield'))return'MF';
+ if(text.includes('attack')||text.includes('forward'))return'FW';
+ return'';
+}
+async function fetchJsonProxy(url){
+ const direct=async()=>{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);return r.json()};
+ try{return await direct()}catch{}
+ const r=await fetch(viaProxy(url),{cache:'no-store'});if(!r.ok)throw new Error('Proxy HTTP '+r.status);return r.json();
+}
+async function loadFotMobRosterPool(){
+ const league=await fetchJsonProxy(FOTMOB_LEAGUE);
+ let teams=league?.table?.all||league?.table?.data?.table?.all||[];
+ if(!Array.isArray(teams)||teams.length<15)throw new Error('FotMob lig takımları alınamadı');
+ const out=[],seen=new Set();
+ const work=teams.map(t=>async()=>{
+   const team=teamCanon(t.name||t.shortName||''); if(!t.id||!team)return[];
+   const data=await fetchJsonProxy(FOTMOB_TEAM(t.id));
+   const sections=data?.squad?.squad||[],arr=[];
+   for(const sec of sections){
+     if(String(sec.title||'').toLowerCase()==='coach')continue;
+     for(const m of (sec.members||[])){
+       const pos=fotmobPos(sec,m),name=m.name||'';if(!name||!['GK','DF','MF','FW'].includes(pos))continue;
+       const key=(name+'|'+team).toLocaleLowerCase('tr');if(seen.has(key))continue;seen.add(key);
+       arr.push(norm({id:'fotmob-'+(m.id||key),Player:name,Team:team,Pos:pos,MP:0,Min:0,Gls:m.goals||0,Ast:m.assists||0,xG90:0,xA90:0,price:6,startProb:.25,rosterOnly:true}));
+     }
+   }
+   return arr;
+ });
+ for(let i=0;i<work.length;i+=4){
+   const chunk=await Promise.all(work.slice(i,i+4).map(fn=>fn().catch(()=>[])));
+   chunk.forEach(a=>out.push(...a));
+ }
+ if(out.length<350)throw new Error('FotMob tam kadro eksik: '+out.length);
+ return out;
+}
+function mergeStatsIntoRoster(roster,stats){
+ const statMap=new Map(stats.map(p=>[(p.player+'|'+teamCanon(p.team)).toLocaleLowerCase('tr'),p]));
+ const out=[],seen=new Set();
+ for(const r of roster){
+   const k=(r.player+'|'+teamCanon(r.team)).toLocaleLowerCase('tr'),s=statMap.get(k);
+   out.push(norm(s?{...r,...s,rosterOnly:false}:r));seen.add(k);
+ }
+ for(const s of stats){
+   const k=(s.player+'|'+teamCanon(s.team)).toLocaleLowerCase('tr');
+   if(!seen.has(k))out.push(norm(s));
+ }
+ return out;
+}
 function parseWikiSquad(text,team){
  const lines=text.split(/\r?\n/),out=[],seen=new Set();
  let inSquad=false;
@@ -326,16 +381,20 @@ async function fetchData(force=false){
  }catch{}
  try{
    const expanded=await loadFullPublicPool();
-   const rosterOnly=await loadRosterOnlyCatalog();
-   const combined=mergePools(expanded,rosterOnly);
-   const manual=new Map((localData?.players||[]).map(x=>[(x.player+'|'+x.team).toLocaleLowerCase('tr'),x]));
+   let rosterOnly=[];
+   try{rosterOnly=await loadFotMobRosterPool()}catch(fotmobErr){
+     console.warn('FotMob roster fallback failed',fotmobErr);
+     rosterOnly=await loadRosterOnlyCatalog();
+   }
+   const combined=rosterOnly.length>=350?mergeStatsIntoRoster(rosterOnly,expanded):mergePools(expanded,rosterOnly);
+   const manual=new Map((localData?.players||[]).map(x=>[(x.player+'|'+teamCanon(x.team)).toLocaleLowerCase('tr'),x]));
    players=combined.map(p=>{
-     const m=manual.get((p.player+'|'+p.team).toLocaleLowerCase('tr'));
+     const m=manual.get((p.player+'|'+teamCanon(p.team)).toLocaleLowerCase('tr'));
      return norm(m?{...p,price:m.price,priceVerified:m.priceVerified,priceSource:m.priceSource,ownership:m.ownership,ownershipVerified:m.ownershipVerified,ownershipSource:m.ownershipSource,penalty:m.penalty||p.penalty,corner:m.corner,opponent:m.opponent,home:m.home,unavailable:m.unavailable,doubtful:m.doubtful,suspended:m.suspended,injuryRisk:m.injuryRisk,startProb:m.startProb}:p)
    });
    save();renderAll();
    const rosterCount=players.filter(p=>p.rosterOnly).length;
-   setStatus('Geniş havuz yüklendi: '+players.length+' oyuncu ('+rosterCount+' roster-only). Fantasy referansı 593.');
+   setStatus('Tam kadro havuzu yüklendi: '+players.length+' oyuncu ('+rosterCount+' henüz istatistiksiz). Fantasy referansı 593.');
    return;
  }catch(fullErr){
    if(localData?.players?.length>=15){
