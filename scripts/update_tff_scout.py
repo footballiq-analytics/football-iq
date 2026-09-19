@@ -14,6 +14,12 @@ STANDARD_URLS = [
 ]
 PLAYING_URL = "https://fbref.com/en/comps/26/playingtime/Super-Lig-Stats"
 INJURY_URL = "https://lineupstoday.com/super-lig/injuries/"
+FANTASY_HOME = "https://www.fantasysuperlig.com/"
+FANTASY_BLOGS = [
+ "https://www.fantasysuperlig.com/blog/gw5-en-iyi-fantasy-oyunculari-form-raporu",
+ "https://www.fantasysuperlig.com/blog/gw6-kaptan-transfer-diferansiyel-analizi",
+ "https://www.fantasysuperlig.com/blog/gw3-kaptanlik-analizi-osimhen-greenwood",
+]
 TFF_URL = "https://www.tff.org/?pageID=198"
 TEAM_ALIASES = {
  "KASIMPAŞA A.Ş.":"Kasımpaşa","TÜMOSAN KONYASPOR":"Konyaspor","ARCA ÇORUM FK":"Çorum FK",
@@ -152,6 +158,45 @@ def parse_current_fixtures():
         print(f"Fixture feed skipped: {e}",file=sys.stderr)
     return out
 
+def parse_public_fantasy_market():
+    market={}
+    texts=[]
+    for url in [FANTASY_HOME,*FANTASY_BLOGS]:
+        try:
+            texts.append(fetch(url,3000))
+        except Exception as e:
+            print(f"Fantasy public feed skipped {url}: {e}",file=sys.stderr)
+    soup_text="\n".join(BeautifulSoup(x,"lxml").get_text(" ",strip=True) for x in texts)
+    # Use actual league player names later; this helper scans a local text window around each name.
+    return soup_text
+
+def enrich_market(player, public_text, prev):
+    out={
+      "price":prev.get("price",6.0),
+      "priceVerified":prev.get("priceVerified",False),
+      "priceSource":prev.get("priceSource","Varsayılan/manuel"),
+      "ownership":prev.get("ownership"),
+      "ownershipVerified":prev.get("ownershipVerified",False),
+      "ownershipSource":prev.get("ownershipSource","Bilinmiyor")
+    }
+    # Search surname + first initial/full name in a bounded public-text window.
+    tokens=[t for t in re.split(r"\s+",player) if len(t)>2]
+    needle=tokens[-1] if tokens else player
+    m=re.search(rf"(.{{0,220}}\b{re.escape(needle)}\b.{{0,260}})",public_text,re.I)
+    if not m: return out
+    window=m.group(1)
+    pm=re.search(r"(?:Fiyat|fiyatı|Fiyat₺)\s*₺?\s*([0-9]+(?:[\.,][0-9]+)?)\s*m?",window,re.I)
+    if pm:
+        out["price"]=float(pm.group(1).replace(",","."))
+        out["priceVerified"]=True
+        out["priceSource"]="Fantasy Süper Lig public"
+    om=re.search(r"(?:sahipliği|sahiplik(?:i)?|ownership)\s*(?:yaklaşık\s*)?(?:yüzde\s*)?%?\s*([0-9]+(?:[\.,][0-9]+)?)",window,re.I)
+    if om:
+        out["ownership"]=float(om.group(1).replace(",","."))
+        out["ownershipVerified"]=True
+        out["ownershipSource"]="Fantasy Süper Lig public"
+    return out
+
 def injury_status(player, team, injury_sections):
     pkey=norm_key(player)
     tkey=norm_key(team)
@@ -179,6 +224,7 @@ play_html=fetch(PLAYING_URL,30000)
 ptime=parse_playing_time(play_html)
 injuries=parse_injuries()
 fixtures=parse_current_fixtures()
+public_market=parse_public_fantasy_market()
 table=player_table(std_html,"stats_standard")
 players=[]
 
@@ -207,9 +253,13 @@ for i,row in enumerate(table.select("tbody tr")):
         "pk":n(txt(row,"pens_made")),"pkAtt":n(txt(row,"pens_att")),
     }
     prev=previous_for(p,old_id,old_nt)
-    p["price"]=prev.get("price",6.0)
-    p["priceVerified"]=prev.get("priceVerified",False)
-    p["priceSource"]=prev.get("priceSource","Varsayılan/manuel")
+    market=enrich_market(player,public_market,prev)
+    p["price"]=market["price"]
+    p["priceVerified"]=market["priceVerified"]
+    p["priceSource"]=market["priceSource"]
+    p["ownership"]=market["ownership"]
+    p["ownershipVerified"]=market["ownershipVerified"]
+    p["ownershipSource"]=market["ownershipSource"]
     p["penalty"]=bool(prev.get("penalty",False) or p["pkAtt"]>0)
     p["corner"]=bool(prev.get("corner",False))
     p["form4"]=bool(p["startRate"]>=0.8 and p["mp"]>=4)
@@ -247,7 +297,7 @@ out={
         "stats":"daily",
         "playingTime":"daily",
         "availability":"daily",
-        "manualFieldsPreserved":["price","priceVerified","priceSource","corner"]
+        "manualFieldsPreserved":["price","priceVerified","priceSource","ownership","ownershipVerified","ownershipSource","corner"]
     },
     "players":players,
 }
