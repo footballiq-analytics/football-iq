@@ -17,7 +17,7 @@ import PlayerCard,{type FantasyPlayer,type PlayerPosition}from"@/components/fant
 import{SUPER_LIG_CLUBS_2026_27}from"@/data/superlig-2026";
 import{SUPER_LIG_COACHES_2026_27,type FantasyCoach}from"@/data/superlig-coaches-2026";
 import{FANTASY_PLAYER_POOL,INITIAL_BENCH_IDS,INITIAL_LINEUP_IDS,SQUAD_STORAGE_KEY}from"@/data/fantasy-player-pool";
-import{useTeamStore,FORMATIONS,type Formation,type Player as StorePlayer}from"@/store/useTeamStore";
+import{useTeamStore,FORMATIONS,FORMATION_POSITIONS,type Formation,type Player as StorePlayer}from"@/store/useTeamStore";
 
 const BUDGET=100;const STORAGE_KEY=SQUAD_STORAGE_KEY;const DEFAULT_COACH_ID="coach-galatasaray";const SCOUT_IMPORT_KEY="futbol-iq-scout-xi-import-v1";
 const normalizeScoutText=(value:string)=>value.toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9ğüşöçıİ]+/gi," ").replace(/\s+/g," ").trim();
