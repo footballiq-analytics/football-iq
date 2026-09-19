@@ -372,7 +372,7 @@ function repairBudget(selected){
  while(totalCost(selected)>BUDGET&&guard++<100){
    const counts=clubCounts(selected);let best=null;
    selected.forEach((cur,idx)=>{
-     const alts=players.filter(p=>p.pos===cur.pos&&!selected.some(s=>s.id===p.id)&&p.price<cur.price&&((counts[p.team]||0)+(p.team===cur.team?0:1)<=CLUB_LIMIT))
+     const alts=players.filter(p=>p.pos===cur.pos&&!p.unavailable&&!p.suspended&&!selected.some(s=>s.id===p.id)&&p.price<cur.price&&((counts[p.team]||0)+(p.team===cur.team?0:1)<=CLUB_LIMIT))
        .sort((a,b)=>b.eff-a.eff||b.xp-a.xp);
      for(const alt of alts){
        const save=cur.price-alt.price;if(save<=0)continue;
@@ -430,7 +430,6 @@ function buildSquad(){
  setStatus(label+' TFF kadrosu kuruldu: 11 ilk + 4 yedek · '+totalCost(squad).toFixed(1)+'M / 100M');
 }
 function squadMetrics(list,mode){
- const startAvg=list.reduce((s,p)=>s+p.startProb,0)/Math.max(1,list.length);
  const riskAvg=list.reduce((s,p)=>s+p.injuryRisk,0)/Math.max(1,list.length);
  const xp=list.reduce((s,p)=>s+p.xp,0);
  const verifiedOwn=list.filter(p=>p.ownershipVerified&&p.ownership!=null);
@@ -438,6 +437,7 @@ function squadMetrics(list,mode){
  const score=list.reduce((s,p)=>s+strategyScore(p,mode),0);
  const q=quotas(),xi=[];
  for(const [pos,count] of Object.entries(q))xi.push(...list.filter(p=>p.pos===pos).sort((a,b)=>b.xp-a.xp).slice(0,count));
+ const startAvg=xi.reduce((s,p)=>s+p.startProb,0)/Math.max(1,xi.length);
  const cap=[...xi].sort((a,b)=>strategyScore(b,mode)-strategyScore(a,mode))[0]||null;
  return {cost:totalCost(list),xp,startAvg,riskAvg,lowOwn,verifiedOwn:verifiedOwn.length,score,cap};
 }
