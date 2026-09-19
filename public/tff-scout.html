@@ -293,7 +293,7 @@ function buildCandidate(lambda,order){
  const selected=[],counts={};
  for(const pos of order){
    const need=SQUAD_QUOTAS[pos];
-   const pool=players.filter(p=>p.pos===pos).sort((a,b)=>{
+   const pool=players.filter(p=>p.pos===pos&&!p.unavailable&&!p.suspended).sort((a,b)=>{
      const gkA=pos==='GK'&&['Galatasaray','Fenerbahçe','Beşiktaş'].includes(a.team)?0.45:0;
      const gkB=pos==='GK'&&['Galatasaray','Fenerbahçe','Beşiktaş'].includes(b.team)?0.45:0;
      const ra=strategyScore(a)+lambda*a.eff*7+gkA,rb=strategyScore(b)+lambda*b.eff*7+gkB;
@@ -311,7 +311,7 @@ function buildCandidate(lambda,order){
 }
 function buildSquad(){
  if(!players.length){setStatus('Önce veri yüklemelisin.','err');return}
- const avail={GK:0,DF:0,MF:0,FW:0};players.forEach(p=>avail[p.pos]=(avail[p.pos]||0)+1);
+ const avail={GK:0,DF:0,MF:0,FW:0};players.filter(p=>!p.unavailable&&!p.suspended).forEach(p=>avail[p.pos]=(avail[p.pos]||0)+1);
  for(const k of Object.keys(SQUAD_QUOTAS)){if(avail[k]<SQUAD_QUOTAS[k]){setStatus('TFF kadrosu için '+k+' mevkiinde yeterli oyuncu yok.','err');return}}
  const perms=a=>a.length<2?[a]:a.flatMap((x,i)=>perms(a.filter((_,j)=>j!==i)).map(rest=>[x,...rest]));
  const orders=perms(Object.keys(SQUAD_QUOTAS));
