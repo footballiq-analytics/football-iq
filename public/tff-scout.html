@@ -150,7 +150,7 @@ const WIKI_SQUADS={
  'Samsunspor':'https://en.wikipedia.org/wiki/Samsunspor',
  'Trabzonspor':'https://en.wikipedia.org/wiki/Trabzonspor'
 };
-const LS_DATA='fiq_tff_scout_data_v10',LS_TIME='fiq_tff_scout_time_v10';
+const LS_DATA='fiq_tff_scout_data_v11',LS_TIME='fiq_tff_scout_time_v11';
 let players=[],squad=[],starters=[],bench=[],captain=null,viceCaptain=null;
 const SQUAD_QUOTAS={GK:2,DF:5,MF:5,FW:3};
 const FORMATIONS={433:{GK:1,DF:4,MF:3,FW:3},442:{GK:1,DF:4,MF:4,FW:2},343:{GK:1,DF:3,MF:4,FW:3},352:{GK:1,DF:3,MF:5,FW:2},532:{GK:1,DF:5,MF:3,FW:2}};
@@ -159,8 +159,10 @@ const el=id=>document.getElementById(id);
 const num=v=>{const n=parseFloat(String(v??'').replace(',','.').replace(/[^0-9.+-]/g,''));return Number.isFinite(n)?n:0};
 const posNorm=p=>{p=String(p||'').toUpperCase();if(p.includes('GK'))return'GK';if(p.includes('DF')||p.includes('FB')||p.includes('CB'))return'DF';if(p.includes('MF')||p.includes('DM')||p.includes('AM')||p.includes('CM'))return'MF';if(p.includes('FW')||p.includes('ST')||p.includes('LW')||p.includes('RW'))return'FW';return p.slice(0,2)};
 const TEAM_CANON={
- 'Amedspor':'Amed SK','Amed':'Amed SK','Başakşehir':'İstanbul Başakşehir','Istanbul Basaksehir':'İstanbul Başakşehir',
- 'Rizespor':'Çaykur Rizespor','Erzurum BB':'Erzurumspor','Yeni Çorumspor':'Çorum FK','Çorumspor':'Çorum FK',
+ 'Amedspor':'Amed SK','Amed':'Amed SK','Amed Sportif':'Amed SK','Amed Sportif Faaliyetler':'Amed SK',
+ 'Başakşehir':'İstanbul Başakşehir','Istanbul Basaksehir':'İstanbul Başakşehir','İstanbul Başakşehir':'İstanbul Başakşehir',
+ 'Rizespor':'Çaykur Rizespor','Çaykur Rizespor':'Çaykur Rizespor',
+ 'Erzurum BB':'Erzurumspor','Erzurumspor FK':'Erzurumspor','Yeni Çorumspor':'Çorum FK','Çorumspor':'Çorum FK','Çorum':'Çorum FK',
  'Gaziantep FK':'Gaziantep','Gaziantep F.K.':'Gaziantep','Kasımpaşa SK':'Kasımpaşa','Kocaelispor':'Kocaelispor'
 };
 const teamCanon=t=>TEAM_CANON[String(t||'').trim()]||String(t||'').trim();
@@ -306,7 +308,8 @@ async function loadFotMobRosterPool(){
    const chunk=await Promise.all(work.slice(i,i+4).map(fn=>fn().catch(()=>[])));
    chunk.forEach(a=>out.push(...a));
  }
- if(out.length<350)throw new Error('FotMob tam kadro eksik: '+out.length);
+ const teamCount=new Set(out.map(p=>teamCanon(p.team))).size;
+ if(teamCount<18||out.length<350)throw new Error('FotMob tam kadro eksik: '+out.length+' oyuncu / '+teamCount+' takım');
  return out;
 }
 function mergeStatsIntoRoster(roster,stats){
@@ -394,7 +397,8 @@ async function fetchData(force=false){
    });
    save();renderAll();
    const rosterCount=players.filter(p=>p.rosterOnly).length;
-   setStatus('Tam kadro havuzu yüklendi: '+players.length+' oyuncu ('+rosterCount+' henüz istatistiksiz). Fantasy referansı 593.');
+   const teamCount=new Set(players.map(p=>teamCanon(p.team)).filter(Boolean)).size;
+   setStatus('Tam kadro havuzu yüklendi: '+players.length+' oyuncu · '+teamCount+'/18 takım · '+rosterCount+' henüz istatistiksiz.');
    return;
  }catch(fullErr){
    if(localData?.players?.length>=15){
@@ -408,7 +412,7 @@ async function fetchData(force=false){
    setStatus('Oyuncu havuzu alınamadı. Manuel CSV fallback açıldı.','err');
  }finally{setLoading(false)}
 }
-function renderAll(){players=players.map(norm);el('playerCount').textContent=players.length;el('coverageText').textContent=players.length+' / '+FANTASY_TOTAL+' ('+Math.round(players.length/FANTASY_TOTAL*100)+'%)';refreshTeams();renderTable();if(squad.length)buildSquad()}
+function renderAll(){players=players.map(norm);el('playerCount').textContent=players.length;const tc=new Set(players.map(p=>teamCanon(p.team)).filter(Boolean)).size;el('coverageText').textContent=players.length+' / '+FANTASY_TOTAL+' ('+Math.round(players.length/FANTASY_TOTAL*100)+'%) · '+tc+'/18 takım';refreshTeams();renderTable();if(squad.length)buildSquad()}
 function refreshTeams(){const cur=el('teamFilter').value;const teams=[...new Set(players.map(p=>p.team).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));el('teamFilter').innerHTML='<option value="">Tüm takımlar</option>'+teams.map(t=>'<option>'+esc(t)+'</option>').join('');el('teamFilter').value=teams.includes(cur)?cur:''}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function renderTable(){
