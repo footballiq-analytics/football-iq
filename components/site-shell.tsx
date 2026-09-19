@@ -14,9 +14,9 @@ import { shareOrCopy } from "@/lib/share";
 
 const navigation=[["Ana Sayfa","/"],["Kadrom","/team"]] as const;
 
-export function ScoutVisualButton({compact=false}:{compact?:boolean}){
+export function ScoutVisualButton(){
  const base=process.env.NEXT_PUBLIC_BASE_PATH??"";
- return <a href={`${base}/tff-scout.html`} className={compact?"fiq-scout-visual fiq-scout-visual-compact":"fiq-scout-visual"} aria-label="FUTBOL IQ analiz sayfasını aç">
+ return <a href={`${base}/tff-scout.html`} className="fiq-scout-visual" aria-label="FUTBOL IQ analiz sayfasını aç">
   <img className="fiq-scout-banner-image" src={`${base}/game-ui/futbol-iq-brain-ball.webp`} alt="FUTBOL IQ analiz sayfası"/>
  </a>
 }
