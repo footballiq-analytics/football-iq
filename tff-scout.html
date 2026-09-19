@@ -41,6 +41,16 @@ button{cursor:pointer}
 .quick-strip::-webkit-scrollbar{display:none}
 .quick-action{flex:0 0 156px;min-height:58px;border:1px solid var(--line);background:#111827;color:var(--text);border-radius:11px;padding:9px 10px;display:grid;grid-template-columns:27px 1fr;gap:8px;text-align:left;align-items:center;box-shadow:0 5px 18px #0002}
 .quick-action:hover{background:#172033;border-color:#41516a}
+.quick-action{position:relative;overflow:hidden}
+.quick-action:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--qa,#5AA8E8)}
+.quick-action .qa-icon{color:var(--qa,#5AA8E8);border:1px solid color-mix(in srgb,var(--qa,#5AA8E8) 42%,transparent);background:color-mix(in srgb,var(--qa,#5AA8E8) 12%,#101827)}
+.action-refresh{--qa:#38C98D}.action-best{--qa:#D7B86A}.action-compare{--qa:#5AA8E8}.action-transfer{--qa:#38C98D}.action-weekly{--qa:#E8C76E}.action-health{--qa:#E35D6A}.action-radar{--qa:#52D39C}
+.action-refresh:hover,.action-transfer:hover,.action-radar:hover{border-color:#38C98D88}.action-best:hover,.action-weekly:hover{border-color:#D7B86A88}.action-health:hover{border-color:#E35D6A88}.action-compare:hover{border-color:#5AA8E888}
+.back-home{justify-self:center;display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 13px;border:1px solid #34445c;border-radius:10px;background:#101a2a;color:#dce6ef;text-decoration:none;font-size:11px;font-weight:800}
+.back-home:hover{border-color:#D7B86A88;color:#f0d78b;background:#172033}
+.export-team-btn{min-height:34px;padding:0 10px;border-radius:8px;border:1px solid #38C98D77;background:#38C98D12;color:#8ce3bd;font-size:8px;font-weight:900;letter-spacing:.03em}
+.export-team-btn:hover{background:#38C98D22;border-color:#38C98D}
+
 .quick-action.primary{border-color:#d7b86a66;background:linear-gradient(145deg,#1b2027,#171a20)}
 .qa-icon{width:27px;height:27px;border-radius:8px;display:grid;place-items:center;background:#1b2838;font-size:14px}
 .quick-action b{display:block;font-size:11px;line-height:1.15}
@@ -147,7 +157,7 @@ tbody tr:hover{background:#ffffff05}
 @media(max-width:900px){
   .player-card{width:78px;height:108px}.player-card .fantasy-name{font-size:7.5px}.player-card .fantasy-team{font-size:5.8px}.player-card .fantasy-stat span{font-size:4.8px}.player-card .fantasy-stat b{font-size:6.2px}.player-card .fantasy-foot{font-size:5px}.bench-card .player-card{height:96px}
 
-  .app-shell{padding:0 9px 76px}.topbar{grid-template-columns:1fr auto;height:60px;padding:0 4px}.desktop-nav,.top-actions .icon-btn,.top-actions .profile-chip,.top-actions .pro-badge{display:none}.mobile-menu-btn{display:grid}
+  .app-shell{padding:0 9px 76px}.topbar{grid-template-columns:1fr auto;height:60px;padding:0 4px}.desktop-nav,.top-actions .icon-btn,.top-actions .profile-chip,.top-actions .pro-badge{display:none}.back-home{justify-self:end;font-size:9px;padding:0 9px;min-height:32px}.mobile-menu-btn{display:grid}
   .brand-mark{width:34px;height:34px}.brand-title{font-size:14px}.brand-sub{font-size:9px}
   .mobile-menu.open{display:grid;position:fixed;top:60px;left:9px;right:9px;z-index:70;background:#111827;border:1px solid #263449;border-radius:12px;padding:8px;gap:4px}.mobile-menu a{color:#d6e0ea;text-decoration:none;font-size:11px;padding:10px;border-radius:8px}.mobile-menu a:hover{background:#172033}
   .quick-strip{padding:8px 0}.quick-action{flex-basis:132px;min-height:52px;padding:7px}.quick-action small{font-size:8px}
@@ -170,27 +180,25 @@ tbody tr:hover{background:#ffffff05}
       <div>
         <div class="brand-title">FUTBOL <span style="color:var(--gold)">IQ</span></div>
         <div class="brand-sub">TFF Fantezi Lig · Canlı Scout</div>
-        <span class="version-badge">PRO UI V10 · FANTASY CARDS</span>
+        <span class="version-badge">PRO UI V10.1 · FANTASY BRIDGE</span>
       </div>
     </div>
-    <nav class="desktop-nav">
-      <a href="#dashboard" class="active">Anasayfa</a><a href="#squadSection">Kadro Kurucu</a><a href="#playersSection">Oyuncular</a><a href="#radarMini">Fikstür</a><a href="#insights">Analizler</a><a href="#playersSection">Liderlik</a>
-    </nav>
+    <a id="backToFantasy" class="back-home" href="./">← Web sitesine geri dön</a>
     <div class="top-actions">
       <button class="icon-btn" aria-label="Karanlık mod">☾</button><button class="icon-btn" aria-label="Bildirim">◉</button><button class="profile-chip">FantastikAdam</button><span class="pro-badge">PRO</span>
       <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" aria-label="Menü">☰</button>
     </div>
   </header>
-  <div id="mobileMenu" class="mobile-menu"><a href="#squadSection">Kadro Kurucu</a><a href="#playersSection">Oyuncular</a><a href="#radarMini">Fikstür</a><a href="#insights">Analizler</a></div>
+  <div id="mobileMenu" class="mobile-menu"><a href="./">← Web sitesine geri dön</a><a href="#squadSection">Kadrom</a><a href="#playersSection">Oyuncular</a><a href="#insights">Analizler</a></div>
 
   <section class="quick-strip" aria-label="Hızlı işlemler">
-    <button id="fetchBtn" class="quick-action"><span class="qa-icon">↻</span><span><b>Veriyi Yenile</b><small>360 oyuncu havuzu</small></span></button>
-    <button id="squadBtn" class="quick-action primary"><span class="qa-icon">🏆</span><span><b>En İyi 15</b><small>Optimum kadro</small></span></button>
-    <button id="compareBtn" class="quick-action"><span class="qa-icon">▥</span><span><b>3 Modu Karşılaştır</b><small>Güvenli · Dengeli · Farklı</small></span></button>
-    <button id="transferBtn" class="quick-action"><span class="qa-icon">⇄</span><span><b>Transfer Önerileri</b><small>ÇIKAR → AL</small></span></button>
-    <button id="weeklyBtn" class="quick-action"><span class="qa-icon">★</span><span><b>Haftanın 11’i</b><small>Kaptan + Top 5</small></span></button>
-    <button id="healthBtn" class="quick-action"><span class="qa-icon">♥</span><span><b>Kadro Sağlığı</b><small>Sakat · cezalı · risk</small></span></button>
-    <button id="radarBtn" class="quick-action"><span class="qa-icon">◎</span><span><b>Fikstür Radarı</b><small>Fırsatlar ve zorluklar</small></span></button>
+    <button id="fetchBtn" class="quick-action action-refresh"><span class="qa-icon">↻</span><span><b>Veriyi Yenile</b><small>360 oyuncu havuzu</small></span></button>
+    <button id="squadBtn" class="quick-action action-best"><span class="qa-icon">🏆</span><span><b>En İyi 15</b><small>Optimum kadro</small></span></button>
+    <button id="compareBtn" class="quick-action action-compare"><span class="qa-icon">▥</span><span><b>3 Modu Karşılaştır</b><small>Güvenli · Dengeli · Farklı</small></span></button>
+    <button id="transferBtn" class="quick-action action-transfer"><span class="qa-icon">⇄</span><span><b>Transfer Önerileri</b><small>ÇIKAR → AL</small></span></button>
+    <button id="weeklyBtn" class="quick-action action-weekly"><span class="qa-icon">★</span><span><b>Haftanın 11’i</b><small>Kaptan + Top 5</small></span></button>
+    <button id="healthBtn" class="quick-action action-health"><span class="qa-icon">♥</span><span><b>Kadro Sağlığı</b><small>Sakat · cezalı · risk</small></span></button>
+    <button id="radarBtn" class="quick-action action-radar"><span class="qa-icon">◎</span><span><b>Fikstür Radarı</b><small>Fırsatlar ve zorluklar</small></span></button>
   </section>
 
   <div id="status" class="statusbar">
@@ -211,7 +219,7 @@ tbody tr:hover{background:#ffffff05}
       <div class="panel-pad">
         <div class="panel-head">
           <div><div class="panel-title">Kadrom</div><div class="panel-sub">TFF uyumlu 15 kişilik kadro</div></div>
-          <div class="control-row"><select id="strategy"><option value="balanced">Dengeli</option><option value="safe">Güvenli</option><option value="differential">Diferansiyel</option></select><select id="formation"><option value="433">4-3-3</option><option value="442">4-4-2</option><option value="343">3-4-3</option><option value="352">3-5-2</option><option value="532">5-3-2</option></select></div>
+          <div class="control-row"><select id="strategy"><option value="balanced">Dengeli</option><option value="safe">Güvenli</option><option value="differential">Diferansiyel</option></select><select id="formation"><option value="433">4-3-3</option><option value="442">4-4-2</option><option value="343">3-4-3</option><option value="352">3-5-2</option><option value="532">5-3-2</option></select><button id="exportTeamBtn" class="export-team-btn">11’İ FANTEZİ KADROMA UYGULA</button></div>
         </div>
         <div class="metric-inline"><div class="metric-pill">Toplam xP <b id="squadXP">0.0</b></div><div class="metric-pill">Tahmini <b id="projectedScore">0.0</b></div><div class="metric-pill">Bütçe <b><span id="budgetUsed">0.0</span>M</b></div></div>
         <div id="pitch" class="pitch mt-2"><div id="emptyPitch" class="absolute inset-0 grid place-items-center text-center p-8"><div><div class="text-4xl mb-2">⚽</div><b>Henüz kadro kurulmadı</b><p class="text-[10px] text-white/60 mt-1">“En İyi 15” ile otomatik kadro oluştur.</p></div></div></div>
@@ -1016,6 +1024,24 @@ function renderBench(){
  el('bench').innerHTML=bench.map((p,i)=>'<div class="bench-card"><div class="text-[9px] text-iq font-black mb-1">'+(p.pos==='GK'?'YEDEK KALECİ':'YEDEK '+i)+'</div>'+cardHtml(p)+'</div>').join('');
  el('captainInfo').innerHTML=(captain?'<span class="badge-c">C</span>'+esc(captain.player):'')+(viceCaptain?' &nbsp; <span class="badge-c2">C2</span>'+esc(viceCaptain.player):'');
 }
+const FANTASY_IMPORT_KEY='futbol-iq-scout-xi-import-v1';
+function scoutFormationLabel(){return ({433:'4-3-3',442:'4-4-2',343:'3-4-3',352:'3-5-2',532:'5-3-2'})[el('formation').value]||'4-3-3'}
+function exportXIToFantasy(){
+ if(starters.length!==11){setStatus('Fantezi kadrosuna aktarmadan önce geçerli bir ilk 11 oluştur.','err');return}
+ const payload={
+  source:'FUTBOL IQ Scout',
+  createdAt:new Date().toISOString(),
+  formation:scoutFormationLabel(),
+  starters:starters.map(p=>({name:p.player,club:p.team,position:p.pos})),
+  captain:captain?captain.player:null,
+  viceCaptain:viceCaptain?viceCaptain.player:null
+ };
+ try{
+   localStorage.setItem(FANTASY_IMPORT_KEY,JSON.stringify(payload));
+   setStatus('İlk 11 ana FUTBOL IQ Fantezi kadrosuna aktarılıyor…');
+   location.href='./team/';
+ }catch(err){setStatus('Kadro aktarımı başarısız: '+(err?.message||err),'err')}
+}
 async function ensurePlayerData(){
  if(players.length)return true;
  await fetchData(true);
@@ -1035,7 +1061,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-why]');if(
 document.addEventListener('change',e=>{const t=e.target;if(t.matches('[data-id]')){const p=players.find(x=>x.id===t.dataset.id);if(p){p[t.dataset.k]=t.type==='checkbox'?t.checked:num(t.value);if(t.dataset.k==='price'){p.priceVerified=false;p.priceSource='Manuel düzenleme'}calc(p);save();renderAll()}}});
 ['posFilter','teamFilter','availabilityFilter','sortBy'].forEach(id=>el(id).addEventListener('change',renderTable));
 el('strategy').addEventListener('change',()=>runAction('Strateji güncelleme',()=>buildSquad()));el('search').addEventListener('input',renderTable);
-el('fetchBtn').onclick=()=>runAction('Veri yenileme',()=>fetchData(true),{needsData:false});
+el('fetchBtn').onclick=()=>runAction('Veri yenileme',()=>fetchData(true),{needsData:false});el('exportTeamBtn').onclick=()=>runAction('Fantezi kadrosuna aktarım',()=>{if(starters.length!==11)buildSquad();exportXIToFantasy()});
 el('closePlayerModal').onclick=()=>el('playerModal').classList.add('hidden');el('playerModal').addEventListener('click',e=>{if(e.target===el('playerModal'))el('playerModal').classList.add('hidden')});
 el('squadBtn').onclick=()=>runAction('En iyi 15',()=>buildSquad());
 el('compareBtn').onclick=()=>runAction('3 mod karşılaştırma',()=>compareAllStrategies());
