@@ -3,384 +3,215 @@ from datetime import datetime, timezone
 import requests
 from bs4 import BeautifulSoup
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36",
-    "Accept-Language": "en-US,en;q=0.9,tr;q=0.8",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+OUT="public/data/tff-scout.json"
+HEADERS={
+ "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36",
+ "Accept-Language":"tr-TR,tr;q=0.9,en;q=0.8",
+ "Referer":"https://www.fotmob.com/",
 }
-STANDARD_URLS = [
-    "https://fbref.com/en/comps/26/stats/Super-Lig-Estatisticas",
-    "https://fbref.com/en/comps/26/stats/Super-Lig-Stats",
+FOTMOB_LEAGUE_URLS=[
+ "https://www.fotmob.com/api/leagues?id=71&ccode3=TUR",
+ "https://www.fotmob.com/api/data/leagues?id=71&ccode3=TUR",
 ]
-PLAYING_URL = "https://fbref.com/en/comps/26/playingtime/Super-Lig-Stats"
-INJURY_URL = "https://lineupstoday.com/super-lig/injuries/"
-FOTMOB_LEAGUE = "https://www.fotmob.com/api/leagues?id=71&ccode3=TUR&season=2026%2F2027"
-FOTMOB_TEAM = "https://www.fotmob.com/api/teams?id={team_id}&tab=squad&type=team"
-FANTASY_HOME = "https://www.fantasysuperlig.com/"
-FANTASY_BLOGS = [
- "https://www.fantasysuperlig.com/blog/gw5-en-iyi-fantasy-oyunculari-form-raporu",
- "https://www.fantasysuperlig.com/blog/gw6-kaptan-transfer-diferansiyel-analizi",
- "https://www.fantasysuperlig.com/blog/gw3-kaptanlik-analizi-osimhen-greenwood",
+FOTMOB_TEAM_URLS=[
+ "https://www.fotmob.com/api/teams?id={id}&tab=squad&type=team",
+ "https://www.fotmob.com/api/data/teams?id={id}",
 ]
-TFF_URL = "https://www.tff.org/?pageID=198"
-TEAM_ALIASES = {
- "KASIMPAŞA A.Ş.":"Kasımpaşa","TÜMOSAN KONYASPOR":"Konyaspor","ARCA ÇORUM FK":"Çorum FK",
- "CORENDON ALANYASPOR":"Alanyaspor","KOCAELİSPOR":"Kocaelispor","GAZİANTEP FUTBOL KULÜBÜ A.Ş.":"Gaziantep",
- "TRABZONSPOR A.Ş.":"Trabzonspor","GALATASARAY A.Ş.":"Galatasaray","İSTANBUL BAŞAKŞEHİR FK":"Başakşehir",
- "GENÇLERBİRLİĞİ":"Gençlerbirliği","FENERBAHÇE A.Ş.":"Fenerbahçe","EYÜPSPOR":"Eyüpspor",
- "ERZURUMSPOR FK":"Erzurumspor","SAMSUNSPOR A.Ş.":"Samsunspor","AMED SPORTİF FAALİYETLER":"Amedspor",
- "BEŞİKTAŞ A.Ş.":"Beşiktaş","GÖZTEPE A.Ş.":"Göztepe","ÇAYKUR RİZESPOR A.Ş.":"Rizespor"
+FBREF_URLS=[
+ "https://fbref.com/en/comps/26/stats/Super-Lig-Stats",
+ "https://fbref.com/en/comps/26/stats/Super-Lig-Estatisticas",
+]
+
+TEAM_CANON={
+ "İstanbul Başakşehir":"İstanbul Başakşehir","Istanbul Basaksehir":"İstanbul Başakşehir","Başakşehir":"İstanbul Başakşehir",
+ "Çaykur Rizespor":"Çaykur Rizespor","Rizespor":"Çaykur Rizespor",
+ "Amedspor":"Amed SK","Amed Sportif Faaliyetler":"Amed SK","Amed SK":"Amed SK",
+ "Erzurumspor FK":"Erzurumspor","Erzurumspor":"Erzurumspor",
+ "Çorum FK":"Çorum FK","Corum FK":"Çorum FK",
+ "Gaziantep FK":"Gaziantep","Gaziantep":"Gaziantep",
 }
-OUT = "public/data/tff-scout.json"
 
-def n(v):
-    try:
-        return float(str(v).replace(",", "").replace("%","").strip() or 0)
-    except Exception:
-        return 0.0
+def canon_team(v):
+    return TEAM_CANON.get(str(v or "").strip(),str(v or "").strip())
 
-def norm_key(v):
-    s = unicodedata.normalize("NFKD", str(v or "")).encode("ascii","ignore").decode().lower()
+def key(v):
+    s=unicodedata.normalize("NFKD",str(v or "")).encode("ascii","ignore").decode().lower()
     return re.sub(r"[^a-z0-9]+","",s)
 
-def txt(row, key):
-    el = row.select_one(f'[data-stat="{key}"]')
-    return el.get_text(" ", strip=True) if el else ""
+def n(v):
+    try:return float(str(v if v is not None else 0).replace(",","").strip() or 0)
+    except:return 0.0
 
-def pos_norm(v):
-    v=(v or "").upper()
-    if "GK" in v: return "GK"
-    if any(x in v for x in ["DF","CB","FB"]): return "DF"
-    if any(x in v for x in ["MF","DM","CM","AM"]): return "MF"
-    if any(x in v for x in ["FW","ST","LW","RW"]): return "FW"
-    return v[:2]
-
-def fetch(url, min_bytes=1000):
-    r=requests.get(url,headers=HEADERS,timeout=35)
-    if not r.ok or len(r.text)<min_bytes:
-        raise RuntimeError(f"{url}: HTTP {r.status_code}, {len(r.text)} bytes")
-    return r.text.replace("<!--","").replace("-->","")
-
-def fetch_first(urls):
-    errors=[]
-    for url in urls:
+def get_json(url,retries=3):
+    err=None
+    for i in range(retries):
         try:
-            html=fetch(url,50000)
-            return html,url
-        except Exception as e:
-            errors.append(str(e)); time.sleep(2)
-    raise RuntimeError("\n".join(errors))
+            r=requests.get(url,headers={**HEADERS,"Accept":"application/json,*/*"},timeout=35)
+            if r.ok:
+                return r.json()
+            err=RuntimeError(f"HTTP {r.status_code}: {url}")
+        except Exception as e: err=e
+        time.sleep(1.2*(i+1))
+    raise err or RuntimeError(url)
 
-def player_table(html, table_id):
-    soup=BeautifulSoup(html,"lxml")
-    t=soup.select_one(f"table#{table_id}")
-    if t: return t
-    for cand in soup.select("table"):
-        if cand.select_one('[data-stat="player"]'):
-            return cand
-    raise RuntimeError(f"{table_id} player table not found")
+def first_json(urls):
+    errs=[]
+    for u in urls:
+        try:return get_json(u),u
+        except Exception as e:errs.append(str(e))
+    raise RuntimeError(" | ".join(errs))
 
-def fetch_json(url):
-    r=requests.get(url,headers={**HEADERS,"Accept":"application/json","Referer":"https://www.fotmob.com/"},timeout=35)
-    if not r.ok:
-        raise RuntimeError(f"{url}: HTTP {r.status_code}")
-    return r.json()
-
-def fotmob_pos(section_title, role=None):
-    s=(section_title or "").lower()
-    rk=((role or {}).get("key") or "").lower() if isinstance(role,dict) else ""
-    text=f"{s} {rk}"
-    if "keeper" in text or rk=="goalkeeper": return "GK"
-    if "defend" in text: return "DF"
-    if "midfield" in text: return "MF"
-    if "attack" in text or "forward" in text: return "FW"
+def role_pos(section,member):
+    text=(" ".join([
+        str(section.get("title","")),
+        str((member.get("role") or {}).get("key","")),
+        str((member.get("role") or {}).get("fallback","")),
+        str(member.get("positionIdsDesc","")),
+    ])).lower()
+    if "keeper" in text or "goalkeeper" in text:return "GK"
+    if "defend" in text or "back" in text:return "DF"
+    if "midfield" in text:return "MF"
+    if "attack" in text or "forward" in text or "striker" in text:return "FW"
     return ""
 
-def parse_fotmob_rosters():
-    players=[]
+def load_previous():
+    if not os.path.exists(OUT):return {}
     try:
-        league=fetch_json(FOTMOB_LEAGUE)
-    except Exception as e:
-        print(f"FotMob league skipped: {e}",file=sys.stderr)
-        return players
+        d=json.load(open(OUT,encoding="utf-8"))
+        return {(key(p.get("player")),key(canon_team(p.get("team")))):p for p in d.get("players",[])}
+    except:return {}
+
+def fetch_full_rosters():
+    league,league_url=first_json(FOTMOB_LEAGUE_URLS)
     table=league.get("table") or {}
     teams=table.get("all") or []
     if not teams and isinstance(table.get("data"),dict):
         teams=(table["data"].get("table") or {}).get("all") or []
-    seen=set()
+    if not isinstance(teams,list) or len(teams)<18:
+        raise RuntimeError(f"FotMob league table incomplete: {len(teams) if isinstance(teams,list) else 0} teams")
+
+    out=[];seen=set();team_names=set()
     for t in teams:
-        tid=t.get("id"); team=t.get("name") or t.get("shortName") or ""
-        if not tid or not team: continue
-        try:
-            data=fetch_json(FOTMOB_TEAM.format(team_id=tid))
-            sections=((data.get("squad") or {}).get("squad") or [])
-        except Exception as e:
-            print(f"FotMob squad skipped {team}: {e}",file=sys.stderr)
-            continue
-        for section in sections:
-            if str(section.get("title","")).lower()=="coach": continue
-            for m in section.get("members") or []:
-                name=m.get("name") or ""
-                if not name: continue
-                pos=fotmob_pos(section.get("title"),m.get("role"))
-                if pos not in {"GK","DF","MF","FW"}: continue
-                key=(norm_key(name),norm_key(team))
-                if key in seen: continue
-                seen.add(key)
-                players.append({
-                    "id":f"fotmob-{m.get('id') or norm_key(team)+'-'+norm_key(name)}",
+        tid=t.get("id"); team=canon_team(t.get("name") or t.get("shortName") or "")
+        if not tid or not team:continue
+        data=None
+        for tpl in FOTMOB_TEAM_URLS:
+            try:
+                data=get_json(tpl.format(id=tid),retries=2);break
+            except Exception:pass
+        if not data:
+            print(f"WARN no squad: {team}",file=sys.stderr);continue
+        sections=((data.get("squad") or {}).get("squad") or [])
+        if not sections and isinstance(data.get("squad"),list):sections=data["squad"]
+        count_before=len(out)
+        for sec in sections:
+            if str(sec.get("title","")).lower()=="coach":continue
+            for m in sec.get("members") or []:
+                name=m.get("name") or ""; pos=role_pos(sec,m)
+                if not name or pos not in {"GK","DF","MF","FW"}:continue
+                k=(key(name),key(team))
+                if k in seen:continue
+                seen.add(k);team_names.add(team)
+                pid=m.get("id")
+                out.append({
+                    "id":f"fotmob-{pid or key(team)+'-'+key(name)}",
+                    "fotmobId":pid,
                     "player":name,"team":team,"pos":pos,
                     "shirtNumber":m.get("shirtNumber"),"age":m.get("age"),
-                    "rosterOnly":True,"mp":0,"min":0,"starts":0,"startRate":0,"minutesPerMatch":0,
+                    "photo":f"https://images.fotmob.com/image_resources/playerimages/{pid}.png" if pid else "",
+                    "rosterOnly":True,
+                    "mp":0,"min":0,"starts":0,"startRate":0,"minutesPerMatch":0,
                     "gls":n(m.get("goals")),"ast":n(m.get("assists")),
-                    "xg":0,"xa":0,"xg90":0,"xa90":0,"yellow":n(m.get("ycards")),"red":n(m.get("rcards")),
-                    "pk":0,"pkAtt":0
+                    "xg":0,"xa":0,"xg90":0,"xa90":0,
+                    "yellow":n(m.get("ycards")),"red":n(m.get("rcards")),
+                    "pk":0,"pkAtt":0,
+                    "price":6.0,"priceVerified":False,"priceSource":"Varsayılan/manuel",
+                    "ownership":None,"ownershipVerified":False,"ownershipSource":"Bilinmiyor",
+                    "penalty":False,"corner":False,"form4":False,
+                    "unavailable":False,"doubtful":False,"suspended":False,"injuryRisk":0.0,
+                    "startProb":0.25,
                 })
-        time.sleep(0.35)
-    return players
+        print(f"{team}: {len(out)-count_before} players")
+        time.sleep(0.25)
 
-def merge_roster_and_stats(rosters, stats):
-    out=[]
-    stats_map={(norm_key(p.get("player")),norm_key(p.get("team"))):p for p in stats}
-    matched=set()
-    for r in rosters:
-        key=(norm_key(r.get("player")),norm_key(r.get("team")))
-        s=stats_map.get(key)
-        if s:
-            out.append({**r,**s,"rosterOnly":False}); matched.add(key)
-        else:
-            out.append(r)
-    for s in stats:
-        key=(norm_key(s.get("player")),norm_key(s.get("team")))
-        if key not in matched: out.append(s)
-    return out
+    if len(team_names)<18 or len(out)<350:
+        raise RuntimeError(f"Full roster validation failed: {len(out)} players / {len(team_names)} teams")
+    return out,league_url
 
-def previous_data():
-    if not os.path.exists(OUT): return {},{}
-    try:
-        old=json.load(open(OUT,encoding="utf-8"))
-    except Exception:
-        return {},{}
-    by_id={p.get("id"):p for p in old.get("players",[]) if p.get("id")}
-    by_name_team={(norm_key(p.get("player")),norm_key(p.get("team"))):p for p in old.get("players",[])}
-    return by_id,by_name_team
+def txt(row,name):
+    el=row.select_one(f'[data-stat="{name}"]')
+    return el.get_text(" ",strip=True) if el else ""
 
-def previous_for(p, old_id, old_nt):
-    if p.get("id") in old_id: return old_id[p["id"]]
-    return old_nt.get((norm_key(p.get("player")),norm_key(p.get("team"))),{})
+def pos_norm(v):
+    v=(v or "").upper()
+    if "GK" in v:return "GK"
+    if any(x in v for x in ["DF","CB","FB"]):return "DF"
+    if any(x in v for x in ["MF","DM","CM","AM"]):return "MF"
+    if any(x in v for x in ["FW","ST","LW","RW"]):return "FW"
+    return ""
 
-def parse_playing_time(html):
-    table=player_table(html,"stats_playing_time")
+def fetch_fbref_stats():
+    html=None;used=None
+    for u in FBREF_URLS:
+        try:
+            r=requests.get(u,headers=HEADERS,timeout=30)
+            if r.ok and len(r.text)>30000:
+                html=r.text.replace("<!--","").replace("-->","");used=u;break
+        except Exception:pass
+    if not html:return {},None
+    soup=BeautifulSoup(html,"lxml")
+    table=soup.select_one("table#stats_standard")
+    if not table:return {},used
     out={}
     for row in table.select("tbody tr"):
-        name=txt(row,"player"); team=txt(row,"team") or txt(row,"squad")
-        if not name or not team: continue
-        games=n(txt(row,"games"))
-        starts=n(txt(row,"games_starts"))
-        minutes=n(txt(row,"minutes"))
-        out[(norm_key(name),norm_key(team))]={
-            "starts":starts,"minutes":minutes,"games":games,
-            "startRate": (starts/games if games else 0),
-            "minutesPerMatch": (minutes/games if games else 0),
+        name=txt(row,"player");team=canon_team(txt(row,"team") or txt(row,"squad"));pos=pos_norm(txt(row,"position"))
+        if not name or not team or not pos:continue
+        mp=n(txt(row,"games"));minutes=n(txt(row,"minutes"))
+        out[(key(name),key(team))]={
+            "mp":mp,"min":minutes,"gls":n(txt(row,"goals")),"ast":n(txt(row,"assists")),
+            "xg":n(txt(row,"xg")),"xa":n(txt(row,"xg_assist")),
+            "xg90":n(txt(row,"xg_per90")),"xa90":n(txt(row,"xg_assist_per90")),
+            "yellow":n(txt(row,"cards_yellow")),"red":n(txt(row,"cards_red")),
+            "pk":n(txt(row,"pens_made")),"pkAtt":n(txt(row,"pens_att")),
+            "minutesPerMatch":minutes/mp if mp else 0,
+            "startProb":max(.25,min(.98,(minutes/mp/75) if mp else .25)),
+            "rosterOnly":False,
         }
-    return out
+    return out,used
 
-def parse_injuries():
-    unavailable={}
-    try:
-        html=fetch(INJURY_URL,5000)
-    except Exception as e:
-        print(f"Injury feed skipped: {e}",file=sys.stderr); return unavailable
-    soup=BeautifulSoup(html,"lxml")
-    # Site presents club sections followed by a table/list of unavailable players.
-    for heading in soup.find_all(["h2","h3"]):
-        team=heading.get_text(" ",strip=True)
-        if not team or "Süper Lig" in team: continue
-        node=heading.find_next()
-        limit=0
-        while node and node.name not in ["h2","h3"] and limit<30:
-            if node.name in ["tr","li","div"]:
-                text=" ".join(node.stripped_strings)
-                if text and len(text)<250:
-                    # Match against actual player names later, using the entire line as evidence.
-                    unavailable.setdefault(norm_key(team),[]).append(text)
-            node=node.find_next(); limit+=1
-    return unavailable
+def main():
+    previous=load_previous()
+    players,league_url=fetch_full_rosters()
+    stats,fbref_url=fetch_fbref_stats()
 
-def parse_current_fixtures():
-    out={}
-    try:
-        html=fetch(TFF_URL,5000)
-        soup=BeautifulSoup(html,"lxml")
-        for tr in soup.select("tr"):
-            text=" ".join(tr.stripped_strings)
-            if not re.search(r"\d{2}\.\d{2}\.2026\s+\d{2}:\d{2}",text): continue
-            found=[]
-            for raw,canon in TEAM_ALIASES.items():
-                if raw in text: found.append(canon)
-            if len(found)==2:
-                home,away=found
-                out[home]={"opponent":away,"home":True}
-                out[away]={"opponent":home,"home":False}
-        # Some TFF markup is not table based; fall back to line-level text.
-        if len(out)<12:
-            body="\n".join(" ".join(x.stripped_strings) for x in soup.find_all(["div","li","p"]))
-            for line in body.splitlines():
-                if not re.search(r"\d{2}\.\d{2}\.2026\s+\d{2}:\d{2}",line): continue
-                found=[canon for raw,canon in TEAM_ALIASES.items() if raw in line]
-                if len(found)==2:
-                    out[found[0]]={"opponent":found[1],"home":True}
-                    out[found[1]]={"opponent":found[0],"home":False}
-    except Exception as e:
-        print(f"Fixture feed skipped: {e}",file=sys.stderr)
-    return out
+    for p in players:
+        k=(key(p["player"]),key(canon_team(p["team"])))
+        prev=previous.get(k,{})
+        if k in stats:p.update(stats[k])
+        for fld in ["price","priceVerified","priceSource","ownership","ownershipVerified","ownershipSource","corner","opponent","home"]:
+            if fld in prev:p[fld]=prev[fld]
+        p["penalty"]=bool(prev.get("penalty",False) or p.get("pkAtt",0)>0)
+        if p.get("unavailable") or p.get("suspended"):p["startProb"]=0
 
-def parse_public_fantasy_market():
-    market={}
-    texts=[]
-    for url in [FANTASY_HOME,*FANTASY_BLOGS]:
-        try:
-            texts.append(fetch(url,3000))
-        except Exception as e:
-            print(f"Fantasy public feed skipped {url}: {e}",file=sys.stderr)
-    soup_text="\n".join(BeautifulSoup(x,"lxml").get_text(" ",strip=True) for x in texts)
-    # Use actual league player names later; this helper scans a local text window around each name.
-    return soup_text
+    teams=sorted({canon_team(p["team"]) for p in players if p.get("team")})
+    if len(teams)<18 or len(players)<350:
+        raise SystemExit(f"REFUSING TO PUBLISH incomplete data: {len(players)} players / {len(teams)} teams")
 
-def enrich_market(player, public_text, prev):
     out={
-      "price":prev.get("price",6.0),
-      "priceVerified":prev.get("priceVerified",False),
-      "priceSource":prev.get("priceSource","Varsayılan/manuel"),
-      "ownership":prev.get("ownership"),
-      "ownershipVerified":prev.get("ownershipVerified",False),
-      "ownershipSource":prev.get("ownershipSource","Bilinmiyor")
+        "source":"FotMob full squads + optional FBref stats",
+        "sourceUrl":league_url,
+        "statsSourceUrl":fbref_url,
+        "updatedAt":datetime.now(timezone.utc).isoformat(),
+        "season":"2026-2027",
+        "count":len(players),
+        "teamCount":len(teams),
+        "teams":teams,
+        "players":players,
     }
-    # Search surname + first initial/full name in a bounded public-text window.
-    tokens=[t for t in re.split(r"\s+",player) if len(t)>2]
-    needle=tokens[-1] if tokens else player
-    m=re.search(rf"(.{{0,220}}\b{re.escape(needle)}\b.{{0,260}})",public_text,re.I)
-    if not m: return out
-    window=m.group(1)
-    pm=re.search(r"(?:Fiyat|fiyatı|Fiyat₺)\s*₺?\s*([0-9]+(?:[\.,][0-9]+)?)\s*m?",window,re.I)
-    if pm:
-        out["price"]=float(pm.group(1).replace(",","."))
-        out["priceVerified"]=True
-        out["priceSource"]="Fantasy Süper Lig public"
-    om=re.search(r"(?:sahipliği|sahiplik(?:i)?|ownership)\s*(?:yaklaşık\s*)?(?:yüzde\s*)?%?\s*([0-9]+(?:[\.,][0-9]+)?)",window,re.I)
-    if om:
-        out["ownership"]=float(om.group(1).replace(",","."))
-        out["ownershipVerified"]=True
-        out["ownershipSource"]="Fantasy Süper Lig public"
-    return out
+    os.makedirs(os.path.dirname(OUT),exist_ok=True)
+    with open(OUT,"w",encoding="utf-8") as fh:
+        json.dump(out,fh,ensure_ascii=False,separators=(",",":"))
+    print(f"OK {len(players)} players / {len(teams)} teams -> {OUT}")
 
-def injury_status(player, team, injury_sections):
-    pkey=norm_key(player)
-    tkey=norm_key(team)
-    lines=[]
-    for key,vals in injury_sections.items():
-        if key in tkey or tkey in key:
-            lines.extend(vals)
-    for line in lines:
-        if pkey and pkey in norm_key(line):
-            low=line.lower()
-            doubtful=("doubt" in low or "şüpheli" in low or "supheli" in norm_key(low))
-            suspended=("suspend" in low or "cezalı" in low or "cezali" in norm_key(low))
-            return {
-                "unavailable": not doubtful,
-                "doubtful": doubtful,
-                "suspended": suspended,
-                "injuryNote": line[:180],
-                "injuryRisk": 0.5 if doubtful else 1.0
-            }
-    return {"unavailable":False,"doubtful":False,"suspended":False,"injuryNote":"","injuryRisk":0.0}
-
-old_id,old_nt=previous_data()
-std_html,used=fetch_first(STANDARD_URLS)
-play_html=fetch(PLAYING_URL,30000)
-ptime=parse_playing_time(play_html)
-injuries=parse_injuries()
-fixtures=parse_current_fixtures()
-public_market=parse_public_fantasy_market()
-table=player_table(std_html,"stats_standard")
-stats_players=[]
-
-for i,row in enumerate(table.select("tbody tr")):
-    player=txt(row,"player")
-    if not player or player=="Player": continue
-    team=txt(row,"team") or txt(row,"squad")
-    pos=pos_norm(txt(row,"position"))
-    if not team or pos not in {"GK","DF","MF","FW"}: continue
-    href=(row.select_one('[data-stat="player"] a') or {}).get("href","") if row.select_one('[data-stat="player"] a') else ""
-    fbref_id=""
-    m=re.search(r"/players/([^/]+)/",href)
-    if m: fbref_id=m.group(1)
-    pid=f"fbref-{fbref_id}" if fbref_id else f"fbref-{norm_key(team)}-{norm_key(player)}"
-    pt=ptime.get((norm_key(player),norm_key(team)),{})
-    p={
-        "id":pid,"player":player,"team":team,"pos":pos,
-        "mp":n(txt(row,"games")),"min":n(txt(row,"minutes")),
-        "starts":pt.get("starts",n(txt(row,"games_starts"))),
-        "startRate":pt.get("startRate",0),
-        "minutesPerMatch":pt.get("minutesPerMatch",0),
-        "gls":n(txt(row,"goals")),"ast":n(txt(row,"assists")),
-        "xg":n(txt(row,"xg")),"xa":n(txt(row,"xg_assist")),
-        "xg90":n(txt(row,"xg_per90")),"xa90":n(txt(row,"xg_assist_per90")),
-        "yellow":n(txt(row,"cards_yellow")),"red":n(txt(row,"cards_red")),
-        "pk":n(txt(row,"pens_made")),"pkAtt":n(txt(row,"pens_att")),
-    }
-    prev=previous_for(p,old_id,old_nt)
-    market=enrich_market(player,public_market,prev)
-    p["price"]=market["price"]
-    p["priceVerified"]=market["priceVerified"]
-    p["priceSource"]=market["priceSource"]
-    p["ownership"]=market["ownership"]
-    p["ownershipVerified"]=market["ownershipVerified"]
-    p["ownershipSource"]=market["ownershipSource"]
-    p["penalty"]=bool(prev.get("penalty",False) or p["pkAtt"]>0)
-    p["corner"]=bool(prev.get("corner",False))
-    p["form4"]=bool(p["startRate"]>=0.8 and p["mp"]>=4)
-    fixture=fixtures.get(team) or fixtures.get(TEAM_ALIASES.get(team,""))
-    if fixture:
-        p.update(fixture)
-    else:
-        for k in ["opponent","home"]:
-            if k in prev: p[k]=prev[k]
-    p.update(injury_status(player,team,injuries))
-    # Start probability: recent availability + actual start rate + minutes.
-    if p["unavailable"] or p["suspended"]:
-        p["startProb"]=0.0
-    else:
-        base=max(p["startRate"], min(1.0,p["minutesPerMatch"]/75.0) if p["minutesPerMatch"] else 0)
-        if p["mp"]<2: base=max(base,0.45)
-        if p["doubtful"]: base*=0.55
-        p["startProb"]=round(max(0.15,min(0.98,base or 0.55)),3)
-    players.append(p)
-
-if len(players)<250:
-    raise SystemExit(f"Too few player rows parsed: {len(players)}")
-
-out={
-    "source":"FotMob full squads + FBref stats + LineupsToday availability",
-    "sourceUrl":used,
-    "playingTimeUrl":PLAYING_URL,
-    "injuryUrl":INJURY_URL,
-    "fixtureUrl":TFF_URL,
-    "fixtureTeams":len(fixtures),
-    "updatedAt":datetime.now(timezone.utc).isoformat(),
-    "season":"2026-2027",
-    "count":len(players),
-    "rosterCount":len(roster_players),
-    "statsCount":len(stats_players),
-    "automation":{
-        "stats":"daily",
-        "playingTime":"daily",
-        "availability":"daily",
-        "manualFieldsPreserved":["price","priceVerified","priceSource","ownership","ownershipVerified","ownershipSource","corner"]
-    },
-    "players":players,
-}
-os.makedirs(os.path.dirname(OUT),exist_ok=True)
-with open(OUT,"w",encoding="utf-8") as f:
-    json.dump(out,f,ensure_ascii=False,separators=(",",":"))
-print(f"Wrote {len(players)} players from FBref; playing-time rows={len(ptime)}")
+if __name__=="__main__":
+    main()
