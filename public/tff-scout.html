@@ -3,49 +3,75 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<meta name="theme-color" content="#07111f"/>
+<meta name="theme-color" content="#0b1220"/>
 <title>FUTBOL IQ - TFF Fantezi Otomatik Kadro Kurucu</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-tailwind.config={theme:{extend:{colors:{iq:"#f4c542",night:"#07111f",panel:"#0d1b2a"}}}}
+tailwind.config={theme:{extend:{colors:{iq:"#d7b86a",night:"#0b1220",panel:"#111827"}}}}
 </script>
 <style>
-html{background:#07111f;color-scheme:dark}body{min-height:100vh;background:radial-gradient(circle at 20% 0,#16304b 0,transparent 34%),linear-gradient(180deg,#07111f,#050b12 68%);color:#eef4fa}
-.glass{background:rgba(10,24,38,.82);border:1px solid rgba(255,255,255,.1);box-shadow:0 18px 50px rgba(0,0,0,.25);backdrop-filter:blur(14px)}
-.pitch{background:repeating-linear-gradient(0deg,#0f6a3d 0 44px,#0c5d36 44px 88px);position:relative;overflow:hidden}
-.pitch:before{content:"";position:absolute;inset:3%;border:2px solid #ffffff88;border-radius:10px}
-.pitch:after{content:"";position:absolute;left:50%;top:3%;bottom:3%;border-left:2px solid #ffffff88}
-.line-circle{position:absolute;width:34%;aspect-ratio:1;border:2px solid #ffffff88;border-radius:50%;left:33%;top:33%}
-.player-card{position:absolute;transform:translate(-50%,-50%);width:118px;max-width:25vw;text-align:center;filter:drop-shadow(0 10px 16px #0008)}
-.player-card .kit-shell{position:relative;padding-top:4px}
-.player-card .jersey{position:relative;width:86px;height:78px;margin:0 auto 4px;clip-path:polygon(20% 0,36% 10%,64% 10%,80% 0,100% 19%,88% 39%,79% 33%,79% 100%,21% 100%,21% 33%,12% 39%,0 19%);background:linear-gradient(135deg,var(--kit1,#1e293b) 0 48%,var(--kit2,#334155) 48% 100%);border:1px solid rgba(255,255,255,.18)}
-.player-card .jersey:after{content:"";position:absolute;inset:8px 30px auto;height:8px;border-radius:0 0 10px 10px;background:#07111f99}
-.player-card .face{position:absolute;left:50%;top:9px;transform:translateX(-50%);width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #f4c542;background:#13283b;z-index:2}
-.player-card .face-fallback{position:absolute;left:50%;top:9px;transform:translateX(-50%);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;border:2px solid #f4c542;background:#13283b;font-size:12px;font-weight:900;z-index:2}
-.player-card .card-meta{background:linear-gradient(145deg,rgba(4,13,24,.96),rgba(17,41,59,.96));border:1px solid #f4c54266;border-radius:12px;padding:5px 6px}
-.player-card b{font-size:11px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-card small{font-size:9px;color:#b8c8d8;display:block}.player-card strong{font-size:10px;color:#f4c542}
-.spinner{width:20px;height:20px;border:2px solid #ffffff33;border-top-color:#f4c542;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-input,select,textarea{background:#07111f!important;color:#eef4fa!important;border-color:#ffffff22!important}
-th{position:sticky;top:0;background:#0d1b2a;z-index:1}
-.bench-card{background:linear-gradient(145deg,rgba(7,17,31,.98),rgba(17,41,59,.92));border:1px solid rgba(244,197,66,.38);border-radius:14px;padding:10px;min-width:0}
-.bench-card b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bench-card small{font-size:10px;color:#94a3b8}.badge-c,.badge-c2{display:inline-grid;place-items:center;width:23px;height:23px;border-radius:50%;font-size:10px;font-weight:900;margin-right:4px}.badge-c{background:#f4c542;color:#07111f}.badge-c2{background:#38bdf8;color:#07111f}
-.rule-ok{border-color:rgba(52,211,153,.35);color:#a7f3d0;background:rgba(16,185,129,.08)}
-@media(max-width:900px){.player-card{width:92px}.player-card .jersey{width:70px;height:64px}.player-card .face,.player-card .face-fallback{width:40px;height:40px;top:8px}.player-card small{font-size:7.5px}.player-card b{font-size:9px}}
+:root{
+ --bg:#0b1220;--bg2:#0f1726;--panel:#121b2b;--panel2:#172234;--line:#263449;
+ --text:#e8edf5;--muted:#93a4b8;--accent:#d7b86a;--accent2:#6ea8a1;--good:#76b49b;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);color-scheme:dark}
+body{min-height:100vh;background:linear-gradient(180deg,#0b1220 0%,#0d1522 55%,#0a101a 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.glass{background:rgba(18,27,43,.92);border:1px solid rgba(148,163,184,.12);box-shadow:0 10px 28px rgba(0,0,0,.18);backdrop-filter:blur(10px)}
+button,select,input,textarea{transition:.18s ease}
+button:hover{transform:translateY(-1px)}
+button:active{transform:translateY(0)}
+input,select,textarea{background:#0d1624!important;color:var(--text)!important;border-color:#2a3950!important}
+th{position:sticky;top:0;background:#111b2b;z-index:1;color:#9fb0c3}
+.pitch{
+ background:
+   linear-gradient(rgba(255,255,255,.018),rgba(255,255,255,.018)),
+   repeating-linear-gradient(0deg,#20553d 0 56px,#1d4c38 56px 112px);
+ position:relative;overflow:hidden;border:1px solid #304a3d!important;
+ box-shadow:inset 0 0 0 1px rgba(255,255,255,.025),0 14px 34px rgba(0,0,0,.2)
+}
+.pitch:before{content:"";position:absolute;inset:3.5%;border:1.5px solid rgba(236,253,245,.5);border-radius:10px}
+.pitch:after{display:none!important}
+.line-circle{display:none!important}
+.player-card{position:absolute;transform:translate(-50%,-50%);width:112px;max-width:24vw;text-align:center;filter:drop-shadow(0 8px 14px rgba(0,0,0,.28))}
+.player-card .kit-shell{position:relative;padding-top:2px}
+.player-card .jersey{position:relative;width:78px;height:70px;margin:0 auto 3px;clip-path:polygon(20% 0,36% 10%,64% 10%,80% 0,100% 19%,88% 39%,79% 33%,79% 100%,21% 100%,21% 33%,12% 39%,0 19%);background:linear-gradient(135deg,var(--kit1,#334155) 0 48%,var(--kit2,#475569) 48% 100%);border:1px solid rgba(255,255,255,.13)}
+.player-card .jersey:after{content:"";position:absolute;inset:8px 27px auto;height:7px;border-radius:0 0 10px 10px;background:#0b122099}
+.player-card .face,.player-card .face-fallback{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(215,184,106,.75);background:#172234;z-index:2}
+.player-card .face{object-fit:cover}
+.player-card .face-fallback{display:grid;place-items:center;font-size:11px;font-weight:800}
+.player-card .card-meta{background:rgba(13,22,36,.95);border:1px solid rgba(148,163,184,.15);border-radius:10px;padding:5px 6px;box-shadow:0 6px 16px rgba(0,0,0,.16)}
+.player-card b{font-size:10.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-card small{font-size:8.5px;color:#a8b6c7;display:block}.player-card strong{font-size:9.5px;color:#dcc27f}
+.spinner{width:18px;height:18px;border:2px solid #ffffff22;border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.bench-card{background:#0e1827;border:1px solid rgba(148,163,184,.14);border-radius:11px;padding:8px;min-width:0}
+.bench-card b{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bench-card small{font-size:9px;color:#94a3b8}
+.badge-c,.badge-c2{display:inline-grid;place-items:center;width:21px;height:21px;border-radius:50%;font-size:9px;font-weight:900;margin-right:4px}.badge-c{background:#d7b86a;color:#0b1220}.badge-c2{background:#7fb2c8;color:#0b1220}
+.rule-ok{border-color:rgba(118,180,155,.35);color:#b7dfcf;background:rgba(118,180,155,.07)}
+.compact-action{padding:.72rem .9rem!important;border-radius:12px!important;min-height:auto!important}
+.compact-action b{font-size:.92rem!important;line-height:1.15}
+.compact-action small{font-size:.68rem!important}
+.soft-accent{background:#cdb476!important;color:#111827!important;box-shadow:none!important}
+.soft-outline{background:#111b2b!important;border:1px solid #2a3950!important}
+.section-title{font-size:1.05rem!important}
+@media(max-width:900px){
+ .player-card{width:86px}.player-card .jersey{width:66px;height:58px}.player-card .face,.player-card .face-fallback{width:37px;height:37px;top:7px}
+ .player-card small{font-size:7px}.player-card b{font-size:8.5px}.player-card strong{font-size:8px}
+}
 </style>
 </head>
 <body>
 <div class="max-w-[1500px] mx-auto p-3 sm:p-5 lg:p-7">
 <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
-  <div><div class="flex items-center gap-2"><div class="text-iq font-black tracking-[.22em] text-xl">FUTBOL IQ</div><span class="text-[10px] px-2 py-1 rounded-full border border-emerald-400/30 text-emerald-300 bg-emerald-400/5">FULL-ROSTER 360 · FORMA V2</span></div><h1 class="text-2xl sm:text-4xl font-black tracking-tight mt-1">TFF Fantezi Otomatik Kadro Kurucu</h1><p class="text-slate-400 mt-1">TFF Fantezi Lig · Canlı Scout · 100M bütçe</p></div>
+  <div><div class="flex items-center gap-2"><div class="text-amber-200 font-black tracking-[.22em] text-xl">FUTBOL IQ</div><span class="text-[10px] px-2 py-1 rounded-full border border-emerald-400/30 text-emerald-300 bg-emerald-400/5">PRO UI V3 · 360 OYUNCU</span></div><h1 class="text-xl sm:text-3xl font-extrabold tracking-tight mt-1">TFF Fantezi Otomatik Kadro Kurucu</h1><p class="text-slate-400 mt-1">TFF Fantezi Lig · Canlı Scout · 100M bütçe</p></div>
   <div class="text-xs text-slate-400">Kaynak: FBref + manuel CSV · Son veri: <span id="lastUpdate">—</span></div>
 </header>
 
-<section class="grid md:grid-cols-3 gap-3 mb-4">
-  <button id="fetchBtn" class="glass rounded-2xl p-4 text-left hover:border-iq/60 transition"><span class="text-iq font-black">01</span><b class="block text-lg mt-1">Veriyi Çek / Yenile</b><small class="text-slate-400">FBref → AllOrigins → otomatik parse</small></button>
+<section class="grid md:grid-cols-3 gap-2 mb-3">
+  <button id="fetchBtn" class="glass compact-action text-left hover:border-slate-500/50 transition"><span class="text-iq font-black">01</span><b class="block text-lg mt-1">Veriyi Çek / Yenile</b><small class="text-slate-400">FBref → AllOrigins → otomatik parse</small></button>
   <button id="csvBtn" class="glass rounded-2xl p-4 text-left hover:border-iq/60 transition"><span class="text-iq font-black">02</span><b class="block text-lg mt-1">Manuel CSV Yapıştır</b><small class="text-slate-400">Export CSV içeriğini buraya yapıştır</small></button>
   <div class="grid gap-2">
-    <button id="squadBtn" class="rounded-2xl p-4 text-left bg-iq text-slate-950 shadow-xl hover:brightness-110 transition"><span class="font-black">03</span><b class="block text-lg mt-1">EN İYİ 15'Lİ KADROYU KUR</b><small class="text-slate-800">11 ilk + 4 yedek · 100M · kulüp başına max 3</small></button>
-    <button id="compareBtn" class="glass rounded-xl px-4 py-3 text-left hover:border-sky-400/50 transition"><b class="text-sky-300">3 MODU KARŞILAŞTIR</b><small class="block text-slate-400">Güvenli · Dengeli · Diferansiyel</small></button>
+    <button id="squadBtn" class="compact-action soft-accent text-left hover:brightness-105 transition"><span class="font-black">03</span><b class="block text-lg mt-1">EN İYİ 15'Lİ KADROYU KUR</b><small class="text-slate-800">11 ilk + 4 yedek · 100M · kulüp başına max 3</small></button>
+    <button id="compareBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-sky-300">3 MODU KARŞILAŞTIR</b><small class="block text-slate-400">Güvenli · Dengeli · Diferansiyel</small></button>
   </div>
 </section>
 
@@ -66,7 +92,7 @@ th{position:sticky;top:0;background:#0d1b2a;z-index:1}
   <div class="space-y-4">
     <div class="glass rounded-2xl p-4">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <div><h2 class="text-xl font-black">TFF Uyumlu 15 Kişilik Kadro</h2><p class="text-xs text-slate-400">2 KL · 5 DEF · 5 ORT · 3 FOR · kulüp başına en fazla 3 · 11 ilk + 4 yedek</p></div>
+        <div><h2 class="section-title font-extrabold">TFF Uyumlu 15 Kişilik Kadro</h2><p class="text-xs text-slate-400">2 KL · 5 DEF · 5 ORT · 3 FOR · kulüp başına en fazla 3 · 11 ilk + 4 yedek</p></div>
         <div class="flex gap-2 flex-wrap">
           <select id="strategy" class="rounded-lg border px-3 py-2 text-sm">
             <option value="balanced">Dengeli Kadro</option>
@@ -88,7 +114,7 @@ th{position:sticky;top:0;background:#0d1b2a;z-index:1}
         <div id="ruleClub" class="glass rounded-xl px-3 py-2">Kulüp max 3</div>
         <div id="ruleBudget" class="glass rounded-xl px-3 py-2">Bütçe ≤100M</div>
       </div>
-      <div id="pitch" class="pitch rounded-2xl mt-4 min-h-[610px] sm:min-h-[680px] border border-white/10"><div class="line-circle"></div><div id="emptyPitch" class="absolute inset-0 grid place-items-center text-center p-8"><div><div class="text-5xl mb-2">⚽</div><b>Henüz kadro kurulmadı</b><p class="text-sm text-white/70 mt-1">Veriyi yükle ve “EN İYİ 15'Lİ KADROYU KUR” butonuna bas.</p></div></div></div>
+      <div id="pitch" class="pitch rounded-2xl mt-4 min-h-[610px] sm:min-h-[680px] border border-white/10"><div id="emptyPitch" class="absolute inset-0 grid place-items-center text-center p-8"><div><div class="text-5xl mb-2">⚽</div><b>Henüz kadro kurulmadı</b><p class="text-sm text-white/70 mt-1">Veriyi yükle ve “EN İYİ 15'Lİ KADROYU KUR” butonuna bas.</p></div></div></div>
       <div class="mt-4">
         <div class="flex items-center justify-between gap-3 mb-2"><h3 class="font-black">YEDEK KULÜBESİ · 4 OYUNCU</h3><span id="captainInfo" class="text-xs text-slate-400">C / C2 bekleniyor</span></div>
         <div id="bench" class="grid grid-cols-2 sm:grid-cols-4 gap-2"><div class="bench-card text-slate-500">Yedekler kadro kurulunca burada görünür.</div></div>
@@ -107,7 +133,7 @@ th{position:sticky;top:0;background:#0d1b2a;z-index:1}
 
   <div class="glass rounded-2xl overflow-hidden">
     <div class="p-4 border-b border-white/10">
-      <div class="flex flex-wrap items-center justify-between gap-2"><div><h2 class="text-xl font-black">Oyuncu Sıralaması</h2><p class="text-xs text-slate-400"><span id="playerCount">0</span> oyuncu · Fantasy havuzu: <b>593</b> · <span id="coverageText">kapsama hesaplanıyor</span></p></div><div id="loading" class="hidden spinner"></div></div>
+      <div class="flex flex-wrap items-center justify-between gap-2"><div><h2 class="section-title font-extrabold">Oyuncu Sıralaması</h2><p class="text-xs text-slate-400"><span id="playerCount">0</span> oyuncu · Fantasy havuzu: <b>593</b> · <span id="coverageText">kapsama hesaplanıyor</span></p></div><div id="loading" class="hidden spinner"></div></div>
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-3">
         <select id="posFilter" class="rounded-lg border px-2 py-2 text-xs"><option value="">Tüm mevkiler</option><option>GK</option><option>DF</option><option>MF</option><option>FW</option></select>
         <select id="teamFilter" class="rounded-lg border px-2 py-2 text-xs"><option value="">Tüm takımlar</option></select>
