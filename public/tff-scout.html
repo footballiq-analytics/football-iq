@@ -149,6 +149,32 @@ function parseHtml(html){
   if(!out.length)throw new Error('Oyuncu satırı bulunamadı');
   return out;
 }
+function parseMarkdownFbref(text){
+  const lines=text.split(/\r?\n/).filter(Boolean);
+  let headerIndex=-1,headers=[];
+  for(let i=0;i<lines.length;i++){
+    if(lines[i].includes('|')&&/\bPlayer\b/i.test(lines[i])&&/(Squad|Team)/i.test(lines[i])&&/xG/i.test(lines[i])){
+      headers=lines[i].split('|').map(x=>x.trim()).filter(Boolean);
+      headerIndex=i;break;
+    }
+  }
+  if(headerIndex<0)throw new Error('Jina oyuncu tablosu bulunamadı');
+  const idx=name=>headers.findIndex(h=>h.toLowerCase()===name.toLowerCase());
+  const pick=(cells,names)=>{for(const n of names){const j=idx(n);if(j>=0)return cells[j]??''}return''};
+  const out=[];
+  for(let i=headerIndex+1;i<lines.length;i++){
+    const line=lines[i];
+    if(!line.includes('|')){if(out.length>20)break;continue}
+    if(/^\s*\|?\s*[-: ]+\|/.test(line))continue;
+    const cells=line.split('|').map(x=>x.trim()).filter(Boolean);
+    if(cells.length<6)continue;
+    const player=pick(cells,['Player']); if(!player||player==='Player')continue;
+    const raw={Player:player,Team:pick(cells,['Squad','Team']),Pos:pick(cells,['Pos']),MP:pick(cells,['MP']),Min:pick(cells,['Min']),Gls:pick(cells,['Gls']),Ast:pick(cells,['Ast']),xG:pick(cells,['xG']),xA:pick(cells,['xAG','xA']),xG90:pick(cells,['xG/90']),xA90:pick(cells,['xAG/90','xA/90'])};
+    const p=norm(raw,out.length); if(p.team&&['GK','DF','MF','FW'].includes(p.pos))out.push(p);
+  }
+  if(out.length<100)throw new Error('Jina tablosunda yeterli oyuncu yok: '+out.length);
+  return out;
+}
 function parseCsvText(text){
   const lines=text.trim().split(/\r?\n/);if(lines.length<2)throw new Error('CSV en az başlık + 1 satır içermeli');
   const csvLine=s=>{let a=[],x='',q=false;for(let i=0;i<s.length;i++){const c=s[i];if(c==='"'){if(q&&s[i+1]==='"'){x+='"';i++}else q=!q}else if(c===','&&!q){a.push(x);x=''}else x+=c}a.push(x);return a};
@@ -166,9 +192,24 @@ async function fetchData(force=false){
     const local=await fetch(LOCAL_DATA+'?v='+Date.now(),{cache:'no-store'});
     if(local.ok){
       const data=await local.json();
-      if(Array.isArray(data.players)&&data.players.length>=15){
+      if(Array.isArray(data.players)&&data.players.length>=250){
         players=data.players.map(norm);save();renderAll();
         setStatus((data.source||'Yerel canlı veri')+' yüklendi: '+players.length+' oyuncu.');
+        return;
+      }
+      if(Array.isArray(data.players)&&data.players.length>=15){
+        try{
+          const jr=await fetch(JINA,{cache:'no-store'});
+          if(jr.ok){
+            const jt=await jr.text();
+            const expanded=parseMarkdownFbref(jt);
+            const manual=new Map(data.players.map(x=>[(x.player+'|'+x.team).toLocaleLowerCase('tr'),x]));
+            players=expanded.map(p=>{const m=manual.get((p.player+'|'+p.team).toLocaleLowerCase('tr'));return norm(m?{...p,price:m.price,priceVerified:m.priceVerified,priceSource:m.priceSource,penalty:m.penalty||p.penalty,corner:m.corner,opponent:m.opponent,home:m.home}:p)});
+            save();renderAll();setStatus('Tam FBref havuzu Jina üzerinden yüklendi: '+players.length+' oyuncu.');return;
+          }
+        }catch(jinaErr){console.warn('Jina expansion failed',jinaErr)}
+        players=data.players.map(norm);save();renderAll();
+        setStatus('Güvenli yerel veri yüklendi: '+players.length+' oyuncu. Tam havuz arka planda güncelleniyor.','err');
         return;
       }
     }
