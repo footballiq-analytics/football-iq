@@ -11,200 +11,215 @@ tailwind.config={theme:{extend:{colors:{iq:"#d7b86a",night:"#0b1220",panel:"#111
 </script>
 <style>
 :root{
- --bg:#0b1220;--bg2:#0f1726;--panel:#121b2b;--panel2:#172234;--line:#263449;
- --text:#e8edf5;--muted:#93a4b8;--accent:#d7b86a;--accent2:#6ea8a1;--good:#76b49b;
+  --bg:#0B1220;--panel:#111827;--panel2:#172033;--line:#263449;--text:#E8EDF5;--muted:#93A4B8;
+  --gold:#D7B86A;--green:#38C98D;--blue:#5AA8E8;--red:#E35D6A;--orange:#D9A441;
 }
 *{box-sizing:border-box}
-html{background:var(--bg);color-scheme:dark}
-body{min-height:100vh;background:linear-gradient(180deg,#0b1220 0%,#0d1522 55%,#0a101a 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.glass{background:rgba(18,27,43,.92);border:1px solid rgba(148,163,184,.12);box-shadow:0 10px 28px rgba(0,0,0,.18);backdrop-filter:blur(10px)}
-button,select,input,textarea{transition:.18s ease}
-button:hover{transform:translateY(-1px)}
-button:active{transform:translateY(0)}
-input,select,textarea{background:#0d1624!important;color:var(--text)!important;border-color:#2a3950!important}
-th{position:sticky;top:0;background:#111b2b;z-index:1;color:#9fb0c3}
-.pitch{
- background:
-   linear-gradient(rgba(255,255,255,.018),rgba(255,255,255,.018)),
-   repeating-linear-gradient(0deg,#20553d 0 56px,#1d4c38 56px 112px);
- position:relative;overflow:hidden;border:1px solid #304a3d!important;
- box-shadow:inset 0 0 0 1px rgba(255,255,255,.025),0 14px 34px rgba(0,0,0,.2)
-}
-.pitch:before{content:"";position:absolute;inset:3.5%;border:1.5px solid rgba(236,253,245,.5);border-radius:10px}
-.pitch:after{display:none!important}
-.line-circle{display:none!important}
-.player-card{position:absolute;transform:translate(-50%,-50%);width:112px;max-width:24vw;text-align:center;filter:drop-shadow(0 8px 14px rgba(0,0,0,.28))}
-.player-card .kit-shell{position:relative;padding-top:2px}
-.player-card .jersey{position:relative;width:78px;height:70px;margin:0 auto 3px;clip-path:polygon(20% 0,36% 10%,64% 10%,80% 0,100% 19%,88% 39%,79% 33%,79% 100%,21% 100%,21% 33%,12% 39%,0 19%);background:linear-gradient(135deg,var(--kit1,#334155) 0 48%,var(--kit2,#475569) 48% 100%);border:1px solid rgba(255,255,255,.13)}
-.player-card .jersey:after{content:"";position:absolute;inset:8px 27px auto;height:7px;border-radius:0 0 10px 10px;background:#0b122099}
-.player-card .face,.player-card .face-fallback{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(215,184,106,.75);background:#172234;z-index:2}
-.player-card .face{object-fit:cover}
-.player-card .face-fallback{display:grid;place-items:center;font-size:11px;font-weight:800}
-.player-card .card-meta{background:rgba(13,22,36,.95);border:1px solid rgba(148,163,184,.15);border-radius:10px;padding:5px 6px;box-shadow:0 6px 16px rgba(0,0,0,.16)}
-.player-card b{font-size:10.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-card small{font-size:8.5px;color:#a8b6c7;display:block}.player-card strong{font-size:9.5px;color:#dcc27f}
-.spinner{width:18px;height:18px;border:2px solid #ffffff22;border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-.bench-card{background:#0e1827;border:1px solid rgba(148,163,184,.14);border-radius:11px;padding:8px;min-width:0}
-.bench-card b{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bench-card small{font-size:9px;color:#94a3b8}
-.badge-c,.badge-c2{display:inline-grid;place-items:center;width:21px;height:21px;border-radius:50%;font-size:9px;font-weight:900;margin-right:4px}.badge-c{background:#d7b86a;color:#0b1220}.badge-c2{background:#7fb2c8;color:#0b1220}
-.rule-ok{border-color:rgba(118,180,155,.35);color:#b7dfcf;background:rgba(118,180,155,.07)}
-.compact-action{padding:.72rem .9rem!important;border-radius:12px!important;min-height:auto!important}
-.compact-action b{font-size:.92rem!important;line-height:1.15}
-.compact-action small{font-size:.68rem!important}
-.soft-accent{background:#cdb476!important;color:#111827!important;box-shadow:none!important}
-.soft-outline{background:#111b2b!important;border:1px solid #2a3950!important}
-.section-title{font-size:1.05rem!important}
+html{background:var(--bg);color-scheme:dark;scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:linear-gradient(180deg,#09111d 0%,#0B1220 45%,#0a101a 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,select,input{font:inherit}
+button{cursor:pointer}
+.app-shell{max-width:1760px;margin:0 auto;padding:0 14px 78px}
+.topbar{height:68px;position:sticky;top:0;z-index:50;display:grid;grid-template-columns:280px 1fr 250px;align-items:center;gap:12px;background:rgba(11,18,32,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,#d7b86a,#8d6f2b);color:#0b1220;font-weight:900;box-shadow:0 6px 18px #0006}
+.brand-title{font-weight:800;letter-spacing:.05em}
+.brand-sub{font-size:11px;color:var(--muted)}
+.version-badge{display:inline-flex;margin-top:2px;padding:2px 7px;border-radius:999px;border:1px solid #d7b86a55;color:#e8d69c;font-size:9px;font-weight:700}
+.desktop-nav{display:flex;justify-content:center;gap:4px}
+.desktop-nav a{color:#9fb0c3;text-decoration:none;font-size:12px;font-weight:600;padding:9px 11px;border-radius:9px}
+.desktop-nav a:hover,.desktop-nav a.active{background:#172033;color:#fff}
+.top-actions{display:flex;justify-content:flex-end;align-items:center;gap:7px}
+.icon-btn,.profile-chip{height:36px;border:1px solid var(--line);background:#101a2a;color:#dbe5ef;border-radius:10px}
+.icon-btn{width:36px;display:grid;place-items:center}
+.profile-chip{padding:0 10px;font-size:11px;font-weight:700}
+.pro-badge{font-size:9px;padding:4px 7px;border:1px solid #d7b86a66;border-radius:8px;color:#e5c978;background:#d7b86a0d}
+.mobile-menu-btn{display:none}
+.mobile-menu{display:none}
+
+.quick-strip{display:flex;gap:8px;overflow-x:auto;padding:10px 0 8px;scrollbar-width:none}
+.quick-strip::-webkit-scrollbar{display:none}
+.quick-action{flex:0 0 156px;min-height:58px;border:1px solid var(--line);background:#111827;color:var(--text);border-radius:11px;padding:9px 10px;display:grid;grid-template-columns:27px 1fr;gap:8px;text-align:left;align-items:center;box-shadow:0 5px 18px #0002}
+.quick-action:hover{background:#172033;border-color:#41516a}
+.quick-action.primary{border-color:#d7b86a66;background:linear-gradient(145deg,#1b2027,#171a20)}
+.qa-icon{width:27px;height:27px;border-radius:8px;display:grid;place-items:center;background:#1b2838;font-size:14px}
+.quick-action b{display:block;font-size:11px;line-height:1.15}
+.quick-action small{display:block;font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+
+.statusbar{min-height:34px;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#0f1927;border-radius:9px;padding:7px 11px;margin-bottom:10px;font-size:10px;color:#a7b6c7}
+.status-left{display:flex;align-items:center;gap:7px;min-width:0}.status-left span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px #38c98d66;flex:0 0 auto}
+.status-meta{display:flex;gap:12px;white-space:nowrap;color:#8090a3}
+
+.dashboard{display:grid;grid-template-columns:minmax(420px,38fr) minmax(500px,42fr) minmax(255px,20fr);gap:10px;align-items:start}
+.panel{background:rgba(17,24,39,.94);border:1px solid var(--line);border-radius:13px;box-shadow:0 10px 28px #0003;overflow:hidden}
+.panel-pad{padding:12px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.panel-title{font-size:14px;font-weight:800}.panel-sub{font-size:9px;color:var(--muted);margin-top:2px}
+.control-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+select,input{background:#0d1624!important;color:var(--text)!important;border:1px solid #2a3950!important;border-radius:8px;padding:7px 8px}
+select{font-size:10px}input{font-size:10px}
+.metric-inline{display:flex;gap:5px}
+.metric-pill{background:#0d1624;border:1px solid #223149;border-radius:8px;padding:5px 7px;font-size:9px;color:var(--muted)}
+.metric-pill b{color:#fff;font-size:11px}
+
+.pitch{min-height:585px;position:relative;overflow:hidden;border-radius:12px;border:1px solid #304a3d!important;background:repeating-linear-gradient(0deg,#20553d 0 52px,#1d4c38 52px 104px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)}
+.pitch:before{content:"";position:absolute;inset:3.3%;border:1.5px solid rgba(236,253,245,.46);border-radius:8px}
+.pitch:after{display:none!important}.line-circle{display:none!important}
+.player-card{position:absolute;transform:translate(-50%,-50%);width:90px;text-align:center;filter:drop-shadow(0 6px 10px #0007)}
+.player-card .kit-shell{position:relative;padding-top:1px}
+.player-card .jersey{position:relative;width:62px;height:55px;margin:0 auto 2px;clip-path:polygon(20% 0,36% 10%,64% 10%,80% 0,100% 19%,88% 39%,79% 33%,79% 100%,21% 100%,21% 33%,12% 39%,0 19%);background:linear-gradient(135deg,var(--kit1,#334155) 0 48%,var(--kit2,#475569) 48% 100%);border:1px solid rgba(255,255,255,.12)}
+.player-card .jersey:after{content:"";position:absolute;inset:7px 22px auto;height:6px;border-radius:0 0 8px 8px;background:#0b122099}
+.player-card .face,.player-card .face-fallback{position:absolute;left:50%;top:6px;transform:translateX(-50%);width:36px;height:36px;border-radius:50%;border:1.5px solid #d7b86aaa;background:#172234;z-index:2}
+.player-card .face{object-fit:cover}.player-card .face-fallback{display:grid;place-items:center;font-size:9px;font-weight:800}
+.player-card .card-meta{background:rgba(10,18,30,.96);border:1px solid #304059;border-radius:8px;padding:4px 5px;box-shadow:0 5px 12px #0005}
+.player-card b{font-size:8.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-card small{font-size:6.8px;color:#a8b6c7;display:block}.player-card strong{font-size:7.6px;color:#e0c780}
+.badge-c,.badge-c2{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;font-size:8px;font-weight:900;margin-right:3px}.badge-c{background:var(--gold);color:#0b1220}.badge-c2{background:#5aa8e8;color:#07111f}
+
+.bench-head{display:flex;justify-content:space-between;align-items:center;margin:9px 0 6px}.bench-head h3{font-size:10px;margin:0}
+.bench-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.bench-card{background:#0e1827;border:1px solid #24344b;border-radius:9px;padding:5px;min-width:0}.bench-card .player-card{position:static;transform:none;width:100%;filter:none}.bench-card .jersey{width:48px;height:43px}.bench-card .face,.bench-card .face-fallback{width:28px;height:28px;top:5px}.bench-card b{font-size:7.5px}.bench-card small{font-size:6px}
+.budget-block{margin-top:8px}.budget-line{display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px}.budget-track{height:7px;border-radius:99px;background:#202b3a;overflow:hidden}.budget-fill{height:100%;background:var(--green);transition:.2s}
+.rules{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:7px}.rule{border:1px solid #24344b;background:#0d1624;border-radius:7px;padding:5px;font-size:8px;color:#8fa0b5}.rule-ok{border-color:#38c98d55;color:#9ae4c5;background:#38c98d0b}
+
+.table-panel{min-height:760px}
+.table-head{padding:12px;border-bottom:1px solid var(--line)}
+.filters{display:grid;grid-template-columns:1.2fr repeat(4,.8fr);gap:6px;margin-top:8px}.filters input{min-width:0}
+.table-wrap{overflow:auto;max-height:690px}
+table{width:100%;border-collapse:collapse;font-size:9px;min-width:840px}
+th{position:sticky;top:0;background:#111b2b;z-index:1;color:#8ea0b5;text-align:center;padding:7px 5px;border-bottom:1px solid #263449}
+td{padding:6px 5px;border-bottom:1px solid #1d293a;text-align:center}td:nth-child(2),th:nth-child(2),td:nth-child(3),th:nth-child(3){text-align:left}
+tbody tr:hover{background:#ffffff05}
+
+.side-panel{position:sticky;top:78px;min-height:540px}
+.side-profile{padding:12px}
+.side-empty{color:var(--muted);font-size:11px;padding:28px 10px;text-align:center}
+.side-profile-head{display:grid;grid-template-columns:74px 1fr;gap:10px;align-items:center}
+.side-avatar,.side-avatar-fallback{width:72px;height:72px;border-radius:14px;background:#172234;border:1px solid #d7b86a55;object-fit:cover}.side-avatar-fallback{display:grid;place-items:center;font-weight:900;font-size:20px}
+.side-name{font-size:16px;font-weight:800}.side-team{font-size:10px;color:var(--muted);margin-top:2px}
+.side-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:10px}.side-metric{background:#0d1624;border:1px solid #233249;border-radius:8px;padding:7px}.side-metric small{font-size:8px;color:#8090a3;display:block}.side-metric b{font-size:13px}
+.side-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.tag{font-size:8px;border:1px solid #304059;border-radius:99px;padding:4px 6px;color:#b8c6d5}
+.ai-box{margin-top:10px;border:1px solid #2a3950;background:#0c1522;border-radius:9px;padding:9px}.ai-box b{font-size:10px}.ai-box p{font-size:9px;line-height:1.45;color:#9fb0c3;margin:5px 0 0}
+.side-actions{display:grid;gap:6px;margin-top:10px}.side-actions button{border:1px solid #3d4d66;background:#111c2d;color:#dce7f2;border-radius:8px;padding:8px;font-size:9px;font-weight:700}.side-actions button.primary{border-color:#d7b86a77;color:#e6ce87;background:#d7b86a0d}
+
+.insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.mini-panel{background:#101827;border:1px solid #263449;border-radius:10px;padding:10px;min-height:150px}
+.mini-title{font-size:11px;font-weight:800}.mini-list{margin-top:7px;display:grid;gap:5px}.mini-row{display:flex;align-items:center;justify-content:space-between;gap:7px;background:#0d1624;border-radius:7px;padding:6px 7px;font-size:8px}.mini-row b{font-size:9px}
+.good{color:var(--green)}.warn{color:var(--orange)}.bad{color:var(--red)}.blue{color:var(--blue)}
+
+.overlay-panel{position:fixed;inset:76px 18px 18px;z-index:55;overflow:auto;background:#0b1220f7;border:1px solid #2b3a50;border-radius:14px;padding:14px;box-shadow:0 20px 60px #0009}
+.glass{background:rgba(17,24,39,.96);border:1px solid var(--line);border-radius:12px}
+.metric-card{background:#0e1827;border:1px solid #263449;border-radius:9px;padding:8px}.metric-card small{display:block;color:#8394aa;font-size:8px;text-transform:uppercase}.metric-card b{font-size:13px}
 .player-profile-grid{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:center}
-.player-profile-photo{width:92px;height:92px;border-radius:18px;object-fit:cover;border:1px solid rgba(215,184,106,.45);background:#172234}
-.player-profile-fallback{width:92px;height:92px;border-radius:18px;display:grid;place-items:center;background:#172234;border:1px solid rgba(215,184,106,.45);font-weight:900;font-size:24px}
-.metric-card{background:#0e1827;border:1px solid rgba(148,163,184,.12);border-radius:10px;padding:9px}
-.metric-card small{display:block;color:#8394aa;font-size:9px;text-transform:uppercase;letter-spacing:.06em}.metric-card b{font-size:14px}
-@media(max-width:520px){.player-profile-grid{grid-template-columns:74px 1fr}.player-profile-photo,.player-profile-fallback{width:70px;height:70px;border-radius:14px}.player-profile-fallback{font-size:20px}}
+.player-profile-photo,.player-profile-fallback{width:92px;height:92px;border-radius:16px;border:1px solid #d7b86a66;background:#172234}.player-profile-photo{object-fit:cover}.player-profile-fallback{display:grid;place-items:center;font-size:24px;font-weight:900}
+.spinner{width:17px;height:17px;border:2px solid #ffffff22;border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+
+.mobile-bottom{display:none}
+
+@media(max-width:1200px){
+  .dashboard{grid-template-columns:minmax(390px,1fr) minmax(500px,1.15fr)}
+  .side-panel{grid-column:1/-1;position:static}.side-profile{display:grid;grid-template-columns:1fr 1.4fr;gap:12px}
+}
 @media(max-width:900px){
- .player-card{width:86px}.player-card .jersey{width:66px;height:58px}.player-card .face,.player-card .face-fallback{width:37px;height:37px;top:7px}
- .player-card small{font-size:7px}.player-card b{font-size:8.5px}.player-card strong{font-size:8px}
+  .app-shell{padding:0 9px 76px}.topbar{grid-template-columns:1fr auto;height:60px;padding:0 4px}.desktop-nav,.top-actions .icon-btn,.top-actions .profile-chip,.top-actions .pro-badge{display:none}.mobile-menu-btn{display:grid}
+  .brand-mark{width:34px;height:34px}.brand-title{font-size:14px}.brand-sub{font-size:9px}
+  .mobile-menu.open{display:grid;position:fixed;top:60px;left:9px;right:9px;z-index:70;background:#111827;border:1px solid #263449;border-radius:12px;padding:8px;gap:4px}.mobile-menu a{color:#d6e0ea;text-decoration:none;font-size:11px;padding:10px;border-radius:8px}.mobile-menu a:hover{background:#172033}
+  .quick-strip{padding:8px 0}.quick-action{flex-basis:132px;min-height:52px;padding:7px}.quick-action small{font-size:8px}
+  .status-meta{display:none}.dashboard{display:block}.panel{margin-bottom:9px}.side-panel{display:none}
+  .pitch{min-height:510px}.player-card{width:74px}.player-card .jersey{width:52px;height:47px}.player-card .face,.player-card .face-fallback{width:30px;height:30px;top:5px}.player-card b{font-size:7px}.player-card small{font-size:5.8px}.player-card strong{font-size:6.5px}
+  .filters{grid-template-columns:1fr 1fr}.filters input{grid-column:1/-1}.table-wrap{max-height:none}table{display:none}
+  #playersMobile{display:grid!important;gap:6px;padding:8px}.mobile-player{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;background:#0e1827;border:1px solid #223149;border-radius:9px;padding:8px}.mobile-player img,.mobile-player .avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#172234}.mobile-player b{font-size:10px}.mobile-player small{font-size:8px;color:#8fa0b4}
+  .insight-grid{grid-template-columns:1fr}.overlay-panel{inset:66px 8px 70px}.mobile-bottom{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:80;background:#0b1220f5;border-top:1px solid #263449;padding:6px 5px calc(6px + env(safe-area-inset-bottom))}.mobile-bottom a,.mobile-bottom button{background:transparent;border:0;color:#8fa0b5;font-size:8px;text-decoration:none;text-align:center;padding:5px}.mobile-bottom .active{color:#e0c780}
+}
+@media(max-width:560px){
+  .metric-inline{display:none}.pitch{min-height:470px}.bench-grid{gap:3px}.bench-card{padding:3px}.rules{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
 <body>
-<div class="max-w-[1500px] mx-auto p-3 sm:p-5 lg:p-7">
-<header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
-  <div><div class="flex items-center gap-2"><div class="text-amber-200 font-black tracking-[.22em] text-xl">FUTBOL IQ</div><span class="text-[10px] px-2 py-1 rounded-full border border-emerald-400/30 text-emerald-300 bg-emerald-400/5">PRO UI V8.1 · JS FIX</span></div><h1 class="text-xl sm:text-3xl font-extrabold tracking-tight mt-1">TFF Fantezi Otomatik Kadro Kurucu</h1><p class="text-slate-400 mt-1">TFF Fantezi Lig · Canlı Scout · 100M bütçe</p></div>
-  <div class="text-xs text-slate-400">Kaynak: FBref + manuel CSV · Son veri: <span id="lastUpdate">—</span></div>
-</header>
-
-<section class="grid md:grid-cols-3 gap-2 mb-3">
-  <button id="fetchBtn" class="glass compact-action text-left hover:border-slate-500/50 transition"><span class="text-iq font-black">01</span><b class="block text-lg mt-1">Veriyi Çek / Yenile</b><small class="text-slate-400">FBref → AllOrigins → otomatik parse</small></button>
-  
-  <div class="grid gap-2">
-    <button id="squadBtn" class="compact-action soft-accent text-left hover:brightness-105 transition"><span class="font-black">03</span><b class="block text-lg mt-1">EN İYİ 15'Lİ KADROYU KUR</b><small class="text-slate-800">11 ilk + 4 yedek · 100M · kulüp başına max 3</small></button>
-    <button id="compareBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-sky-300">3 MODU KARŞILAŞTIR</b><small class="block text-slate-400">Güvenli · Dengeli · Diferansiyel</small></button>
-    <button id="transferBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-emerald-300">TRANSFER ÖNERİLERİ</b><small class="block text-slate-400">ÇIKAR → AL · bütçe ve kulüp limiti korunur</small></button>
-    <button id="weeklyBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-amber-200">HAFTANIN 11'İ</b><small class="block text-slate-400">Top 5 · kaptan · tek dokunuşla uygula</small></button>
-    <button id="healthBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-cyan-200">KADRO SAĞLIĞI</b><small class="block text-slate-400">Veri kalitesi · fiyat · risk · eksikler</small></button>
-    <button id="radarBtn" class="compact-action soft-outline text-left hover:border-slate-500/50 transition"><b class="text-violet-200">FİKSTÜR RADARI</b><small class="block text-slate-400">EV/D · rakip · xP · haftanın fırsatları</small></button>
-  </div>
-</section>
-
-<div id="status" class="glass rounded-xl px-4 py-3 mb-4 text-sm flex items-center gap-3"><span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span id="statusText">Hazır. Oyuncu havuzunu yükle ve kadronu oluştur.</span></div>
-<section id="comparePanel" class="hidden glass rounded-2xl p-4 mb-4">
-  <div class="flex items-center justify-between gap-3"><div><h2 class="text-xl font-black">3 KADRO KARŞILAŞTIRMASI</h2><p class="text-xs text-slate-400">Aynı veri, bütçe ve TFF kurallarıyla üç farklı risk profili.</p></div><button id="closeCompare" class="px-3 py-2 rounded-lg border border-white/10 text-xs">Kapat</button></div>
-  <div id="compareCards" class="grid lg:grid-cols-3 gap-3 mt-4"></div>
-  <div id="compareOverlap" class="mt-4 text-xs text-slate-400"></div>
-</section>
-
-<section id="radarPanel" class="hidden glass rounded-2xl p-4 mb-4">
-  <div class="flex items-center justify-between gap-3">
-    <div><h2 class="section-title font-extrabold">Fikstür Radarı</h2><p class="text-xs text-slate-400">Rakip, EV/D, xP ve başlama ihtimaline göre haftanın fırsatlarını sıralar.</p></div>
-    <button id="closeRadar" class="px-3 py-1.5 rounded-lg border border-white/10 text-xs">Kapat</button>
-  </div>
-  <div id="radarSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3"></div>
-  <div class="grid lg:grid-cols-2 gap-2 mt-3">
-    <div class="rounded-xl border border-white/10 bg-black/10 p-3"><div class="font-bold text-sm">En avantajlı 8</div><div id="radarBest" class="mt-2 space-y-1.5"></div></div>
-    <div class="rounded-xl border border-white/10 bg-black/10 p-3"><div class="font-bold text-sm">Riskli / uzak dur</div><div id="radarRisk" class="mt-2 space-y-1.5"></div></div>
-  </div>
-</section>
-
-<section id="healthPanel" class="hidden glass rounded-2xl p-4 mb-4">
-  <div class="flex items-center justify-between gap-3">
-    <div><h2 class="section-title font-extrabold">Kadro Sağlığı</h2><p class="text-xs text-slate-400">Oyuncu havuzunun veri kalitesini ve mevcut 15'linin risklerini tek ekranda gösterir.</p></div>
-    <button id="closeHealth" class="px-3 py-1.5 rounded-lg border border-white/10 text-xs">Kapat</button>
-  </div>
-  <div id="healthSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3"></div>
-  <div id="healthIssues" class="grid lg:grid-cols-2 gap-2 mt-3"></div>
-</section>
-
-<section id="weeklyPanel" class="hidden glass rounded-2xl p-4 mb-4">
-  <div class="flex items-center justify-between gap-3">
-    <div><h2 class="section-title font-extrabold">Haftanın 11'i</h2><p class="text-xs text-slate-400">Seçili stratejiye göre en güçlü ilk 11, kaptan ve pozisyon bazlı Top 5.</p></div>
-    <button id="closeWeekly" class="px-3 py-1.5 rounded-lg border border-white/10 text-xs">Kapat</button>
-  </div>
-  <div id="weeklyHero" class="mt-3"></div>
-  <div id="weeklyTop5" class="grid lg:grid-cols-4 gap-2 mt-3"></div>
-</section>
-
-<section id="transferPanel" class="hidden glass rounded-2xl p-4 mb-4">
-  <div class="flex items-center justify-between gap-3">
-    <div><h2 class="section-title font-extrabold">Transfer Önerileri</h2><p class="text-xs text-slate-400">Mevcut 15'lin için aynı mevki içinde kurallara uygun ÇIKAR → AL seçenekleri.</p></div>
-    <button id="closeTransfer" class="px-3 py-1.5 rounded-lg border border-white/10 text-xs">Kapat</button>
-  </div>
-  <div id="transferSummary" class="text-xs text-slate-400 mt-3"></div>
-  <div id="transferCards" class="grid md:grid-cols-2 xl:grid-cols-3 gap-2 mt-3"></div>
-</section>
-
-<div id="playerModal" class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm p-3 sm:p-6">
-  <div class="max-w-xl mx-auto mt-6 sm:mt-14 glass rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-    <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
-      <div><div class="text-[10px] uppercase tracking-[.18em] text-slate-500">FUTBOL IQ</div><h2 id="playerModalTitle" class="font-extrabold text-lg">Oyuncu Profili</h2></div>
-      <button id="closePlayerModal" class="px-3 py-1.5 rounded-lg border border-white/10 text-xs">Kapat</button>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">IQ</div>
+      <div>
+        <div class="brand-title">FUTBOL <span style="color:var(--gold)">IQ</span></div>
+        <div class="brand-sub">TFF Fantezi Lig · Canlı Scout</div>
+        <span class="version-badge">PRO UI V9 · DASHBOARD</span>
+      </div>
     </div>
-    <div id="playerModalBody" class="p-4"></div>
-  </div>
-</div>
+    <nav class="desktop-nav">
+      <a href="#dashboard" class="active">Anasayfa</a><a href="#squadSection">Kadro Kurucu</a><a href="#playersSection">Oyuncular</a><a href="#radarMini">Fikstür</a><a href="#insights">Analizler</a><a href="#playersSection">Liderlik</a>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" aria-label="Karanlık mod">☾</button><button class="icon-btn" aria-label="Bildirim">◉</button><button class="profile-chip">FantastikAdam</button><span class="pro-badge">PRO</span>
+      <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" aria-label="Menü">☰</button>
+    </div>
+  </header>
+  <div id="mobileMenu" class="mobile-menu"><a href="#squadSection">Kadro Kurucu</a><a href="#playersSection">Oyuncular</a><a href="#radarMini">Fikstür</a><a href="#insights">Analizler</a></div>
 
-<section class="grid xl:grid-cols-[minmax(0,1.08fr)_minmax(520px,.92fr)] gap-4">
-  <div class="space-y-4">
-    <div class="glass rounded-2xl p-4">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div><h2 class="section-title font-extrabold">TFF Uyumlu 15 Kişilik Kadro</h2><p class="text-xs text-slate-400">2 KL · 5 DEF · 5 ORT · 3 FOR · kulüp başına en fazla 3 · 11 ilk + 4 yedek</p></div>
-        <div class="flex gap-2 flex-wrap">
-          <select id="strategy" class="rounded-lg border px-3 py-2 text-sm">
-            <option value="balanced">Dengeli Kadro</option>
-            <option value="safe">Güvenli Kadro</option>
-            <option value="differential">Agresif / Diferansiyel</option>
-          </select>
-          <select id="formation" class="rounded-lg border px-3 py-2 text-sm">
-            <option value="433">4-3-3</option><option value="442">4-4-2</option><option value="343">3-4-3</option><option value="352">3-5-2</option><option value="532">5-3-2</option>
-          </select>
+  <section class="quick-strip" aria-label="Hızlı işlemler">
+    <button id="fetchBtn" class="quick-action"><span class="qa-icon">↻</span><span><b>Veriyi Yenile</b><small>360 oyuncu havuzu</small></span></button>
+    <button id="squadBtn" class="quick-action primary"><span class="qa-icon">🏆</span><span><b>En İyi 15</b><small>Optimum kadro</small></span></button>
+    <button id="compareBtn" class="quick-action"><span class="qa-icon">▥</span><span><b>3 Modu Karşılaştır</b><small>Güvenli · Dengeli · Farklı</small></span></button>
+    <button id="transferBtn" class="quick-action"><span class="qa-icon">⇄</span><span><b>Transfer Önerileri</b><small>ÇIKAR → AL</small></span></button>
+    <button id="weeklyBtn" class="quick-action"><span class="qa-icon">★</span><span><b>Haftanın 11’i</b><small>Kaptan + Top 5</small></span></button>
+    <button id="healthBtn" class="quick-action"><span class="qa-icon">♥</span><span><b>Kadro Sağlığı</b><small>Sakat · cezalı · risk</small></span></button>
+    <button id="radarBtn" class="quick-action"><span class="qa-icon">◎</span><span><b>Fikstür Radarı</b><small>Fırsatlar ve zorluklar</small></span></button>
+  </section>
+
+  <div id="status" class="statusbar">
+    <div class="status-left"><span id="statusDot" class="status-dot"></span><span id="statusText">Hazır. Oyuncu havuzunu yükle ve kadronu oluştur.</span></div>
+    <div class="status-meta"><span>360 oyuncu</span><span>18/18 takım</span><span>Son veri: <b id="lastUpdate">—</b></span></div>
+  </div>
+
+  <section id="comparePanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">3 Kadro Karşılaştırması</div><div class="panel-sub">Aynı veriyle üç risk profili</div></div><button id="closeCompare" class="icon-btn">×</button></div><div id="compareCards" class="grid lg:grid-cols-3 gap-3"></div><div id="compareOverlap" class="mt-3 text-xs text-slate-400"></div></section>
+  <section id="radarPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Fikstür Radarı</div><div class="panel-sub">Rakip, EV/D, xP ve başlama ihtimali</div></div><button id="closeRadar" class="icon-btn">×</button></div><div id="radarSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div><div class="grid lg:grid-cols-2 gap-2 mt-3"><div class="mini-panel"><div class="mini-title">En avantajlı 8</div><div id="radarBest" class="mini-list"></div></div><div class="mini-panel"><div class="mini-title">Riskli / uzak dur</div><div id="radarRisk" class="mini-list"></div></div></div></section>
+  <section id="healthPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Kadro Sağlığı</div><div class="panel-sub">Veri kalitesi ve risk kontrolü</div></div><button id="closeHealth" class="icon-btn">×</button></div><div id="healthSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div><div id="healthIssues" class="grid lg:grid-cols-2 gap-2 mt-3"></div></section>
+  <section id="weeklyPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Haftanın 11’i</div><div class="panel-sub">Kaptan, C2 ve pozisyon Top 5</div></div><button id="closeWeekly" class="icon-btn">×</button></div><div id="weeklyHero"></div><div id="weeklyTop5" class="grid lg:grid-cols-4 gap-2 mt-3"></div></section>
+  <section id="transferPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Transfer Önerileri</div><div class="panel-sub">Kurallara uygun ÇIKAR → AL</div></div><button id="closeTransfer" class="icon-btn">×</button></div><div id="transferSummary" class="text-xs text-slate-400"></div><div id="transferCards" class="grid md:grid-cols-2 xl:grid-cols-3 gap-2 mt-3"></div></section>
+
+  <div id="playerModal" class="hidden fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm p-3 sm:p-6"><div class="max-w-xl mx-auto mt-8 glass overflow-hidden"><div class="panel-head p-3 border-b border-white/10"><div><div class="panel-sub">FUTBOL IQ</div><div id="playerModalTitle" class="panel-title">Oyuncu Profili</div></div><button id="closePlayerModal" class="icon-btn">×</button></div><div id="playerModalBody" class="p-4"></div></div></div>
+
+  <main id="dashboard" class="dashboard">
+    <section id="squadSection" class="panel">
+      <div class="panel-pad">
+        <div class="panel-head">
+          <div><div class="panel-title">Kadrom</div><div class="panel-sub">TFF uyumlu 15 kişilik kadro</div></div>
+          <div class="control-row"><select id="strategy"><option value="balanced">Dengeli</option><option value="safe">Güvenli</option><option value="differential">Diferansiyel</option></select><select id="formation"><option value="433">4-3-3</option><option value="442">4-4-2</option><option value="343">3-4-3</option><option value="352">3-5-2</option><option value="532">5-3-2</option></select></div>
         </div>
+        <div class="metric-inline"><div class="metric-pill">Toplam xP <b id="squadXP">0.0</b></div><div class="metric-pill">Tahmini <b id="projectedScore">0.0</b></div><div class="metric-pill">Bütçe <b><span id="budgetUsed">0.0</span>M</b></div></div>
+        <div id="pitch" class="pitch mt-2"><div id="emptyPitch" class="absolute inset-0 grid place-items-center text-center p-8"><div><div class="text-4xl mb-2">⚽</div><b>Henüz kadro kurulmadı</b><p class="text-[10px] text-white/60 mt-1">“En İyi 15” ile otomatik kadro oluştur.</p></div></div></div>
+        <div class="bench-head"><h3>YEDEK KULÜBESİ · 4/4</h3><span id="captainInfo" class="text-[9px] text-slate-400">C / C2 bekleniyor</span></div>
+        <div id="bench" class="bench-grid"><div class="bench-card text-slate-500">Yedekler kadro kurulunca burada görünür.</div></div>
+        <div class="budget-block"><div class="budget-line"><span>Bütçe</span><b><span id="budgetUsedMirror">0.0</span>M / 100M · Kalan <span id="budgetRemaining">100.0</span>M</b></div><div class="budget-track"><div id="budgetBar" class="budget-fill" style="width:0%"></div></div></div>
+        <div class="rules"><div id="rule15" class="rule">15 oyuncu</div><div id="rulePos" class="rule">2/5/5/3 mevki</div><div id="ruleClub" class="rule">Kulüp max 3</div><div id="ruleBudget" class="rule">≤100M</div></div>
+        <div id="whyPanel" class="mini-panel mt-2"><div class="mini-title">Neden bu oyuncu?</div><div id="whyContent" class="text-[9px] text-slate-400 mt-1">Bir oyuncu seç; FUTBOL IQ gerekçelerini göstersin.</div></div>
       </div>
-      <div class="mt-4">
-        <div class="flex items-center justify-between text-xs mb-1"><span>Bütçe</span><b><span id="budgetUsed">0.0</span>M / 100M</b></div>
-        <div class="h-3 bg-slate-800 rounded-full overflow-hidden"><div id="budgetBar" class="h-full bg-iq transition-all" style="width:0%"></div></div>
-      </div>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 text-[11px]">
-        <div id="rule15" class="glass rounded-xl px-3 py-2">15 oyuncu</div>
-        <div id="rulePos" class="glass rounded-xl px-3 py-2">2/5/5/3 mevki</div>
-        <div id="ruleClub" class="glass rounded-xl px-3 py-2">Kulüp max 3</div>
-        <div id="ruleBudget" class="glass rounded-xl px-3 py-2">Bütçe ≤100M</div>
-      </div>
-      <div id="pitch" class="pitch rounded-2xl mt-4 min-h-[610px] sm:min-h-[680px] border border-white/10"><div id="emptyPitch" class="absolute inset-0 grid place-items-center text-center p-8"><div><div class="text-5xl mb-2">⚽</div><b>Henüz kadro kurulmadı</b><p class="text-sm text-white/70 mt-1">Veriyi yükle ve “EN İYİ 15'Lİ KADROYU KUR” butonuna bas.</p></div></div></div>
-      <div class="mt-4">
-        <div class="flex items-center justify-between gap-3 mb-2"><h3 class="font-black">YEDEK KULÜBESİ · 4 OYUNCU</h3><span id="captainInfo" class="text-xs text-slate-400">C / C2 bekleniyor</span></div>
-        <div id="bench" class="grid grid-cols-2 sm:grid-cols-4 gap-2"><div class="bench-card text-slate-500">Yedekler kadro kurulunca burada görünür.</div></div>
-      </div>
-      <div id="whyPanel" class="mt-4 border border-iq/20 rounded-2xl p-4 bg-black/20">
-        <div class="flex items-center justify-between gap-3"><h3 class="font-black">NEDEN BU OYUNCU?</h3><span class="text-[10px] text-slate-500">Karttaki “Neden?” tuşuna dokun</span></div>
-        <div id="whyContent" class="text-sm text-slate-400 mt-2">Kadro kurulduktan sonra bir oyuncuyu seç; FUTBOL IQ kararını gerekçeleriyle açıklasın.</div>
-      </div>
-    </div>
-    <div class="glass rounded-2xl p-4">
-      <div class="flex items-center justify-between gap-3"><div><h2 class="font-black">FUTBOL IQ Scout Skoru</h2><p class="text-xs text-slate-400">Seçim metriği = xG90×6 + xA90×4 + Form4+ + Penaltı×1.5 + Korner×1</p></div><button id="embedBtn" class="text-xs border border-iq/30 text-iq px-3 py-2 rounded-lg">Web sitene göm</button></div>
-      <p class="text-xs text-slate-500 mt-3">Bu değer <b>resmî TFF maç puanı değil</b>; en verimli kadroyu seçmek için FUTBOL IQ projeksiyonudur. TFF kadro kısıtları ayrı olarak eksiksiz uygulanır. Fiyat yoksa 6M varsayılır.</p>
-      <div class="grid sm:grid-cols-2 gap-2 mt-3 text-xs text-slate-400"><div class="border border-white/10 rounded-xl p-3"><b class="text-white">Haftalık xP motoru</b><br>Resmî gol/asist/clean-sheet puanları + xG/xA + rakip gücü + ev avantajı + oynama ihtimali + risk.</div><div class="border border-white/10 rounded-xl p-3"><b class="text-white">Kaptan & yedek</b><br>Kaptan xP'ye göre; yedek GK ayrı, saha yedekleri 1→2→3 önceliğiyle sıralanır.</div></div>
-    </div>
-  </div>
+    </section>
 
-  <div class="glass rounded-2xl overflow-hidden">
-    <div class="p-4 border-b border-white/10">
-      <div class="flex flex-wrap items-center justify-between gap-2"><div><h2 class="section-title font-extrabold">Oyuncu Sıralaması</h2><p class="text-xs text-slate-400"><span id="playerCount">0</span> oyuncu · Fantasy havuzu: <b>593</b> · <span id="coverageText">kapsama hesaplanıyor</span></p></div><div id="loading" class="hidden spinner"></div></div>
-      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-3">
-        <select id="posFilter" class="rounded-lg border px-2 py-2 text-xs"><option value="">Tüm mevkiler</option><option>GK</option><option>DF</option><option>MF</option><option>FW</option></select>
-        <select id="teamFilter" class="rounded-lg border px-2 py-2 text-xs"><option value="">Tüm takımlar</option></select>
-        <select id="availabilityFilter" class="rounded-lg border px-2 py-2 text-xs"><option value="">Tüm uygunluk</option><option value="available">Uygun</option><option value="doubtful">Şüpheli</option><option value="out">Sakat/Cezalı</option></select>
-        <select id="sortBy" class="rounded-lg border px-2 py-2 text-xs"><option value="xp">Haftalık xP</option><option value="score">IQ Scout Skoru</option><option value="eff">Verim</option><option value="xg90">xG90</option><option value="xa90">xA90</option></select>
-        <input id="search" class="rounded-lg border px-2 py-2 text-xs" placeholder="Oyuncu ara"/>
+    <section id="playersSection">
+      <div class="panel table-panel">
+        <div class="table-head">
+          <div class="panel-head"><div><div class="panel-title">Oyuncu Sıralaması</div><div class="panel-sub"><span id="playerCount">0</span> oyuncu · <span id="coverageText">kapsama hesaplanıyor</span></div></div><div id="loading" class="hidden spinner"></div></div>
+          <div class="filters"><input id="search" placeholder="Oyuncu ara (ad, takım...)"/><select id="posFilter"><option value="">Tüm mevkiler</option><option>GK</option><option>DF</option><option>MF</option><option>FW</option></select><select id="teamFilter"><option value="">Tüm takımlar</option></select><select id="availabilityFilter"><option value="">Tüm uygunluk</option><option value="available">Uygun</option><option value="doubtful">Şüpheli</option><option value="out">Sakat/Cezalı</option></select><select id="sortBy"><option value="xp">xP ↓</option><option value="score">IQ Skoru</option><option value="eff">Verim</option><option value="xg90">xG90</option><option value="xa90">xA90</option></select></div>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>#</th><th>Oyuncu</th><th>Takım</th><th>Rakip</th><th>Ev/D</th><th>Pos</th><th>xG90</th><th>xA90</th><th>xP</th><th>Baş%</th><th>CS%</th><th>Fiyat</th><th>Sahiplik</th><th>Kaynak</th><th>Risk</th></tr></thead><tbody id="playersBody"></tbody></table><div id="playersMobile" class="hidden"></div></div>
       </div>
-    </div>
-    <div class="overflow-auto max-h-[1010px]">
-      <table class="w-full text-xs min-w-[850px]">
-        <thead><tr class="text-slate-400"><th class="text-left p-2">#</th><th class="text-left p-2">Oyuncu</th><th class="text-left p-2">Takım</th><th class="p-2">Rakip</th><th class="p-2">Ev/D</th><th class="p-2">Pos</th><th class="p-2">xG90</th><th class="p-2">xA90</th><th class="p-2">xP</th><th class="p-2">Başlama%</th><th class="p-2">CS%</th><th class="p-2">Fiyat</th><th class="p-2">Sahiplik</th><th class="p-2">Kaynak</th><th class="p-2">Risk</th></tr></thead>
-        <tbody id="playersBody"></tbody>
-      </table>
-    </div>
-  </div>
-</section>
+      <div id="insights" class="insight-grid">
+        <div id="healthMini" class="mini-panel"><div class="mini-title">♥ Kadro Sağlığı <button id="healthMiniOpen" class="float-right text-[8px] text-slate-400">Tümünü Gör</button></div><div id="healthMiniList" class="mini-list"><div class="mini-row"><span>Veri yükleniyor</span><b>—</b></div></div></div>
+        <div id="radarMini" class="mini-panel"><div class="mini-title">◎ Fikstür Radarı <button id="radarMiniOpen" class="float-right text-[8px] text-slate-400">Tümünü Gör</button></div><div id="radarMiniList" class="mini-list"><div class="mini-row"><span>Veri yükleniyor</span><b>—</b></div></div></div>
+      </div>
+    </section>
+
+    <aside class="panel side-panel">
+      <div id="sideProfile" class="side-profile"><div class="side-empty">Oyuncu listesinden bir oyuncu seç. Detayları burada anında göreceksin.</div></div>
+    </aside>
+  </main>
+
+  <button id="embedBtn" class="hidden">Web sitene göm</button>
 </div>
 
+<nav class="mobile-bottom"><a href="#playersSection">Oyuncular</a><a href="#radarMini">Fikstür</a><a href="#squadSection" class="active">Kadro</a><a href="#insights">Analiz</a><button id="mobileMore">Diğer</button></nav>
 <script>
 const FBREF='https://fbref.com/en/comps/26/stats/Super-Lig-Stats';
 const FBREF_ALT='https://fbref.com/en/comps/26/stats/Super-Lig-Estatisticas';
@@ -543,7 +558,7 @@ async function fetchData(force=false){
    setStatus('TAM HAVUZ YÜKLENEMEDİ: '+err.message+' — 29 kişilik eski veri artık kullanılmıyor.','err');
  }finally{setLoading(false)}
 }
-function renderAll(){players=players.map(norm);el('playerCount').textContent=players.length;const tc=new Set(players.map(p=>teamCanon(p.team)).filter(Boolean)).size;el('coverageText').textContent=players.length+' / '+FANTASY_TOTAL+' ('+Math.round(players.length/FANTASY_TOTAL*100)+'%) · '+tc+'/18 takım';refreshTeams();renderTable();if(squad.length)buildSquad()}
+function renderAll(){players=players.map(norm);el('playerCount').textContent=players.length;const tc=new Set(players.map(p=>teamCanon(p.team)).filter(Boolean)).size;el('coverageText').textContent=players.length+' oyuncu · '+tc+'/18 takım';refreshTeams();renderTable();renderDashboardInsights();if(players.length)renderSideProfile(players[0]);if(squad.length)buildSquad()}
 function refreshTeams(){const cur=el('teamFilter').value;const teams=[...new Set(players.map(p=>p.team).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));el('teamFilter').innerHTML='<option value="">Tüm takımlar</option>'+teams.map(t=>'<option>'+esc(t)+'</option>').join('');el('teamFilter').value=teams.includes(cur)?cur:''}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function renderTable(){
@@ -551,6 +566,7 @@ function renderTable(){
  const key={xp:'xp',score:'score',eff:'eff',xg90:'xg90',xa90:'xa90'}[sort]||'xp';
  const arr=players.filter(p=>(!pos||p.pos===pos)&&(!team||p.team===team)&&(!q||p.player.toLocaleLowerCase('tr').includes(q))&&(!avail||(avail==='available'&&!p.unavailable&&!p.doubtful&&!p.suspended)||(avail==='doubtful'&&p.doubtful)||(avail==='out'&&(p.unavailable||p.suspended)))).sort((a,b)=>b[key]-a[key]);
  el('playersBody').innerHTML=arr.map((p,i)=>'<tr class="border-t border-white/5 hover:bg-white/[.03]"><td class="p-2 text-slate-500">'+(i+1)+'</td><td class="p-2 font-bold"><div class="flex items-center gap-2"><div class="shrink-0">'+(p.photo?'<img src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.15)" onerror="this.style.display=\'none\'">':'')+'</div><button data-profile="'+esc(p.id)+'" class="text-left hover:text-amber-200">'+esc(p.player)+'</button></div></td><td class="p-2 text-slate-400">'+esc(p.team)+'</td><td class="p-2 text-center">'+esc(p.opponent)+'</td><td class="p-2 text-center">'+(p.home===true?'EV':p.home===false?'D':'—')+'</td><td class="p-2 text-center">'+p.pos+'</td><td class="p-2 text-center">'+p.xg90.toFixed(2)+'</td><td class="p-2 text-center">'+p.xa90.toFixed(2)+'</td><td class="p-2 text-center font-black text-iq">'+p.xp.toFixed(2)+'</td><td class="p-2 text-center">'+Math.round(p.startProb*100)+'%</td><td class="p-2 text-center">'+Math.round(p.cleanSheetProb*100)+'%</td><td class="p-2"><input data-id="'+p.id+'" data-k="price" type="number" min="1" step=".1" value="'+p.price.toFixed(1)+'" class="w-16 rounded border px-1 py-1 text-center"/></td><td class="p-2 text-center">'+(p.ownershipVerified&&p.ownership!=null?'<span class="text-sky-300">%'+p.ownership.toFixed(1)+'</span>':'<span class="text-slate-500">—</span>')+'</td><td class="p-2 text-center">'+(p.priceVerified?'<span class="text-emerald-300">Doğrulandı</span>':'<span class="text-amber-300">Manuel</span>')+'</td><td class="p-2 text-center">'+(p.suspended?'<span class="text-red-300">Cezalı</span>':p.unavailable?'<span class="text-red-300">Sakat</span>':p.doubtful?'<span class="text-amber-300">Şüpheli</span>':'<span class="text-emerald-300">Uygun</span>')+'</td></tr>').join('');
+ renderMobilePlayers(arr);
 }
 function quotas(){return FORMATIONS[el('formation').value]||FORMATIONS[433]}
 function clubCounts(list){return list.reduce((m,p)=>(m[p.team]=(m[p.team]||0)+1,m),{})}
@@ -740,6 +756,29 @@ function showPlayerProfile(p){
  '<div class="mt-4 rounded-xl border border-white/10 bg-black/10 p-3"><div class="text-xs font-bold text-slate-200">FUTBOL IQ yorumu</div><div class="flex flex-wrap gap-1.5 mt-2">'+reasons.map(r=>'<span class="px-2 py-1 rounded-full border border-iq/15 bg-iq/5 text-[10px] text-slate-300">'+esc(r)+'</span>').join('')+'</div></div>'+
  '<div class="grid grid-cols-2 gap-2 mt-3 text-xs"><div class="metric-card"><small>Penaltı</small><b>'+(p.penalty?'Evet':'Hayır')+'</b></div><div class="metric-card"><small>Korner / duran top</small><b>'+(p.corner?'Evet':'Hayır')+'</b></div></div>';
  el('playerModal').classList.remove('hidden');
+}
+function renderSideProfile(p){
+ if(!p||!el('sideProfile'))return;
+ const own=p.ownershipVerified&&p.ownership!=null?'%'+p.ownership.toFixed(1):'—';
+ const initials=esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''));
+ const face=p.photo?'<img class="side-avatar" src="'+esc(p.photo)+'" alt="" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="side-avatar-fallback" style="display:none">'+initials+'</div>':'<div class="side-avatar-fallback">'+initials+'</div>';
+ const reasons=explainPlayer(p);
+ el('sideProfile').innerHTML='<div class="side-profile-head">'+face+'<div><div class="side-name">'+esc(p.player)+'</div><div class="side-team">'+esc(p.team)+' · '+p.pos+'</div><div class="side-tags"><span class="tag">'+availabilityLabel(p)+'</span><span class="tag">'+(p.home===true?'EV':p.home===false?'D':'—')+' · '+esc(p.opponent)+'</span></div></div></div>'+
+ '<div class="side-metrics"><div class="side-metric"><small>Fiyat</small><b>'+p.price.toFixed(1)+'M</b></div><div class="side-metric"><small>xP</small><b>'+p.xp.toFixed(2)+'</b></div><div class="side-metric"><small>xG90</small><b>'+p.xg90.toFixed(2)+'</b></div><div class="side-metric"><small>xA90</small><b>'+p.xa90.toFixed(2)+'</b></div><div class="side-metric"><small>Başlama</small><b>%'+Math.round(p.startProb*100)+'</b></div><div class="side-metric"><small>CS</small><b>%'+Math.round(p.cleanSheetProb*100)+'</b></div><div class="side-metric"><small>Sahiplik</small><b>'+own+'</b></div><div class="side-metric"><small>Dakika</small><b>'+Math.round(p.min)+'</b></div></div>'+
+ '<div class="ai-box"><b>FUTBOL IQ yorumu</b><p>'+reasons.map(esc).join(' · ')+'</p></div>'+
+ '<div class="side-actions"><button class="primary" data-side-transfer="'+esc(p.id)+'">Transfer listeme ekle</button><button data-profile="'+esc(p.id)+'">Detaylı analiz</button></div>';
+}
+function renderDashboardInsights(){
+ if(!players.length)return;
+ const risk=players.filter(p=>p.unavailable||p.suspended||p.doubtful).slice(0,4);
+ const mode=el('strategy')?.value||'balanced';
+ const best=[...players].filter(p=>!p.unavailable&&!p.suspended).sort((a,b)=>fixtureScore(b,mode)-fixtureScore(a,mode)).slice(0,5);
+ if(el('healthMiniList'))el('healthMiniList').innerHTML=(risk.length?risk.map(p=>'<button data-profile="'+esc(p.id)+'" class="mini-row w-full"><span>'+esc(p.player)+'</span><b class="bad">'+availabilityLabel(p)+'</b></button>').join(''):'<div class="mini-row"><span>Aktif risk</span><b class="good">0</b></div>');
+ if(el('radarMiniList'))el('radarMiniList').innerHTML=best.map((p,i)=>'<button data-profile="'+esc(p.id)+'" class="mini-row w-full"><span>'+(i+1)+'. '+esc(p.team)+' · '+fixtureLabel(p)+'</span><b class="good">'+p.xp.toFixed(1)+'</b></button>').join('');
+}
+function renderMobilePlayers(arr){
+ if(!el('playersMobile'))return;
+ el('playersMobile').innerHTML=arr.slice(0,80).map(p=>'<button data-profile="'+esc(p.id)+'" class="mobile-player text-left"><span class="avatar">'+esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''))+'</span><span><b>'+esc(p.player)+'</b><small>'+esc(p.team)+' · '+p.pos+' · '+fixtureLabel(p)+'</small></span><span class="text-right"><b class="text-amber-200">'+p.xp.toFixed(1)+'</b><small>'+p.price.toFixed(1)+'M</small></span></button>').join('');
 }
 function fixtureScore(p,mode){
  let s=strategyScore(p,mode);
@@ -944,19 +983,20 @@ function renderPitch(){
  const pitch=el('pitch');[...pitch.querySelectorAll('.player-card')].forEach(n=>n.remove());el('emptyPitch').classList.add('hidden');
  const q=quotas(),rows=[['GK',q.GK],['DF',q.DF],['MF',q.MF],['FW',q.FW]],ys={GK:88,DF:68,MF:43,FW:17};
  rows.forEach(([pos])=>{const arr=starters.filter(p=>p.pos===pos);arr.forEach((p,i)=>{const x=(i+1)*100/(arr.length+1);const node=document.createElement('div');node.className='player-card';node.style.left=x+'%';node.style.top=ys[pos]+'%';node.innerHTML=cardHtml(p);pitch.appendChild(node)})});
- const used=totalCost(squad);el('budgetUsed').textContent=used.toFixed(1);el('budgetBar').style.width=Math.min(100,used)+'%';
+ const used=totalCost(squad),xp=starters.reduce((s,p)=>s+p.xp,0);el('budgetUsed').textContent=used.toFixed(1);if(el('budgetUsedMirror'))el('budgetUsedMirror').textContent=used.toFixed(1);if(el('budgetRemaining'))el('budgetRemaining').textContent=Math.max(0,100-used).toFixed(1);if(el('squadXP'))el('squadXP').textContent=xp.toFixed(1);if(el('projectedScore'))el('projectedScore').textContent=(xp+(captain?.xp||0)).toFixed(1);el('budgetBar').style.width=Math.min(100,used)+'%';el('budgetBar').style.background=used>100?'#E35D6A':used>=95?'#D9A441':'#38C98D';
 }
 function renderBench(){
  el('bench').innerHTML=bench.map((p,i)=>'<div class="bench-card"><div class="text-[9px] text-iq font-black mb-1">'+(p.pos==='GK'?'YEDEK KALECİ':'YEDEK '+i)+'</div>'+cardHtml(p)+'</div>').join('');
  el('captainInfo').innerHTML=(captain?'<span class="badge-c">C</span>'+esc(captain.player):'')+(viceCaptain?' &nbsp; <span class="badge-c2">C2</span>'+esc(viceCaptain.player):'');
 }
-document.addEventListener('click',e=>{const b=e.target.closest('[data-why]');if(b){e.stopPropagation();const p=players.find(x=>x.id===b.dataset.why);if(p)showWhy(p)}const a=e.target.closest('[data-apply-mode]');if(a)applyComparedMode(a.dataset.applyMode);const tr=e.target.closest('[data-transfer-out]');if(tr)applyTransfer(tr.dataset.transferOut,tr.dataset.transferIn);const pr=e.target.closest('[data-profile]');if(pr){const p=players.find(x=>x.id===pr.dataset.profile);if(p)showPlayerProfile(p)}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-why]');if(b){e.stopPropagation();const p=players.find(x=>x.id===b.dataset.why);if(p)showWhy(p)}const a=e.target.closest('[data-apply-mode]');if(a)applyComparedMode(a.dataset.applyMode);const tr=e.target.closest('[data-transfer-out]');if(tr)applyTransfer(tr.dataset.transferOut,tr.dataset.transferIn);const pr=e.target.closest('[data-profile]');if(pr){const p=players.find(x=>x.id===pr.dataset.profile);if(p){renderSideProfile(p);if(innerWidth<=1200)showPlayerProfile(p)}}});
 document.addEventListener('change',e=>{const t=e.target;if(t.matches('[data-id]')){const p=players.find(x=>x.id===t.dataset.id);if(p){p[t.dataset.k]=t.type==='checkbox'?t.checked:num(t.value);if(t.dataset.k==='price'){p.priceVerified=false;p.priceSource='Manuel düzenleme'}calc(p);save();renderAll()}}});
 ['posFilter','teamFilter','availabilityFilter','sortBy'].forEach(id=>el(id).addEventListener('change',renderTable));
 el('strategy').addEventListener('change',()=>{if(players.length)buildSquad()});el('search').addEventListener('input',renderTable);
 el('fetchBtn').onclick=()=>fetchData(true);
 el('closePlayerModal').onclick=()=>el('playerModal').classList.add('hidden');el('playerModal').addEventListener('click',e=>{if(e.target===el('playerModal'))el('playerModal').classList.add('hidden')});
 el('squadBtn').onclick=buildSquad;el('compareBtn').onclick=compareAllStrategies;el('transferBtn').onclick=renderTransfers;el('weeklyBtn').onclick=renderWeekly;el('healthBtn').onclick=renderHealth;el('radarBtn').onclick=renderRadar;el('closeRadar').onclick=()=>el('radarPanel').classList.add('hidden');el('closeHealth').onclick=()=>el('healthPanel').classList.add('hidden');el('closeWeekly').onclick=()=>el('weeklyPanel').classList.add('hidden');el('closeTransfer').onclick=()=>el('transferPanel').classList.add('hidden');el('closeCompare').onclick=()=>el('comparePanel').classList.add('hidden');el('formation').onchange=()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}if(!el('comparePanel').classList.contains('hidden'))compareAllStrategies()};
+if(el('healthMiniOpen'))el('healthMiniOpen').onclick=renderHealth;if(el('radarMiniOpen'))el('radarMiniOpen').onclick=renderRadar;if(el('mobileMenuBtn'))el('mobileMenuBtn').onclick=()=>el('mobileMenu').classList.toggle('open');if(el('mobileMore'))el('mobileMore').onclick=()=>el('mobileMenu').classList.toggle('open');
 el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
 (function init(){fetchData(true);setInterval(()=>fetchData(true),86400000)})();
 </script>
