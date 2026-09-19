@@ -7,6 +7,15 @@ body .fiq-header{background:var(--panel);border-bottom:1px solid var(--line);col
 body .fiq-header a,body .fiq-header .fiq-logo{color:var(--ink)}
 body .fiq-header .fiq-desktop-nav a{color:var(--ink);border-radius:6px 6px 0 0;padding-inline:8px;font-weight:800}
 body .fiq-header .fiq-desktop-nav a.active{background:color-mix(in srgb,var(--accent) 14%,transparent);border-bottom-color:var(--accent);color:var(--accent)}
+.fiq-scout-visual{display:flex;align-items:center;min-width:260px;min-height:72px;padding:8px 12px;border:1px solid #d6b85f;border-radius:15px;background:linear-gradient(105deg,#06111c 0%,#0b1f31 55%,#07131e 100%);color:#eef5fb!important;box-shadow:inset 0 1px #ffffff10,0 7px 20px #0003;overflow:hidden;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:border-color .18s,transform .18s,background .18s}
+.fiq-scout-visual:hover{border-color:#f0d37d;background:linear-gradient(105deg,#081825,#10304a 55%,#081824);transform:translateY(-1px)}
+.fiq-scout-orb{width:56px;height:56px;flex:none;display:grid;place-items:center;border-radius:50%;background:#020913;border:1px solid #d7b96055;box-shadow:0 0 18px #58a7e733}
+.fiq-scout-orb svg{width:52px;height:52px;display:block}
+.fiq-scout-copy{display:grid;gap:2px;margin-left:11px;min-width:0}.fiq-scout-copy strong{font-size:17px;line-height:1;font-weight:950;letter-spacing:.02em;white-space:nowrap}.fiq-scout-copy strong b{color:#e5c36c}.fiq-scout-copy small{font-size:9px;color:#a9bdca;white-space:nowrap}
+.fiq-scout-arrow{margin-left:auto;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;border:1px solid #d7b96088;color:#f2d67c;font-size:20px;flex:none}
+.fiq-scout-visual-compact{min-width:200px;min-height:44px;height:44px;padding:4px 8px;border-radius:10px}.fiq-scout-visual-compact .fiq-scout-orb{width:34px;height:34px}.fiq-scout-visual-compact .fiq-scout-orb svg{width:31px;height:31px}.fiq-scout-visual-compact .fiq-scout-copy{margin-left:7px}.fiq-scout-visual-compact .fiq-scout-copy strong{font-size:11px}.fiq-scout-visual-compact .fiq-scout-copy small{font-size:7px}.fiq-scout-visual-compact .fiq-scout-arrow{width:27px;height:27px;font-size:15px}
+.fiq-home .home-scout-banner{max-width:570px;margin:18px 0 8px}.fiq-home .home-scout-banner .fiq-scout-visual{width:100%;min-height:94px;padding:11px 15px}.fiq-home .home-scout-banner .fiq-scout-orb{width:70px;height:70px}.fiq-home .home-scout-banner .fiq-scout-orb svg{width:66px;height:66px}.fiq-home .home-scout-banner .fiq-scout-copy strong{font-size:25px}.fiq-home .home-scout-banner .fiq-scout-copy small{font-size:11px}.fiq-home .home-scout-banner .fiq-scout-arrow{width:46px;height:46px;font-size:26px}
+
 body .fiq-header-actions{gap:6px;position:relative;z-index:2}
 .fiq-header-share,.fiq-theme-toggle,.fiq-menu-toggle{align-items:center;justify-content:center;gap:5px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-size:10px;font-weight:850;min-height:40px;touch-action:manipulation;cursor:pointer}
 .fiq-header-share,.fiq-theme-toggle{display:flex}
@@ -15,7 +24,7 @@ body .fiq-header-actions{gap:6px;position:relative;z-index:2}
 .fiq-menu-toggle{display:none;min-width:54px}
 body .mobile-drawer-backdrop{z-index:500;isolation:isolate;position:fixed;inset:0;background:#00132299}
 body .mobile-drawer{background:var(--panel);color:var(--ink);overflow:auto;max-height:100dvh;padding:18px;width:min(86vw,340px);border-color:var(--line)}
-body .mobile-drawer a,body .mobile-drawer>button{display:block;width:100%;min-height:44px;padding:12px;text-align:left;font-size:14px;font-weight:750;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;margin:3px 0}
+body .mobile-drawer a,body .mobile-drawer>button{display:block;width:100%;min-height:44px;padding:12px;text-align:left;font-size:14px;font-weight:750;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;margin:3px 0}body .mobile-drawer .fiq-scout-visual{display:flex;background:linear-gradient(105deg,#06111c,#0b1f31);color:#eef5fb!important;padding:6px 8px}
 body .fiq-menu-heading button{min-width:44px;min-height:44px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;font-size:24px}
 .fiq-manual-share{position:fixed;inset:0;margin:auto;width:min(92vw,480px);max-height:85dvh;padding:20px;overflow:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--ink)}
 .fiq-manual-share::backdrop{background:#001322aa}
@@ -69,7 +78,7 @@ html:not(.dark) .fiq-team-page>.pointer-events-none.fixed{opacity:.08}
 html:not(.dark) .fiq-league-page,html:not(.dark) .fiq-footer{color:var(--ink)}
 @media(max-width:1100px){.fiq-home .home-dashboard{grid-template-columns:1fr 1fr}.fiq-home .home-iq{grid-column:1/-1}.fiq-home .home-next{grid-template-columns:repeat(3,1fr)}.fiq-home .home-next>div{grid-column:1/-1}}
 @media(min-width:601px) and (min-height:601px){
- body .fiq-header .fiq-desktop-nav{gap:4px;justify-content:flex-start}
+ body .fiq-header .fiq-desktop-nav{gap:6px;justify-content:flex-start;align-items:center}
  body .fiq-header .fiq-desktop-nav a{padding-inline:5px;font-size:10px}
  body .fiq-header-share span{display:none}
  body .fiq-header .fiq-menu-toggle{display:none!important}
@@ -86,6 +95,8 @@ html:not(.dark) .fiq-league-page,html:not(.dark) .fiq-footer{color:var(--ink)}
  body .fiq-header .fiq-logo span{font-size:14px}
 }
 @media(max-width:700px){
+ .fiq-home .home-scout-banner{max-width:none;margin:15px 0 8px}.fiq-home .home-scout-banner .fiq-scout-visual{min-width:0;min-height:80px}.fiq-home .home-scout-banner .fiq-scout-orb{width:58px;height:58px}.fiq-home .home-scout-banner .fiq-scout-orb svg{width:54px;height:54px}.fiq-home .home-scout-banner .fiq-scout-copy strong{font-size:20px}.fiq-home .home-scout-banner .fiq-scout-copy small{font-size:10px}
+
  .fiq-home{padding-inline:12px}.fiq-home .home-hero{grid-template-columns:1fr;min-height:0;padding:20px 2px 12px;gap:10px}
  .fiq-home .home-hero h1{font-size:34px}.fiq-home .home-intro{font-size:14px}
  .fiq-home .home-stadium{height:250px;max-width:510px;width:100%;justify-self:center}
