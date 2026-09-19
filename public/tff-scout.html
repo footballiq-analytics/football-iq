@@ -1061,7 +1061,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-why]');if(
 document.addEventListener('change',e=>{const t=e.target;if(t.matches('[data-id]')){const p=players.find(x=>x.id===t.dataset.id);if(p){p[t.dataset.k]=t.type==='checkbox'?t.checked:num(t.value);if(t.dataset.k==='price'){p.priceVerified=false;p.priceSource='Manuel düzenleme'}calc(p);save();renderAll()}}});
 ['posFilter','teamFilter','availabilityFilter','sortBy'].forEach(id=>el(id).addEventListener('change',renderTable));
 el('strategy').addEventListener('change',()=>runAction('Strateji güncelleme',()=>buildSquad()));el('search').addEventListener('input',renderTable);
-el('fetchBtn').onclick=()=>runAction('Veri yenileme',()=>fetchData(true),{needsData:false});el('exportTeamBtn').onclick=()=>runAction('Fantezi kadrosuna aktarım',()=>exportXIToFantasy());
+el('fetchBtn').onclick=()=>runAction('Veri yenileme',()=>fetchData(true),{needsData:false});el('exportTeamBtn').onclick=()=>runAction('Fantezi kadrosuna aktarım',()=>{if(starters.length!==11)buildSquad();exportXIToFantasy()});
 el('closePlayerModal').onclick=()=>el('playerModal').classList.add('hidden');el('playerModal').addEventListener('click',e=>{if(e.target===el('playerModal'))el('playerModal').classList.add('hidden')});
 el('squadBtn').onclick=()=>runAction('En iyi 15',()=>buildSquad());
 el('compareBtn').onclick=()=>runAction('3 mod karşılaştırma',()=>compareAllStrategies());
