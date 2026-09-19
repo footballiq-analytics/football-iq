@@ -165,3 +165,13 @@ html body:has(.fiq-team-page) :is(.fiq-header,.fiq-team-page,.fiq-manual-share) 
 html body:has(.fiq-team-page) :is(.fiq-header,.fiq-team-page) :is(button,select):focus-visible{outline:2px solid #488779!important;outline-offset:2px!important}
 html body:has(.fiq-team-page) .fiq-empty-slot{background:#edf5efa6!important;border:1px dashed #728e78!important}
 html body:has(.fiq-team-page) .fiq-empty-slot span{background:#e0eee8!important;color:#24584c!important}
+
+/* Budget progress occupies its own row beneath the three readable totals. */
+.fiq-team-page .fiq-team-metrics-v27{display:block!important}
+.fiq-team-page .fiq-team-metrics-v27>.grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;padding:0!important;border:0!important;min-height:46px!important}
+.fiq-team-page .fiq-team-metrics-v27>.grid>div{padding:0 16px!important;border-right:1px solid #d5dfe8!important}
+.fiq-team-page .fiq-team-metrics-v27>[aria-label]{margin:9px 16px 0!important;padding:0!important;border:0!important;min-height:0!important}
+.fiq-team-page .fiq-team-metrics-v27>[aria-label]>div:first-child{color:#62748a!important;font-size:10px!important}
+.fiq-team-page .fiq-team-metrics-v27>[aria-label] span{color:#347567!important}
+.fiq-team-page .fiq-team-metrics-v27>[aria-label]>div:last-child{background:#dce8e2!important;border:0!important;box-shadow:none!important;height:5px!important}
+.fiq-team-page .fiq-team-metrics-v27>[aria-label]>div:last-child>div{background:#488779!important;box-shadow:none!important}
