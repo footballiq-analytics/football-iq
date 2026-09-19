@@ -4,7 +4,7 @@
 <svg width="900" height="600" viewBox="0 0 1600 1000" preserveAspectRatio="none">
   <defs>
     <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2f8d43"/><stop offset=".42" stop-color="#217737"/><stop offset="1" stop-color="#115329"/>
+      <stop offset="0" stop-color="#739b4d"/><stop offset=".42" stop-color="#628e43"/><stop offset="1" stop-color="#517c38"/>
     </linearGradient>
     <linearGradient id="depth" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d8ffe5" stop-opacity=".12"/><stop offset=".38" stop-color="#0a301a" stop-opacity="0"/><stop offset="1" stop-color="#04170d" stop-opacity=".35"/></linearGradient>
     <radialGradient id="light" cx="50%" cy="0%" r="85%"><stop stop-color="#effff2" stop-opacity=".24"/><stop offset=".42" stop-color="#9fffc0" stop-opacity=".05"/><stop offset="1" stop-color="#001008" stop-opacity="0"/></radialGradient>
@@ -16,16 +16,16 @@
   <rect width="1600" height="1000" fill="url(#grass)"/>
   <rect width="1600" height="1000" fill="url(#mow)"/>
   <rect width="1600" height="1000" fill="url(#cross)"/>
-  <rect width="1600" height="1000" filter="url(#grain)" opacity=".72"/>
+  
   <path d="M130 1000L1470 1000L1350 0L250 0Z" fill="none" stroke="#caffd8" stroke-opacity=".07" stroke-width="12"/>
   <path d="M290 1000L1310 1000L1230 0L370 0Z" fill="none" stroke="#001d0c" stroke-opacity=".07" stroke-width="10"/>
   <ellipse cx="800" cy="-20" rx="610" ry="230" fill="#d9ffe5" opacity=".08" filter="url(#soft)"/>
-  <ellipse cx="250" cy="590" rx="340" ry="500" fill="#00180b" opacity=".12" filter="url(#soft)"/>
-  <ellipse cx="1390" cy="560" rx="300" ry="470" fill="#00180b" opacity=".11" filter="url(#soft)"/>
+  
+  
   <rect width="1600" height="1000" fill="url(#light)"/>
-  <rect width="1600" height="1000" fill="url(#depth)"/>
+  
 </svg>
-<path d="M0 0H900V600H0Z" fill="#b9cf7d" opacity=".18"/>
+<path d="M0 0H900V600H0Z" fill="#b9cf7d" opacity=".10"/><path d="M0 50H900V100H0Z M0 150H900V200H0Z M0 250H900V300H0Z M0 350H900V400H0Z M0 450H900V500H0Z M0 550H900V600H0Z" fill="#e4edb2" opacity=".09"/>
 <g stroke="#f3f7df" stroke-opacity=".8" stroke-width="2" fill="none">
 <path d="M135 16H765L866 574H34Z M84 291H816"/>
 <ellipse cx="450" cy="291" rx="74" ry="51"/>

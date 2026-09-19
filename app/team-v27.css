@@ -157,3 +157,11 @@ body:has(.fiq-team-page) .fiq-card-remove{display:none!important}
  body:has(.fiq-team-page) .fiq-desktop-nav{gap:10px!important}
  body:has(.fiq-team-page) .fiq-desktop-nav a{font-size:13px!important}
 }
+
+/* Match the approved flat controls; legacy tactile selectors have high specificity. */
+html body:has(.fiq-team-page) :is(.fiq-header,.fiq-team-page,.fiq-manual-share) :is(button,select,[role="button"]):not(.fiq-market-backdrop):not(.fiq-transfer-player-info):not(.fiq-coach-face){
+ background-image:none!important;box-shadow:none!important;filter:none!important;
+}
+html body:has(.fiq-team-page) :is(.fiq-header,.fiq-team-page) :is(button,select):focus-visible{outline:2px solid #488779!important;outline-offset:2px!important}
+html body:has(.fiq-team-page) .fiq-empty-slot{background:#edf5efa6!important;border:1px dashed #728e78!important}
+html body:has(.fiq-team-page) .fiq-empty-slot span{background:#e0eee8!important;color:#24584c!important}
