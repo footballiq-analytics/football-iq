@@ -38,7 +38,7 @@ jobs:
           if ((d.count || 0) < 350) throw new Error('Incomplete player catalog: ' + d.count);
           if ((d.teamCount || 0) < 18) throw new Error('Incomplete team catalog: ' + d.teamCount);
           const html = fs.readFileSync('public/tff-scout.html', 'utf8');
-          if (!html.includes('PRO UI V8 · FIXTURE RADAR')) {
+          if (!html.includes('PRO UI V8.1 · JS FIX')) {
             throw new Error('Unexpected scout UI version in public/tff-scout.html');
           }
           console.log('Source validated:', d.count, 'players /', d.teamCount, 'teams');
@@ -58,7 +58,7 @@ jobs:
         run: |
           test -f out/tff-scout.html
           test -f out/data/tff-scout.json
-          grep -q "PRO UI V8 · FIXTURE RADAR" out/tff-scout.html
+          grep -q "PRO UI V8.1 · JS FIX" out/tff-scout.html
           node - <<'NODE'
           const fs = require('fs');
           const d = JSON.parse(fs.readFileSync('out/data/tff-scout.json', 'utf8'));
