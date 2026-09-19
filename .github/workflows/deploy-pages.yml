@@ -2,11 +2,9 @@ name: Deploy FUTBOL IQ Fantasy to GitHub Pages
 
 on:
   push:
-    branches: [main]
-  page_build:
+    branches:
+      - main
   workflow_dispatch:
-  schedule:
-    - cron: "17 * * * *"
 
 permissions:
   contents: read
@@ -23,23 +21,53 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-                - name: Install dependencies
+          node-version: "20"
+
+      - name: Install dependencies
         run: npm install --no-audit --no-fund
-      - name: Validate static Super Lig catalog
+
+      - name: Validate scout source data
         run: |
-          node -e "const d=require('./public/data/tff-scout.json'); if((d.count||0)<350 || (d.teamCount||0)<18) throw new Error('Incomplete catalog: '+d.count+' / '+d.teamCount); console.log('Validated',d.count,'players /',d.teamCount,'teams')"
+          node - <<'NODE'
+          const fs = require('fs');
+          const d = JSON.parse(fs.readFileSync('public/data/tff-scout.json', 'utf8'));
+          if ((d.count || 0) < 350) throw new Error('Incomplete player catalog: ' + d.count);
+          if ((d.teamCount || 0) < 18) throw new Error('Incomplete team catalog: ' + d.teamCount);
+          const html = fs.readFileSync('public/tff-scout.html', 'utf8');
+          if (!html.includes('PRO UI V8 · FIXTURE RADAR')) {
+            throw new Error('Unexpected scout UI version in public/tff-scout.html');
+          }
+          console.log('Source validated:', d.count, 'players /', d.teamCount, 'teams');
+          NODE
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
+
       - name: Build static site
         run: npm run build
         env:
           GITHUB_ACTIONS: "true"
+
+      - name: Verify exported scout page
+        run: |
+          test -f out/tff-scout.html
+          test -f out/data/tff-scout.json
+          grep -q "PRO UI V8 · FIXTURE RADAR" out/tff-scout.html
+          node - <<'NODE'
+          const fs = require('fs');
+          const d = JSON.parse(fs.readFileSync('out/data/tff-scout.json', 'utf8'));
+          if ((d.count || 0) < 350 || (d.teamCount || 0) < 18) {
+            throw new Error('Exported scout data incomplete');
+          }
+          console.log('Export validated:', d.count, 'players /', d.teamCount, 'teams');
+          NODE
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -55,4 +83,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-# Pages enabled; retry marker
