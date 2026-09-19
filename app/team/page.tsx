@@ -44,39 +44,61 @@ export default function TeamBuilderPage(){useMobileCardGeometry();const{formatio
 
  useEffect(()=>{try{
   const importRaw=localStorage.getItem(SCOUT_IMPORT_KEY);
-  if(importRaw){
+  const importRequested=new URLSearchParams(window.location.search).get("scoutImport")==="1";
+  if(importRaw&&importRequested){
    const imported=JSON.parse(importRaw) as {formation?:Formation;starters?:Array<{name?:string;club?:string;position?:string}>;captain?:string|null;viceCaptain?:string|null};
    const formation=(imported.formation&&FORMATIONS.includes(imported.formation))?imported.formation:"4-3-3";
    const desired=FORMATION_POSITIONS[formation];
+   const importedStarters=imported.starters??[];
    const usedPlayerIds=new Set<string>();
    const usedSourceIndexes=new Set<number>();
-   const importedStarters=imported.starters??[];
-   const ordered:(string|null)[]=desired.map(position=>{
+   const clubCounts=new Map<string,number>();
+   let spend=0;
+   const benchPositions:PlayerPosition[]=["GK","DEF","MID","FWD"];
+   const minBenchCost=benchPositions.reduce((sum,pos)=>{
+    const cheapest=players.filter(p=>p.position===pos).sort((a,b)=>a.price-b.price)[0];
+    return sum+(cheapest?.price??0);
+   },0);
+   const ordered:(string|null)[]=desired.map((position,slotIndex)=>{
     const scoutPos=position==="FWD"?"FW":position==="MID"?"MF":position;
-    let matchedId:string|null=null;
-    for(let sourceIndex=0;sourceIndex<importedStarters.length;sourceIndex++){
-     if(usedSourceIndexes.has(sourceIndex))continue;
-     const source=importedStarters[sourceIndex];
-     if((source.position??"")!==scoutPos)continue;
-     const player=players.find(p=>!usedPlayerIds.has(p.id)&&p.position===position&&normalizeScoutText(p.name)===normalizeScoutText(source.name??"")&&(clubAlias(p.club)===clubAlias(source.club??"")||!source.club));
-     if(!player)continue;
-     usedSourceIndexes.add(sourceIndex);
-     usedPlayerIds.add(player.id);
-     matchedId=player.id;
-     break;
+    const sourceIndexes=importedStarters.map((s,i)=>({s,i})).filter(x=>!usedSourceIndexes.has(x.i)&&(x.s.position??"")===scoutPos);
+    let chosen:StorePlayer|null=null;
+    let chosenSourceIndex:number|null=null;
+    for(const {s,i} of sourceIndexes){
+      const exact=players.find(p=>!usedPlayerIds.has(p.id)&&p.position===position&&normalizeScoutText(p.name)===normalizeScoutText(s.name??"")&&clubAlias(p.club)===clubAlias(s.club??"")&&(clubCounts.get(p.club)??0)<3);
+      if(exact){chosen=exact;chosenSourceIndex=i;break}
     }
-    return matchedId;
+    if(!chosen){
+      for(const {s,i} of sourceIndexes){
+        const sameClub=players.filter(p=>!usedPlayerIds.has(p.id)&&p.position===position&&clubAlias(p.club)===clubAlias(s.club??"")&&(clubCounts.get(p.club)??0)<3)
+          .sort((a,b)=>b.points-a.points||a.price-b.price)[0];
+        if(sameClub){chosen=sameClub;chosenSourceIndex=i;break}
+      }
+    }
+    if(!chosen){
+      chosen=players.filter(p=>!usedPlayerIds.has(p.id)&&p.position===position&&(clubCounts.get(p.club)??0)<3)
+        .sort((a,b)=>b.points-a.points||a.price-b.price)[0]??null;
+      chosenSourceIndex=sourceIndexes[0]?.i??null;
+    }
+    if(chosen&&spend+chosen.price>Math.max(0,BUDGET-minBenchCost+2)){
+      const cheaper=players.filter(p=>!usedPlayerIds.has(p.id)&&p.position===position&&(clubCounts.get(p.club)??0)<3&&spend+p.price<=Math.max(0,BUDGET-minBenchCost+2))
+        .sort((a,b)=>b.points-a.points||a.price-b.price)[0]??null;
+      if(cheaper)chosen=cheaper;
+    }
+    if(!chosen)return null;
+    usedPlayerIds.add(chosen.id);
+    if(chosenSourceIndex!==null)usedSourceIndexes.add(chosenSourceIndex);
+    clubCounts.set(chosen.club,(clubCounts.get(chosen.club)??0)+1);
+    spend+=chosen.price;
+    return chosen.id;
    });
    const starterIds=ordered.filter((id):id is string=>Boolean(id));
-   const starterPlayers=starterIds.map(id=>players.find(p=>p.id===id)).filter((p):p is StorePlayer=>Boolean(p));
-   const clubCounts=new Map<string,number>();starterPlayers.forEach(p=>clubCounts.set(p.club,(clubCounts.get(p.club)??0)+1));
-   let spend=starterPlayers.reduce((sum,p)=>sum+p.price,0);
-   const benchPositions:PlayerPosition[]=["GK","DEF","MID","FWD"];
    const benchIds:(string|null)[]=benchPositions.map(position=>{
-    const choices=players.filter(p=>p.position===position&&!starterIds.includes(p.id)&&(clubCounts.get(p.club)??0)<3&&spend+p.price<=BUDGET+0.0001)
+    const choices=players.filter(p=>p.position===position&&!starterIds.includes(p.id)&&!usedPlayerIds.has(p.id)&&(clubCounts.get(p.club)??0)<3&&spend+p.price<=BUDGET+0.0001)
       .sort((a,b)=>a.price-b.price||b.points-a.points);
     const pick=choices[0]??null;
     if(!pick)return null;
+    usedPlayerIds.add(pick.id);
     clubCounts.set(pick.club,(clubCounts.get(pick.club)??0)+1);
     spend+=pick.price;
     return pick.id;
@@ -93,7 +115,7 @@ export default function TeamBuilderPage(){useMobileCardGeometry();const{formatio
    localStorage.removeItem(SCOUT_IMPORT_KEY);
    const missing=ordered.filter(id=>!id).length;
    const benchMissing=benchIds.filter(id=>!id).length;
-   setToast(missing||benchMissing?`Scout kadrosu aktarıldı · ilk 11 eşleşmeyen: ${missing} · yedek eksik: ${benchMissing}.`:`Scout ilk 11 korundu · 4 yedek otomatik tamamlandı · ${spend.toFixed(1)}M kullanıldı.`);
+   setToast(missing||benchMissing?`Scout önerisi uygulandı · ${missing} ilk 11 slotu veya ${benchMissing} yedek tamamlanamadı.`:`Scout önerisi uygulandı · 11 ilk + 4 yedek · ${spend.toFixed(1)}M kullanıldı.`);
   }else{
    const raw=localStorage.getItem(STORAGE_KEY);
    if(raw){const s=JSON.parse(raw)as{formation?:Formation;startingIds?:(string|null)[];benchIds?:(string|null)[];captain?:string|null;viceCaptain?:string|null;coachId?:string|null};hydrateTeam(players,s.formation??"4-3-3",s.startingIds??initialLineup,s.benchIds??initialBench);setCaptain(s.captain??"gs-victor-osimhen");setViceCaptain(s.viceCaptain??null);if(s.coachId===null)setSelectedCoachId(null);else if(s.coachId&&SUPER_LIG_COACHES_2026_27.some(c=>c.id===s.coachId))setSelectedCoachId(s.coachId)}else hydrateTeam(players,"4-3-3",initialLineup,initialBench)
