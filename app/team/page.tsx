@@ -48,15 +48,24 @@ export default function TeamBuilderPage(){useMobileCardGeometry();const{formatio
    const imported=JSON.parse(importRaw) as {formation?:Formation;starters?:Array<{name?:string;club?:string;position?:string}>;captain?:string|null;viceCaptain?:string|null};
    const formation=(imported.formation&&FORMATIONS.includes(imported.formation))?imported.formation:"4-3-3";
    const desired=FORMATION_POSITIONS[formation];
-   const used=new Set<string>();
+   const usedPlayerIds=new Set<string>();
+   const usedSourceIndexes=new Set<number>();
+   const importedStarters=imported.starters??[];
    const ordered:(string|null)[]=desired.map(position=>{
     const scoutPos=position==="FWD"?"FW":position==="MID"?"MF":position;
-    const source=(imported.starters??[]).find(s=>(s.position??"")===scoutPos&&!used.has(normalizeScoutText(s.name??"")));
-    if(!source)return null;
-    const player=players.find(p=>!used.has(p.id)&&p.position===position&&normalizeScoutText(p.name)===normalizeScoutText(source.name??"")&&(clubAlias(p.club)===clubAlias(source.club??"")||!source.club));
-    if(!player)return null;
-    used.add(player.id);
-    return player.id;
+    let matchedId:string|null=null;
+    for(let sourceIndex=0;sourceIndex<importedStarters.length;sourceIndex++){
+     if(usedSourceIndexes.has(sourceIndex))continue;
+     const source=importedStarters[sourceIndex];
+     if((source.position??"")!==scoutPos)continue;
+     const player=players.find(p=>!usedPlayerIds.has(p.id)&&p.position===position&&normalizeScoutText(p.name)===normalizeScoutText(source.name??"")&&(clubAlias(p.club)===clubAlias(source.club??"")||!source.club));
+     if(!player)continue;
+     usedSourceIndexes.add(sourceIndex);
+     usedPlayerIds.add(player.id);
+     matchedId=player.id;
+     break;
+    }
+    return matchedId;
    });
    const starterIds=ordered.filter((id):id is string=>Boolean(id));
    const starterPlayers=starterIds.map(id=>players.find(p=>p.id===id)).filter((p):p is StorePlayer=>Boolean(p));
@@ -74,8 +83,13 @@ export default function TeamBuilderPage(){useMobileCardGeometry();const{formatio
    });
    hydrateTeam(players,formation,ordered,benchIds);
    const findByName=(name:string|null|undefined)=>name?players.find(p=>starterIds.includes(p.id)&&normalizeScoutText(p.name)===normalizeScoutText(name))?.id??null:null;
-   setCaptain(findByName(imported.captain));
-   setViceCaptain(findByName(imported.viceCaptain));
+   const importedCaptain=findByName(imported.captain);
+   const importedVice=findByName(imported.viceCaptain);
+   setCaptain(importedCaptain);
+   setViceCaptain(importedVice);
+   if(ordered.every(Boolean)&&benchIds.every(Boolean)){
+    persistSquad(localStorage,STORAGE_KEY,{formation,startingIds:ordered,benchIds,captain:importedCaptain,viceCaptain:importedVice,coachId:selectedCoachId});
+   }
    localStorage.removeItem(SCOUT_IMPORT_KEY);
    const missing=ordered.filter(id=>!id).length;
    const benchMissing=benchIds.filter(id=>!id).length;
