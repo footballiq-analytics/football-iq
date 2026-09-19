@@ -58,14 +58,28 @@ export default function TeamBuilderPage(){useMobileCardGeometry();const{formatio
     used.add(player.id);
     return player.id;
    });
-   hydrateTeam(players,formation,ordered,[null,null,null,null]);
    const starterIds=ordered.filter((id):id is string=>Boolean(id));
+   const starterPlayers=starterIds.map(id=>players.find(p=>p.id===id)).filter((p):p is StorePlayer=>Boolean(p));
+   const clubCounts=new Map<string,number>();starterPlayers.forEach(p=>clubCounts.set(p.club,(clubCounts.get(p.club)??0)+1));
+   let spend=starterPlayers.reduce((sum,p)=>sum+p.price,0);
+   const benchPositions:PlayerPosition[]=["GK","DEF","MID","FWD"];
+   const benchIds:(string|null)[]=benchPositions.map(position=>{
+    const choices=players.filter(p=>p.position===position&&!starterIds.includes(p.id)&&(clubCounts.get(p.club)??0)<3&&spend+p.price<=BUDGET+0.0001)
+      .sort((a,b)=>a.price-b.price||b.points-a.points);
+    const pick=choices[0]??null;
+    if(!pick)return null;
+    clubCounts.set(pick.club,(clubCounts.get(pick.club)??0)+1);
+    spend+=pick.price;
+    return pick.id;
+   });
+   hydrateTeam(players,formation,ordered,benchIds);
    const findByName=(name:string|null|undefined)=>name?players.find(p=>starterIds.includes(p.id)&&normalizeScoutText(p.name)===normalizeScoutText(name))?.id??null:null;
    setCaptain(findByName(imported.captain));
    setViceCaptain(findByName(imported.viceCaptain));
    localStorage.removeItem(SCOUT_IMPORT_KEY);
    const missing=ordered.filter(id=>!id).length;
-   setToast(missing?`Scout ilk 11 aktarıldı · ${missing} oyuncu ana fantezi havuzunda eşleşmedi.`:"Scout ilk 11 kadrona başarıyla uygulandı.");
+   const benchMissing=benchIds.filter(id=>!id).length;
+   setToast(missing||benchMissing?`Scout kadrosu aktarıldı · ilk 11 eşleşmeyen: ${missing} · yedek eksik: ${benchMissing}.`:`Scout ilk 11 korundu · 4 yedek otomatik tamamlandı · ${spend.toFixed(1)}M kullanıldı.`);
   }else{
    const raw=localStorage.getItem(STORAGE_KEY);
    if(raw){const s=JSON.parse(raw)as{formation?:Formation;startingIds?:(string|null)[];benchIds?:(string|null)[];captain?:string|null;viceCaptain?:string|null;coachId?:string|null};hydrateTeam(players,s.formation??"4-3-3",s.startingIds??initialLineup,s.benchIds??initialBench);setCaptain(s.captain??"gs-victor-osimhen");setViceCaptain(s.viceCaptain??null);if(s.coachId===null)setSelectedCoachId(null);else if(s.coachId&&SUPER_LIG_COACHES_2026_27.some(c=>c.id===s.coachId))setSelectedCoachId(s.coachId)}else hydrateTeam(players,"4-3-3",initialLineup,initialBench)
