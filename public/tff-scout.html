@@ -139,7 +139,7 @@ const WIKI_SQUADS={
  'Samsunspor':'https://en.wikipedia.org/wiki/Samsunspor',
  'Trabzonspor':'https://en.wikipedia.org/wiki/Trabzonspor'
 };
-const LS_DATA='fiq_tff_scout_data_v7',LS_TIME='fiq_tff_scout_time_v7';
+const LS_DATA='fiq_tff_scout_data_v8',LS_TIME='fiq_tff_scout_time_v8';
 let players=[],squad=[],starters=[],bench=[],captain=null,viceCaptain=null;
 const SQUAD_QUOTAS={GK:2,DF:5,MF:5,FW:3};
 const FORMATIONS={433:{GK:1,DF:4,MF:3,FW:3},442:{GK:1,DF:4,MF:4,FW:2},343:{GK:1,DF:3,MF:4,FW:3},352:{GK:1,DF:3,MF:5,FW:2},532:{GK:1,DF:5,MF:3,FW:2}};
@@ -147,6 +147,12 @@ const CLUB_LIMIT=3,BUDGET=100;
 const el=id=>document.getElementById(id);
 const num=v=>{const n=parseFloat(String(v??'').replace(',','.').replace(/[^0-9.+-]/g,''));return Number.isFinite(n)?n:0};
 const posNorm=p=>{p=String(p||'').toUpperCase();if(p.includes('GK'))return'GK';if(p.includes('DF')||p.includes('FB')||p.includes('CB'))return'DF';if(p.includes('MF')||p.includes('DM')||p.includes('AM')||p.includes('CM'))return'MF';if(p.includes('FW')||p.includes('ST')||p.includes('LW')||p.includes('RW'))return'FW';return p.slice(0,2)};
+const TEAM_CANON={
+ 'Amedspor':'Amed SK','Amed':'Amed SK','Başakşehir':'İstanbul Başakşehir','Istanbul Basaksehir':'İstanbul Başakşehir',
+ 'Rizespor':'Çaykur Rizespor','Erzurum BB':'Erzurumspor','Yeni Çorumspor':'Çorum FK','Çorumspor':'Çorum FK',
+ 'Gaziantep FK':'Gaziantep','Gaziantep F.K.':'Gaziantep','Kasımpaşa SK':'Kasımpaşa','Kocaelispor':'Kocaelispor'
+};
+const teamCanon=t=>TEAM_CANON[String(t||'').trim()]||String(t||'').trim();
 const TEAM_STRENGTH={'Galatasaray':5,'Fenerbahçe':4.8,'Beşiktaş':4.2,'Trabzonspor':4.2,'İstanbul Başakşehir':3.7,'Göztepe':3.4,'Samsunspor':3.3,'Çaykur Rizespor':3.0,'Kasımpaşa':3.0,'Amed SK':2.9,'Alanyaspor':2.8,'Eyüpspor':2.6,'Gençlerbirliği':2.4,'Erzurumspor':2.3,'Çorum FK':2.3,'Konyaspor':2.8};
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function calc(p){
@@ -180,7 +186,7 @@ function strategyScore(p){
  }
  return p.xp+(p.eff*1.35)-(p.injuryRisk*2);
 }
-function norm(raw,i=0){return calc({id:raw.id||('p'+i+'-'+String(raw.player||raw.Player||'').replace(/\W/g,'')),player:raw.player||raw.Player||'Bilinmeyen',rosterOnly:!!raw.rosterOnly,team:raw.team||raw.Team||raw.Squad||'',opponent:raw.opponent||'—',home:raw.home??null,pos:posNorm(raw.pos||raw.Pos),mp:num(raw.mp??raw.MP),min:num(raw.min??raw.Min),starts:num(raw.starts),startRate:num(raw.startRate),minutesPerMatch:num(raw.minutesPerMatch),gls:num(raw.gls??raw.Gls),ast:num(raw.ast??raw.Ast),xg:num(raw.xg??raw.xG),xa:num(raw.xa??raw.xA??raw.xAG),xg90:num(raw.xg90??raw['xG90']??raw['xG/90']),xa90:num(raw.xa90??raw['xA90']??raw['xA/90']??raw['xAG90']??raw['xAG/90']),price:num(raw.price??raw.Price)||6,priceVerified:!!raw.priceVerified,priceSource:raw.priceSource||'Varsayılan/manuel',ownership:raw.ownership==null?null:num(raw.ownership),ownershipVerified:!!raw.ownershipVerified,ownershipSource:raw.ownershipSource||'Bilinmiyor',penalty:/^(1|true|yes|evet)$/i.test(raw.penalty??raw.Penalty??''),corner:/^(1|true|yes|evet)$/i.test(raw.corner??raw.Corner??''),form4:/^(1|true|yes|evet)$/i.test(raw.form4??raw.Form4Plus??''),injuryRisk:num(raw.injuryRisk),unavailable:!!raw.unavailable,doubtful:!!raw.doubtful,suspended:!!raw.suspended,injuryNote:raw.injuryNote||'',startProb:raw.startProb})}
+function norm(raw,i=0){return calc({id:raw.id||('p'+i+'-'+String(raw.player||raw.Player||'').replace(/\W/g,'')),player:raw.player||raw.Player||'Bilinmeyen',rosterOnly:!!raw.rosterOnly,team:teamCanon(raw.team||raw.Team||raw.Squad||''),opponent:raw.opponent||'—',home:raw.home??null,pos:posNorm(raw.pos||raw.Pos),mp:num(raw.mp??raw.MP),min:num(raw.min??raw.Min),starts:num(raw.starts),startRate:num(raw.startRate),minutesPerMatch:num(raw.minutesPerMatch),gls:num(raw.gls??raw.Gls),ast:num(raw.ast??raw.Ast),xg:num(raw.xg??raw.xG),xa:num(raw.xa??raw.xA??raw.xAG),xg90:num(raw.xg90??raw['xG90']??raw['xG/90']),xa90:num(raw.xa90??raw['xA90']??raw['xA/90']??raw['xAG90']??raw['xAG/90']),price:num(raw.price??raw.Price)||6,priceVerified:!!raw.priceVerified,priceSource:raw.priceSource||'Varsayılan/manuel',ownership:raw.ownership==null?null:num(raw.ownership),ownershipVerified:!!raw.ownershipVerified,ownershipSource:raw.ownershipSource||'Bilinmiyor',penalty:/^(1|true|yes|evet)$/i.test(raw.penalty??raw.Penalty??''),corner:/^(1|true|yes|evet)$/i.test(raw.corner??raw.Corner??''),form4:/^(1|true|yes|evet)$/i.test(raw.form4??raw.Form4Plus??''),injuryRisk:num(raw.injuryRisk),unavailable:!!raw.unavailable,doubtful:!!raw.doubtful,suspended:!!raw.suspended,injuryNote:raw.injuryNote||'',startProb:raw.startProb})}
 function save(){localStorage.setItem(LS_DATA,JSON.stringify(players));localStorage.setItem(LS_TIME,String(Date.now()));el('lastUpdate').textContent=new Date().toLocaleString('tr-TR')}
 function setStatus(msg,type='ok'){el('statusText').textContent=msg;el('statusDot').className='w-2.5 h-2.5 rounded-full '+(type==='err'?'bg-red-400':type==='load'?'bg-iq animate-pulse':'bg-emerald-400')}
 function setLoading(v){el('loading').classList.toggle('hidden',!v);el('fetchBtn').disabled=v;if(v)setStatus('Canlı veri çekiliyor ve stats_standard tablosu ayrıştırılıyor…','load')}
@@ -263,10 +269,13 @@ function parseWikiSquad(text,team){
    const cells=clean.split('|').map(x=>x.trim()).filter(Boolean);
    const posIndex=cells.findIndex(x=>/^(GK|DF|MF|FW)$/.test(x));
    if(posIndex<0)continue;
-   const pos=cells[posIndex],name=(cells.slice(posIndex+1).find(x=>x&&!/^[A-Z]{2,3}$/.test(x)&&!/^[0-9]+$/.test(x))||'').replace(/\[[^\]]+\]/g,'').trim();
+   const pos=cells[posIndex];
+   const tail=cells.slice(posIndex+1).filter(x=>x&&!/^[0-9]+$/.test(x));
+   const name=(tail.length>=2?tail[1]:tail[0]||'').replace(/\[[^\]]+\]/g,'').trim();
    if(!name||name.length<2)continue;
-   const key=(name+'|'+team).toLocaleLowerCase('tr');if(seen.has(key))continue;seen.add(key);
-   out.push(norm({id:'roster-'+team+'-'+name,Player:name,Team:team,Pos:pos,MP:0,Min:0,xG90:0,xA90:0,price:6,startProb:.25,rosterOnly:true},out.length));
+   const canonTeam=teamCanon(team);
+   const key=(name+'|'+canonTeam).toLocaleLowerCase('tr');if(seen.has(key))continue;seen.add(key);
+   out.push(norm({id:'roster-'+canonTeam+'-'+name,Player:name,Team:canonTeam,Pos:pos,MP:0,Min:0,xG90:0,xA90:0,price:6,startProb:.25,rosterOnly:true},out.length));
  }
  return out;
 }
@@ -281,9 +290,9 @@ async function loadRosterOnlyCatalog(){
  const groups=await Promise.all(jobs);return groups.flat();
 }
 function mergePools(stats,rosters){
- const out=[...stats],seen=new Set(stats.map(p=>(p.player+'|'+p.team).toLocaleLowerCase('tr')));
+ const out=[...stats],seen=new Set(stats.map(p=>(p.player+'|'+teamCanon(p.team)).toLocaleLowerCase('tr')));
  for(const p of rosters){
-   const k=(p.player+'|'+p.team).toLocaleLowerCase('tr');
+   const k=(p.player+'|'+teamCanon(p.team)).toLocaleLowerCase('tr');
    if(seen.has(k))continue;seen.add(k);out.push(p);
  }
  return out;
