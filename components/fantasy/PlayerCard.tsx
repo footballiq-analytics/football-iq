@@ -53,7 +53,6 @@ export default function PlayerCard({ player, tier = "gold", captain = false, vic
       ? "drop-shadow-[0_0_18px_rgba(255,210,54,.55)]"
       : "";
   const safePhoto = resolveFantasyMedia(player.photo, player.photoMedia);
-  const safeClubLogo = resolveFantasyMedia(player.clubLogo, player.clubLogoMedia);
 
   return (
     <motion.article
