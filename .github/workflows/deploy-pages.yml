@@ -3,7 +3,10 @@ name: Deploy FUTBOL IQ Fantasy to GitHub Pages
 on:
   push:
     branches: [main]
+  page_build:
   workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
 
 permissions:
   contents: read
