@@ -9,7 +9,9 @@ body .fiq-header .fiq-desktop-nav a{color:var(--ink);border-radius:6px 6px 0 0;p
 body .fiq-header .fiq-desktop-nav a.active{background:color-mix(in srgb,var(--accent) 14%,transparent);border-bottom-color:var(--accent);color:var(--accent)}
 .fiq-scout-visual{display:block;position:relative;min-width:280px;min-height:72px;border:1px solid #d6b85f;border-radius:14px;overflow:hidden;background:#07131e;box-shadow:0 7px 20px #0003;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .18s,border-color .18s}
 .fiq-scout-visual:hover{transform:translateY(-1px);border-color:#f0d37d}
-.fiq-scout-visual-compact .fiq-scout-visual-compact .fiq-scout-visual-compact .fiq-scout-copy{margin-left:7px}.fiq-scout-visual-compact .fiq-scout-copy strong{font-size:11px}.fiq-scout-visual-compact .fiq-scout-copy small{font-size:7px}.fiq-scout-visual-compact .fiq-home .home-scout-banner{max-width:570px;margin:18px 0 8px}.fiq-home .home-scout-banner .fiq-scout-visual{width:100%;min-height:94px;padding:11px 15px}.fiq-home .home-scout-banner .fiq-home .home-scout-banner .fiq-home .home-scout-banner .fiq-scout-copy strong{font-size:25px}.fiq-home .home-scout-banner .fiq-scout-copy small{font-size:11px}.fiq-home .home-scout-banner 
+.fiq-scout-banner-image{display:block;width:100%;height:100%;object-fit:cover;object-position:center;border:0}
+.fiq-home .home-scout-banner{max-width:570px;margin:16px 0 10px}
+.fiq-home .home-scout-banner .fiq-scout-visual{width:100%;min-width:0;aspect-ratio:3/1;min-height:0;border-radius:16px}
 body .fiq-header-actions{gap:6px;position:relative;z-index:2}
 .fiq-header-share,.fiq-menu-toggle{align-items:center;justify-content:center;gap:5px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-size:10px;font-weight:850;min-height:40px;touch-action:manipulation;cursor:pointer}
 .fiq-header-share{display:flex}
@@ -88,8 +90,8 @@ html:not(.dark) .fiq-league-page,html:not(.dark) .fiq-footer{color:var(--ink)}
  body .fiq-header .fiq-logo span{font-size:14px}
 }
 @media(max-width:700px){
- .fiq-home .home-scout-banner{max-width:none;margin:15px 0 8px}.fiq-home .home-scout-banner .fiq-scout-visual{min-width:0;min-height:80px}.fiq-home .home-scout-banner .fiq-home .home-scout-banner .fiq-home .home-scout-banner .fiq-scout-copy strong{font-size:20px}.fiq-home .home-scout-banner .fiq-scout-copy small{font-size:10px}
-
+ .fiq-home .home-scout-banner{max-width:none;margin:14px 0 8px}
+ .fiq-home .home-scout-banner .fiq-scout-visual{min-width:0;aspect-ratio:3/1;min-height:0;border-radius:12px}
  .fiq-home{padding-inline:12px}.fiq-home .home-hero{grid-template-columns:1fr;min-height:0;padding:20px 2px 12px;gap:10px}
  .fiq-home .home-hero h1{font-size:34px}.fiq-home .home-intro{font-size:14px}
  .fiq-home .home-stadium{height:250px;max-width:510px;width:100%;justify-self:center}
@@ -99,9 +101,6 @@ html:not(.dark) .fiq-league-page,html:not(.dark) .fiq-footer{color:var(--ink)}
  .fiq-home .home-rule-chips>div{gap:4px;padding:6px 4px}.fiq-home .home-rule-chips>div>span{font-size:17px}
 }
 
-.fiq-scout-banner-image{display:block;width:100%;height:100%;object-fit:cover;object-position:center;border:0}
-.fiq-home .home-scout-banner{max-width:570px;margin:16px 0 10px}
-.fiq-home .home-scout-banner .fiq-scout-visual{width:100%;min-width:0;aspect-ratio:3/1;min-height:0;border-radius:16px}
 body:has(.fiq-team-page) .fiq-desktop-nav{align-items:center}
 @media(max-width:700px){
  .fiq-home .home-scout-banner{max-width:none;margin:14px 0 8px}
