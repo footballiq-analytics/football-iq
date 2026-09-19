@@ -37,10 +37,18 @@ th{position:sticky;top:0;background:#0d1b2a;z-index:1}
 <section class="grid md:grid-cols-3 gap-3 mb-4">
   <button id="fetchBtn" class="glass rounded-2xl p-4 text-left hover:border-iq/60 transition"><span class="text-iq font-black">01</span><b class="block text-lg mt-1">Veriyi Çek / Yenile</b><small class="text-slate-400">FBref → AllOrigins → otomatik parse</small></button>
   <button id="csvBtn" class="glass rounded-2xl p-4 text-left hover:border-iq/60 transition"><span class="text-iq font-black">02</span><b class="block text-lg mt-1">Manuel CSV Yapıştır</b><small class="text-slate-400">Export CSV içeriğini buraya yapıştır</small></button>
-  <button id="squadBtn" class="rounded-2xl p-4 text-left bg-iq text-slate-950 shadow-xl hover:brightness-110 transition"><span class="font-black">03</span><b class="block text-lg mt-1">EN İYİ 15'Lİ KADROYU KUR</b><small class="text-slate-800">11 ilk + 4 yedek · 100M · kulüp başına max 3</small></button>
+  <div class="grid gap-2">
+    <button id="squadBtn" class="rounded-2xl p-4 text-left bg-iq text-slate-950 shadow-xl hover:brightness-110 transition"><span class="font-black">03</span><b class="block text-lg mt-1">EN İYİ 15'Lİ KADROYU KUR</b><small class="text-slate-800">11 ilk + 4 yedek · 100M · kulüp başına max 3</small></button>
+    <button id="compareBtn" class="glass rounded-xl px-4 py-3 text-left hover:border-sky-400/50 transition"><b class="text-sky-300">3 MODU KARŞILAŞTIR</b><small class="block text-slate-400">Güvenli · Dengeli · Diferansiyel</small></button>
+  </div>
 </section>
 
 <div id="status" class="glass rounded-xl px-4 py-3 mb-4 text-sm flex items-center gap-3"><span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span id="statusText">Hazır. Önce canlı veriyi çekebilir veya CSV yapıştırabilirsin.</span></div>
+<section id="comparePanel" class="hidden glass rounded-2xl p-4 mb-4">
+  <div class="flex items-center justify-between gap-3"><div><h2 class="text-xl font-black">3 KADRO KARŞILAŞTIRMASI</h2><p class="text-xs text-slate-400">Aynı veri, bütçe ve TFF kurallarıyla üç farklı risk profili.</p></div><button id="closeCompare" class="px-3 py-2 rounded-lg border border-white/10 text-xs">Kapat</button></div>
+  <div id="compareCards" class="grid lg:grid-cols-3 gap-3 mt-4"></div>
+  <div id="compareOverlap" class="mt-4 text-xs text-slate-400"></div>
+</section>
 
 <section id="csvPanel" class="hidden glass rounded-2xl p-4 mb-4">
   <div class="flex items-center justify-between gap-3"><div><h2 class="font-black text-lg">Manuel Veri Yapıştır</h2><p class="text-xs text-slate-400">FBref Export CSV. Team/Squad, xA/xAG ve xA90/xAG90 adları otomatik eşleştirilir.</p></div><button id="closeCsv" class="px-3 py-2 rounded-lg border border-white/10">Kapat</button></div>
@@ -139,7 +147,7 @@ const WIKI_SQUADS={
  'Samsunspor':'https://en.wikipedia.org/wiki/Samsunspor',
  'Trabzonspor':'https://en.wikipedia.org/wiki/Trabzonspor'
 };
-const LS_DATA='fiq_tff_scout_data_v8',LS_TIME='fiq_tff_scout_time_v8';
+const LS_DATA='fiq_tff_scout_data_v9',LS_TIME='fiq_tff_scout_time_v9';
 let players=[],squad=[],starters=[],bench=[],captain=null,viceCaptain=null;
 const SQUAD_QUOTAS={GK:2,DF:5,MF:5,FW:3};
 const FORMATIONS={433:{GK:1,DF:4,MF:3,FW:3},442:{GK:1,DF:4,MF:4,FW:2},343:{GK:1,DF:3,MF:4,FW:3},352:{GK:1,DF:3,MF:5,FW:2},532:{GK:1,DF:5,MF:3,FW:2}};
@@ -172,8 +180,8 @@ function calc(p){
  const setPiece=((p.penalty?0.45:0)+(p.corner?0.25:0))*p.startProb;
  p.xp=Math.max(0,(appearance+attack+cs+bonus+setPiece)*(1-p.injuryRisk));
  p.eff=p.xp/p.price;return p}
-function strategyScore(p){
- const mode=el('strategy')?.value||'balanced';
+function strategyScore(p,modeOverride){
+ const mode=modeOverride||el('strategy')?.value||'balanced';
  const own=p.ownershipVerified&&p.ownership!=null?p.ownership:null;
  if(mode==='safe'){
    const ownershipShield=own==null?1:1+Math.min(own,50)/250;
@@ -378,14 +386,14 @@ function repairBudget(selected){
  }
  return totalCost(selected)<=BUDGET?selected:null
 }
-function buildCandidate(lambda,order){
+function buildCandidate(lambda,order,mode){
  const selected=[],counts={};
  for(const pos of order){
    const need=SQUAD_QUOTAS[pos];
    const pool=players.filter(p=>p.pos===pos&&!p.unavailable&&!p.suspended).sort((a,b)=>{
      const gkA=pos==='GK'&&['Galatasaray','Fenerbahçe','Beşiktaş'].includes(a.team)?0.45:0;
      const gkB=pos==='GK'&&['Galatasaray','Fenerbahçe','Beşiktaş'].includes(b.team)?0.45:0;
-     const ra=strategyScore(a)+lambda*a.eff*7+gkA,rb=strategyScore(b)+lambda*b.eff*7+gkB;
+     const ra=strategyScore(a,mode)+lambda*a.eff*7+gkA,rb=strategyScore(b,mode)+lambda*b.eff*7+gkB;
      return rb-ra||b.xp-a.xp;
    });
    let added=0;
@@ -398,28 +406,67 @@ function buildCandidate(lambda,order){
  }
  return repairBudget(selected);
 }
-function buildSquad(){
- if(!players.length){setStatus('Önce veri yüklemelisin.','err');return}
+function generateSquadFor(mode){
  const avail={GK:0,DF:0,MF:0,FW:0};players.filter(p=>!p.unavailable&&!p.suspended).forEach(p=>avail[p.pos]=(avail[p.pos]||0)+1);
- for(const k of Object.keys(SQUAD_QUOTAS)){if(avail[k]<SQUAD_QUOTAS[k]){setStatus('TFF kadrosu için '+k+' mevkiinde yeterli oyuncu yok.','err');return}}
+ for(const k of Object.keys(SQUAD_QUOTAS)){if(avail[k]<SQUAD_QUOTAS[k])return null}
  const perms=a=>a.length<2?[a]:a.flatMap((x,i)=>perms(a.filter((_,j)=>j!==i)).map(rest=>[x,...rest]));
- const orders=perms(Object.keys(SQUAD_QUOTAS));
- let best=null;
+ const orders=perms(Object.keys(SQUAD_QUOTAS));let best=null;
  for(const lambda of [0,.15,.35,.6,1,1.5,2.2]){
    for(const order of orders){
-     const cand=buildCandidate(lambda,order);if(!cand||!validFullSquad(cand))continue;
-     const value=cand.reduce((s,p)=>s+strategyScore(p),0);
+     const cand=buildCandidate(lambda,order,mode);if(!cand||!validFullSquad(cand))continue;
+     const value=cand.reduce((s,p)=>s+strategyScore(p,mode),0);
      if(!best||value>best.value)best={list:[...cand],value};
    }
  }
- if(!best){setStatus('100M + 2/5/5/3 + kulüp başına 3 sınırlarıyla geçerli 15 bulunamadı. Fiyat/veri havuzunu kontrol et.','err');return}
- squad=best.list;
- chooseStartingXI();
- renderPitch();
- renderBench();
- updateRuleBadges();
- const label={safe:'Güvenli',balanced:'Dengeli',differential:'Diferansiyel'}[el('strategy').value]||'Dengeli';
+ return best?.list||null;
+}
+function buildSquad(){
+ if(!players.length){setStatus('Önce veri yüklemelisin.','err');return}
+ const mode=el('strategy').value;
+ const built=generateSquadFor(mode);
+ if(!built){setStatus('100M + 2/5/5/3 + kulüp başına 3 sınırlarıyla geçerli 15 bulunamadı. Fiyat/veri havuzunu kontrol et.','err');return}
+ squad=built;chooseStartingXI();renderPitch();renderBench();updateRuleBadges();
+ const label={safe:'Güvenli',balanced:'Dengeli',differential:'Diferansiyel'}[mode]||'Dengeli';
  setStatus(label+' TFF kadrosu kuruldu: 11 ilk + 4 yedek · '+totalCost(squad).toFixed(1)+'M / 100M');
+}
+function squadMetrics(list,mode){
+ const startAvg=list.reduce((s,p)=>s+p.startProb,0)/Math.max(1,list.length);
+ const riskAvg=list.reduce((s,p)=>s+p.injuryRisk,0)/Math.max(1,list.length);
+ const xp=list.reduce((s,p)=>s+p.xp,0);
+ const verifiedOwn=list.filter(p=>p.ownershipVerified&&p.ownership!=null);
+ const lowOwn=verifiedOwn.filter(p=>p.ownership<=10).length;
+ const score=list.reduce((s,p)=>s+strategyScore(p,mode),0);
+ const q=quotas(),xi=[];
+ for(const [pos,count] of Object.entries(q))xi.push(...list.filter(p=>p.pos===pos).sort((a,b)=>b.xp-a.xp).slice(0,count));
+ const cap=[...xi].sort((a,b)=>strategyScore(b,mode)-strategyScore(a,mode))[0]||null;
+ return {cost:totalCost(list),xp,startAvg,riskAvg,lowOwn,verifiedOwn:verifiedOwn.length,score,cap};
+}
+function compareAllStrategies(){
+ if(!players.length){setStatus('Önce oyuncu verisini yüklemelisin.','err');return}
+ const modes=['safe','balanced','differential'],labels={safe:'GÜVENLİ',balanced:'DENGELİ',differential:'DİFERANSİYEL'};
+ const sets={};let failed=false;
+ for(const mode of modes){const list=generateSquadFor(mode);if(!list){failed=true;break}sets[mode]=list}
+ if(failed){setStatus('Üç moddan biri için geçerli kadro üretilemedi. Fiyat/veri havuzunu kontrol et.','err');return}
+ const cards=modes.map(mode=>{
+   const m=squadMetrics(sets[mode],mode);
+   const risk=m.riskAvg<=.08?'Düşük':m.riskAvg<=.2?'Orta':'Yüksek';
+   return '<div class="rounded-2xl border border-white/10 bg-black/20 p-4"><div class="flex items-center justify-between"><b class="'+(mode==='balanced'?'text-iq':mode==='safe'?'text-emerald-300':'text-sky-300')+'">'+labels[mode]+'</b><span class="text-xs">'+m.cost.toFixed(1)+'M</span></div><div class="grid grid-cols-2 gap-2 mt-3 text-xs"><div class="rounded-lg bg-white/5 p-2">Toplam xP<br><b class="text-white text-lg">'+m.xp.toFixed(1)+'</b></div><div class="rounded-lg bg-white/5 p-2">İlk 11 güveni<br><b class="text-white text-lg">%'+Math.round(m.startAvg*100)+'</b></div><div class="rounded-lg bg-white/5 p-2">Risk<br><b class="text-white">'+risk+'</b></div><div class="rounded-lg bg-white/5 p-2">Düşük sahiplik<br><b class="text-white">'+m.lowOwn+'/'+m.verifiedOwn+'</b></div></div><div class="mt-3 text-xs text-slate-400">Kaptan: <b class="text-white">'+esc(m.cap?.player||'—')+'</b></div><button data-apply-mode="'+mode+'" class="w-full mt-3 rounded-xl border border-iq/30 px-3 py-2 text-xs font-black hover:bg-iq/10">BU KADROYU UYGULA</button></div>';
+ }).join('');
+ el('compareCards').innerHTML=cards;
+ const ids=m=>new Set(sets[m].map(p=>p.id));
+ const a=ids('safe'),b=ids('balanced'),d=ids('differential');
+ const all3=[...a].filter(x=>b.has(x)&&d.has(x)).length;
+ const safeBal=[...a].filter(x=>b.has(x)).length;
+ const balDiff=[...b].filter(x=>d.has(x)).length;
+ el('compareOverlap').innerHTML='<b class="text-white">Ortak çekirdek:</b> Üç kadroda da aynı '+all3+' oyuncu · Güvenli↔Dengeli '+safeBal+'/15 · Dengeli↔Diferansiyel '+balDiff+'/15';
+ el('comparePanel').classList.remove('hidden');
+ el('comparePanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function applyComparedMode(mode){
+ el('strategy').value=mode;squad=generateSquadFor(mode)||[];if(!squad.length)return;
+ chooseStartingXI();renderPitch();renderBench();updateRuleBadges();
+ el('comparePanel').classList.add('hidden');
+ setStatus(({safe:'Güvenli',balanced:'Dengeli',differential:'Diferansiyel'}[mode])+' karşılaştırma kadrosu sahaya uygulandı.');
 }
 function chooseStartingXI(){
  const q=quotas();starters=[];
@@ -479,14 +526,14 @@ function renderBench(){
  el('bench').innerHTML=bench.map((p,i)=>'<div class="bench-card"><div class="text-[9px] text-iq font-black mb-1">'+(p.pos==='GK'?'YEDEK KALECİ':'YEDEK '+i)+'</div>'+cardHtml(p)+'</div>').join('');
  el('captainInfo').innerHTML=(captain?'<span class="badge-c">C</span>'+esc(captain.player):'')+(viceCaptain?' &nbsp; <span class="badge-c2">C2</span>'+esc(viceCaptain.player):'');
 }
-document.addEventListener('click',e=>{const b=e.target.closest('[data-why]');if(b){e.stopPropagation();const p=players.find(x=>x.id===b.dataset.why);if(p)showWhy(p)}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-why]');if(b){e.stopPropagation();const p=players.find(x=>x.id===b.dataset.why);if(p)showWhy(p)}const a=e.target.closest('[data-apply-mode]');if(a)applyComparedMode(a.dataset.applyMode)});
 document.addEventListener('change',e=>{const t=e.target;if(t.matches('[data-id]')){const p=players.find(x=>x.id===t.dataset.id);if(p){p[t.dataset.k]=t.type==='checkbox'?t.checked:num(t.value);if(t.dataset.k==='price'){p.priceVerified=false;p.priceSource='Manuel düzenleme'}calc(p);save();renderAll()}}});
 ['posFilter','teamFilter','availabilityFilter','sortBy'].forEach(id=>el(id).addEventListener('change',renderTable));
 el('strategy').addEventListener('change',()=>{if(players.length)buildSquad()});el('search').addEventListener('input',renderTable);
 el('fetchBtn').onclick=()=>fetchData(true);el('csvBtn').onclick=()=>el('csvPanel').classList.toggle('hidden');el('closeCsv').onclick=()=>el('csvPanel').classList.add('hidden');
 el('parseCsv').onclick=()=>{try{players=parseCsvText(el('csvInput').value);if(!players.length)throw new Error('Uyumlu oyuncu bulunamadı');save();renderAll();el('csvPanel').classList.add('hidden');setStatus('CSV başarıyla parse edildi: '+players.length+' oyuncu.')}catch(e){setStatus('CSV hatası: '+e.message,'err')}};
 el('sampleCsv').onclick=()=>el('csvInput').value='Player,Team,Pos,MP,Min,Gls,Ast,xG,xA,xG90,xA90,Price,Penalty,Corner,Form4Plus\n';
-el('squadBtn').onclick=buildSquad;el('formation').onchange=()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}};
+el('squadBtn').onclick=buildSquad;el('compareBtn').onclick=compareAllStrategies;el('closeCompare').onclick=()=>el('comparePanel').classList.add('hidden');el('formation').onchange=()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}if(!el('comparePanel').classList.contains('hidden'))compareAllStrategies()};
 el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
 (function init(){const cached=localStorage.getItem(LS_DATA),ts=num(localStorage.getItem(LS_TIME));if(cached){try{players=JSON.parse(cached).map(norm);renderAll();el('lastUpdate').textContent=ts?new Date(ts).toLocaleString('tr-TR'):'—'}catch{}}fetchData(false);setInterval(()=>fetchData(true),86400000)})();
 </script>
