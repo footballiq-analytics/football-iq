@@ -12,7 +12,24 @@ function Crown(){return <svg className="brand-crown" viewBox="0 0 32 24" aria-hi
 import { useTheme } from "@/components/theme-provider";
 import { shareOrCopy } from "@/lib/share";
 
-const navigation=[["Ana Sayfa","/"],["Kadrom","/team"],["Fikstür","/today"],["Puan Durumu","/leagues/super-lig"],["İstatistikler","/statistics"]] as const;
+const navigation=[["Ana Sayfa","/"],["Kadrom","/team"]] as const;
+
+function ScoutVisualButton({compact=false}:{compact?:boolean}){
+ const base=process.env.NEXT_PUBLIC_BASE_PATH??"";
+ return <a href={`${base}/tff-scout.html`} className={compact?"fiq-scout-visual fiq-scout-visual-compact":"fiq-scout-visual"} aria-label="FUTBOL IQ analiz ve Scout sayfasını aç">
+  <span className="fiq-scout-orb" aria-hidden="true">
+   <svg viewBox="0 0 64 64" role="img">
+    <defs><linearGradient id="gBall" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#f4d77c"/><stop offset="1" stopColor="#9e6f1f"/></linearGradient><linearGradient id="gBrain" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#5aa8e8"/><stop offset="1" stopColor="#244b7a"/></linearGradient></defs>
+    <path d="M7 32a25 25 0 0 1 25-25v50A25 25 0 0 1 7 32Z" fill="url(#gBall)"/>
+    <path d="M12 22l9-7 9 5-3 10-11 2-4-10Zm4 15 10-2 5 8-7 8-10-5 2-9Z" fill="#101827" opacity=".88"/>
+    <path d="M32 7c15 0 25 10 25 25S47 57 32 57V7Z" fill="url(#gBrain)"/>
+    <path d="M40 17c-5 0-7 4-6 8m6-8c5 1 6 5 4 8m0 0c5 0 7 4 6 8m-6-8c-4 0-6 3-5 7m11 1c0 5-4 7-8 6m0 0c1 5-3 9-8 8" fill="none" stroke="#cfe6ff" strokeWidth="2.2" strokeLinecap="round"/>
+   </svg>
+  </span>
+  <span className="fiq-scout-copy"><strong>FUTBOL <b>IQ</b></strong><small>Oyunu verilerle oku</small></span>
+  <span className="fiq-scout-arrow" aria-hidden="true">→</span>
+ </a>
+}
 export function Header(){
  const pathname=usePathname().replace(/\/$/,"")||"/";const isTeam=pathname==="/team";
  const{dark,toggle}=useTheme();const[open,setOpen]=useState(false);const[jokerOpen,setJokerOpen]=useState(false);
@@ -24,13 +41,13 @@ export function Header(){
  useEffect(()=>{const media=window.matchMedia("(min-width:601px) and (min-height:601px)");const update=()=>{if(media.matches)setOpen(false)};media.addEventListener("change",update);return()=>media.removeEventListener("change",update)},[]);
  async function recommend(){const result=await shareOrCopy({title:"FUTBOL IQ",text:"FUTBOL IQ’da kendi fantezi futbol takımını kur!",url:window.location.origin+(process.env.NEXT_PUBLIC_BASE_PATH??"")+"/"});if(result==="copied")setNotice("Site bağlantısı kopyalandı.")}
  function share(){if(isTeam){const event=new Event("fiq-share-squad",{cancelable:true});window.dispatchEvent(event);if(event.defaultPrevented)return}void recommend()}
- return <><header className="fiq-header"><Link href="/" className="fiq-logo"><Crown/><span>FUTBOL <b>IQ</b></span></Link><nav className="fiq-desktop-nav" aria-label="Ana menü">{navigation.map(([label,href])=><Link key={href} aria-current={pathname===href?"page":undefined} className={pathname===href?"active":""} href={href}>{label}</Link>)}</nav><div className="fiq-header-actions">
+ return <><header className="fiq-header"><Link href="/" className="fiq-logo"><Crown/><span>FUTBOL <b>IQ</b></span></Link><nav className="fiq-desktop-nav" aria-label="Ana menü">{navigation.map(([label,href])=><Link key={href} aria-current={pathname===href?"page":undefined} className={pathname===href?"active":""} href={href}>{label}</Link>)}<ScoutVisualButton compact={isTeam}/></nav><div className="fiq-header-actions">
  <button type="button" className="fiq-header-share" aria-label={isTeam?"Kadromu paylaş":"Arkadaşıma öner"} onClick={share}><Icon name="share"/><span>{isTeam?"KADRO PAYLAŞ":"ARKADAŞIMA ÖNER"}</span></button>
  <button type="button" className="fiq-theme-toggle" onClick={toggle} aria-label={dark?"Açık moda geç":"Koyu moda geç"} title={dark?"Açık moda geç":"Koyu moda geç"} aria-pressed={dark}><span aria-hidden="true">{dark?"☀":"☾"}</span><span>{dark?"AÇIK":"KOYU"}</span></button>
  <button type="button" ref={trigger} className="menu-trigger fiq-menu-toggle" aria-label="Menüyü aç" aria-expanded={open} aria-controls="fiq-mobile-menu" onClick={()=>setOpen(true)}><Icon name="menu"/><span>MENÜ</span></button>
  </div></header>
  {notice?<div className="fiq-share-notice" role="status"><span>{notice}</span><button onClick={()=>setNotice("")} aria-label="Bildirimi kapat">×</button></div>:null}
- {open?<div className="mobile-drawer-backdrop" onClick={()=>setOpen(false)}><aside ref={menu} id="fiq-mobile-menu" role="dialog" aria-modal="true" aria-label="Gezinme menüsü" className="mobile-drawer" onClick={e=>e.stopPropagation()}><div className="fiq-menu-heading"><strong>FUTBOL IQ</strong><button aria-label="Menüyü kapat" onClick={()=>setOpen(false)}>×</button></div>{navigation.map(([label,href])=><Link key={href} href={href} onClick={()=>setOpen(false)}>{label}</Link>)}{isTeam?<button onClick={()=>{setOpen(false);window.dispatchEvent(new Event("fiq-open-transfers"))}}>Transfer Merkezi</button>:null}<Link href="/rules" onClick={()=>setOpen(false)}>Nasıl oynanır?</Link><button onClick={()=>{setOpen(false);setJokerOpen(true)}}>Jokerler</button></aside></div>:null}
+ {open?<div className="mobile-drawer-backdrop" onClick={()=>setOpen(false)}><aside ref={menu} id="fiq-mobile-menu" role="dialog" aria-modal="true" aria-label="Gezinme menüsü" className="mobile-drawer" onClick={e=>e.stopPropagation()}><div className="fiq-menu-heading"><strong>FUTBOL IQ</strong><button aria-label="Menüyü kapat" onClick={()=>setOpen(false)}>×</button></div>{navigation.map(([label,href])=><Link key={href} href={href} onClick={()=>setOpen(false)}>{label}</Link>)}<ScoutVisualButton compact/>{isTeam?<button onClick={()=>{setOpen(false);window.dispatchEvent(new Event("fiq-open-transfers"))}}>Transfer Merkezi</button>:null}<Link href="/rules" onClick={()=>setOpen(false)}>Nasıl oynanır?</Link><button onClick={()=>{setOpen(false);setJokerOpen(true)}}>Jokerler</button></aside></div>:null}
  <dialog ref={shareDialog} className="fiq-manual-share" aria-label="Paylaşım metni"><h2>{manual.title}</h2><p>Paylaşım açılmazsa aşağıdaki metni seçip kopyalayabilirsin.</p><textarea readOnly value={manual.text} aria-label="Kopyalanacak paylaşım metni" onFocus={e=>e.currentTarget.select()}/><button onClick={()=>shareDialog.current?.close()}>KAPAT</button></dialog>
  {jokerOpen?<JokerModal onClose={()=>setJokerOpen(false)}/>:null}</>;
 }
