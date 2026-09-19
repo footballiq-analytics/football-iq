@@ -14,6 +14,15 @@ STANDARD_URLS = [
 ]
 PLAYING_URL = "https://fbref.com/en/comps/26/playingtime/Super-Lig-Stats"
 INJURY_URL = "https://lineupstoday.com/super-lig/injuries/"
+TFF_URL = "https://www.tff.org/?pageID=198"
+TEAM_ALIASES = {
+ "KASIMPAŞA A.Ş.":"Kasımpaşa","TÜMOSAN KONYASPOR":"Konyaspor","ARCA ÇORUM FK":"Çorum FK",
+ "CORENDON ALANYASPOR":"Alanyaspor","KOCAELİSPOR":"Kocaelispor","GAZİANTEP FUTBOL KULÜBÜ A.Ş.":"Gaziantep",
+ "TRABZONSPOR A.Ş.":"Trabzonspor","GALATASARAY A.Ş.":"Galatasaray","İSTANBUL BAŞAKŞEHİR FK":"Başakşehir",
+ "GENÇLERBİRLİĞİ":"Gençlerbirliği","FENERBAHÇE A.Ş.":"Fenerbahçe","EYÜPSPOR":"Eyüpspor",
+ "ERZURUMSPOR FK":"Erzurumspor","SAMSUNSPOR A.Ş.":"Samsunspor","AMED SPORTİF FAALİYETLER":"Amedspor",
+ "BEŞİKTAŞ A.Ş.":"Beşiktaş","GÖZTEPE A.Ş.":"Göztepe","ÇAYKUR RİZESPOR A.Ş.":"Rizespor"
+}
 OUT = "public/data/tff-scout.json"
 
 def n(v):
@@ -115,6 +124,34 @@ def parse_injuries():
             node=node.find_next(); limit+=1
     return unavailable
 
+def parse_current_fixtures():
+    out={}
+    try:
+        html=fetch(TFF_URL,5000)
+        soup=BeautifulSoup(html,"lxml")
+        for tr in soup.select("tr"):
+            text=" ".join(tr.stripped_strings)
+            if not re.search(r"\d{2}\.\d{2}\.2026\s+\d{2}:\d{2}",text): continue
+            found=[]
+            for raw,canon in TEAM_ALIASES.items():
+                if raw in text: found.append(canon)
+            if len(found)==2:
+                home,away=found
+                out[home]={"opponent":away,"home":True}
+                out[away]={"opponent":home,"home":False}
+        # Some TFF markup is not table based; fall back to line-level text.
+        if len(out)<12:
+            body="\n".join(" ".join(x.stripped_strings) for x in soup.find_all(["div","li","p"]))
+            for line in body.splitlines():
+                if not re.search(r"\d{2}\.\d{2}\.2026\s+\d{2}:\d{2}",line): continue
+                found=[canon for raw,canon in TEAM_ALIASES.items() if raw in line]
+                if len(found)==2:
+                    out[found[0]]={"opponent":found[1],"home":True}
+                    out[found[1]]={"opponent":found[0],"home":False}
+    except Exception as e:
+        print(f"Fixture feed skipped: {e}",file=sys.stderr)
+    return out
+
 def injury_status(player, team, injury_sections):
     pkey=norm_key(player)
     tkey=norm_key(team)
@@ -141,6 +178,7 @@ std_html,used=fetch_first(STANDARD_URLS)
 play_html=fetch(PLAYING_URL,30000)
 ptime=parse_playing_time(play_html)
 injuries=parse_injuries()
+fixtures=parse_current_fixtures()
 table=player_table(std_html,"stats_standard")
 players=[]
 
@@ -175,8 +213,12 @@ for i,row in enumerate(table.select("tbody tr")):
     p["penalty"]=bool(prev.get("penalty",False) or p["pkAtt"]>0)
     p["corner"]=bool(prev.get("corner",False))
     p["form4"]=bool(p["startRate"]>=0.8 and p["mp"]>=4)
-    for k in ["opponent","home"]:
-        if k in prev: p[k]=prev[k]
+    fixture=fixtures.get(team) or fixtures.get(TEAM_ALIASES.get(team,""))
+    if fixture:
+        p.update(fixture)
+    else:
+        for k in ["opponent","home"]:
+            if k in prev: p[k]=prev[k]
     p.update(injury_status(player,team,injuries))
     # Start probability: recent availability + actual start rate + minutes.
     if p["unavailable"] or p["suspended"]:
@@ -196,6 +238,8 @@ out={
     "sourceUrl":used,
     "playingTimeUrl":PLAYING_URL,
     "injuryUrl":INJURY_URL,
+    "fixtureUrl":TFF_URL,
+    "fixtureTeams":len(fixtures),
     "updatedAt":datetime.now(timezone.utc).isoformat(),
     "season":"2026-2027",
     "count":len(players),
