@@ -153,7 +153,7 @@ const WIKI_SQUADS={
  'Samsunspor':'https://en.wikipedia.org/wiki/Samsunspor',
  'Trabzonspor':'https://en.wikipedia.org/wiki/Trabzonspor'
 };
-const LS_DATA='fiq_tff_scout_data_v12',LS_TIME='fiq_tff_scout_time_v12';
+const LS_DATA='fiq_tff_scout_data_v13',LS_TIME='fiq_tff_scout_time_v13';
 let players=[],squad=[],starters=[],bench=[],captain=null,viceCaptain=null;
 const SQUAD_QUOTAS={GK:2,DF:5,MF:5,FW:3};
 const FORMATIONS={433:{GK:1,DF:4,MF:3,FW:3},442:{GK:1,DF:4,MF:4,FW:2},343:{GK:1,DF:3,MF:4,FW:3},352:{GK:1,DF:3,MF:5,FW:2},532:{GK:1,DF:5,MF:3,FW:2}};
@@ -440,48 +440,22 @@ function parseCsvText(text){
   return rows.filter(p=>p.player&&['GK','DF','MF','FW'].includes(p.pos));
 }
 async function fetchData(force=false){
- const ts=num(localStorage.getItem(LS_TIME));const cached=localStorage.getItem(LS_DATA);
- if(!force&&cached&&Date.now()-ts<86400000){
-   const cp=JSON.parse(cached).map(norm);
-   if(cp.length>=150){players=cp;renderAll();setStatus('Tam kamuya açık oyuncu havuzu önbellekten yüklendi: '+players.length+' oyuncu.');return}
- }
  setLoading(true);
- let localData=null;
  try{
    const local=await fetch(LOCAL_DATA+'?v='+Date.now(),{cache:'no-store'});
-   if(local.ok)localData=await local.json();
- }catch{}
- try{
-   const expanded=await loadFullPublicPool();
-   let rosterOnly=[];
-   try{rosterOnly=await loadWikidataRosterPool()}catch(wdErr){
-     console.warn('Wikidata roster fallback failed',wdErr);
-     try{rosterOnly=await loadFotMobRosterPool()}catch(fotmobErr){
-       console.warn('FotMob roster fallback failed',fotmobErr);
-       rosterOnly=await loadRosterOnlyCatalog();
-     }
+   if(!local.ok)throw new Error('Yerel tam kadro dosyası HTTP '+local.status);
+   const data=await local.json();
+   const teamCount=data.teamCount||new Set((data.players||[]).map(p=>teamCanon(p.team)).filter(Boolean)).size;
+   if(!Array.isArray(data.players)||data.players.length<350||teamCount<18){
+     throw new Error('Eksik yayın verisi: '+(data.players?.length||0)+' oyuncu / '+teamCount+' takım');
    }
-   const combined=rosterOnly.length>=350?mergeStatsIntoRoster(rosterOnly,expanded):mergePools(expanded,rosterOnly);
-   const manual=new Map((localData?.players||[]).map(x=>[(x.player+'|'+teamCanon(x.team)).toLocaleLowerCase('tr'),x]));
-   players=combined.map(p=>{
-     const m=manual.get((p.player+'|'+teamCanon(p.team)).toLocaleLowerCase('tr'));
-     return norm(m?{...p,price:m.price,priceVerified:m.priceVerified,priceSource:m.priceSource,ownership:m.ownership,ownershipVerified:m.ownershipVerified,ownershipSource:m.ownershipSource,penalty:m.penalty||p.penalty,corner:m.corner,opponent:m.opponent,home:m.home,unavailable:m.unavailable,doubtful:m.doubtful,suspended:m.suspended,injuryRisk:m.injuryRisk,startProb:m.startProb}:p)
-   });
+   players=data.players.map(norm);
    save();renderAll();
-   const rosterCount=players.filter(p=>p.rosterOnly).length;
-   const teamCount=new Set(players.map(p=>teamCanon(p.team)).filter(Boolean)).size;
-   setStatus('Tam kadro havuzu yüklendi: '+players.length+' oyuncu · '+teamCount+'/18 takım · '+rosterCount+' henüz istatistiksiz.');
-   return;
- }catch(fullErr){
-   if(localData?.players?.length>=15){
-     players=localData.players.map(norm);save();renderAll();
-     setStatus('Tam havuz alınamadı; '+players.length+' oyunculuk güvenli yedek veri kullanılıyor.','err');return;
-   }
-   if(cached){
-     players=JSON.parse(cached).map(norm);renderAll();setStatus('Canlı kaynak erişilemiyor; son veri kullanılıyor.','err');return;
-   }
-   el('csvPanel').classList.remove('hidden');
-   setStatus('Oyuncu havuzu alınamadı. Manuel CSV fallback açıldı.','err');
+   setStatus('TAM HAVUZ: '+players.length+' oyuncu · '+teamCount+'/18 takım · yüz fotoğrafları aktif.');
+ }catch(err){
+   players=[];squad=[];starters=[];bench=[];captain=null;viceCaptain=null;
+   renderAll();
+   setStatus('TAM HAVUZ YÜKLENEMEDİ: '+err.message+' — 29 kişilik eski veri artık kullanılmıyor.','err');
  }finally{setLoading(false)}
 }
 function renderAll(){players=players.map(norm);el('playerCount').textContent=players.length;const tc=new Set(players.map(p=>teamCanon(p.team)).filter(Boolean)).size;el('coverageText').textContent=players.length+' / '+FANTASY_TOTAL+' ('+Math.round(players.length/FANTASY_TOTAL*100)+'%) · '+tc+'/18 takım';refreshTeams();renderTable();if(squad.length)buildSquad()}
@@ -491,7 +465,7 @@ function renderTable(){
  const pos=el('posFilter').value,team=el('teamFilter').value,avail=el('availabilityFilter').value,q=el('search').value.toLocaleLowerCase('tr'),sort=el('sortBy').value;
  const key={xp:'xp',score:'score',eff:'eff',xg90:'xg90',xa90:'xa90'}[sort]||'xp';
  const arr=players.filter(p=>(!pos||p.pos===pos)&&(!team||p.team===team)&&(!q||p.player.toLocaleLowerCase('tr').includes(q))&&(!avail||(avail==='available'&&!p.unavailable&&!p.doubtful&&!p.suspended)||(avail==='doubtful'&&p.doubtful)||(avail==='out'&&(p.unavailable||p.suspended)))).sort((a,b)=>b[key]-a[key]);
- el('playersBody').innerHTML=arr.map((p,i)=>'<tr class="border-t border-white/5 hover:bg-white/[.03]"><td class="p-2 text-slate-500">'+(i+1)+'</td><td class="p-2 font-bold">'+esc(p.player)+'</td><td class="p-2 text-slate-400">'+esc(p.team)+'</td><td class="p-2 text-center">'+esc(p.opponent)+'</td><td class="p-2 text-center">'+(p.home===true?'EV':p.home===false?'D':'—')+'</td><td class="p-2 text-center">'+p.pos+'</td><td class="p-2 text-center">'+p.xg90.toFixed(2)+'</td><td class="p-2 text-center">'+p.xa90.toFixed(2)+'</td><td class="p-2 text-center font-black text-iq">'+p.xp.toFixed(2)+'</td><td class="p-2 text-center">'+Math.round(p.startProb*100)+'%</td><td class="p-2 text-center">'+Math.round(p.cleanSheetProb*100)+'%</td><td class="p-2"><input data-id="'+p.id+'" data-k="price" type="number" min="1" step=".1" value="'+p.price.toFixed(1)+'" class="w-16 rounded border px-1 py-1 text-center"/></td><td class="p-2 text-center">'+(p.ownershipVerified&&p.ownership!=null?'<span class="text-sky-300">%'+p.ownership.toFixed(1)+'</span>':'<span class="text-slate-500">—</span>')+'</td><td class="p-2 text-center">'+(p.priceVerified?'<span class="text-emerald-300">Doğrulandı</span>':'<span class="text-amber-300">Manuel</span>')+'</td><td class="p-2 text-center">'+(p.suspended?'<span class="text-red-300">Cezalı</span>':p.unavailable?'<span class="text-red-300">Sakat</span>':p.doubtful?'<span class="text-amber-300">Şüpheli</span>':'<span class="text-emerald-300">Uygun</span>')+'</td></tr>').join('');
+ el('playersBody').innerHTML=arr.map((p,i)=>'<tr class="border-t border-white/5 hover:bg-white/[.03]"><td class="p-2 text-slate-500">'+(i+1)+'</td><td class="p-2 font-bold"><div class="flex items-center gap-2"><div class="shrink-0">'+(p.photo?'<img src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.15)" onerror="this.style.display=\'none\'">':'')+'</div><span>'+esc(p.player)+'</span></div></td><td class="p-2 text-slate-400">'+esc(p.team)+'</td><td class="p-2 text-center">'+esc(p.opponent)+'</td><td class="p-2 text-center">'+(p.home===true?'EV':p.home===false?'D':'—')+'</td><td class="p-2 text-center">'+p.pos+'</td><td class="p-2 text-center">'+p.xg90.toFixed(2)+'</td><td class="p-2 text-center">'+p.xa90.toFixed(2)+'</td><td class="p-2 text-center font-black text-iq">'+p.xp.toFixed(2)+'</td><td class="p-2 text-center">'+Math.round(p.startProb*100)+'%</td><td class="p-2 text-center">'+Math.round(p.cleanSheetProb*100)+'%</td><td class="p-2"><input data-id="'+p.id+'" data-k="price" type="number" min="1" step=".1" value="'+p.price.toFixed(1)+'" class="w-16 rounded border px-1 py-1 text-center"/></td><td class="p-2 text-center">'+(p.ownershipVerified&&p.ownership!=null?'<span class="text-sky-300">%'+p.ownership.toFixed(1)+'</span>':'<span class="text-slate-500">—</span>')+'</td><td class="p-2 text-center">'+(p.priceVerified?'<span class="text-emerald-300">Doğrulandı</span>':'<span class="text-amber-300">Manuel</span>')+'</td><td class="p-2 text-center">'+(p.suspended?'<span class="text-red-300">Cezalı</span>':p.unavailable?'<span class="text-red-300">Sakat</span>':p.doubtful?'<span class="text-amber-300">Şüpheli</span>':'<span class="text-emerald-300">Uygun</span>')+'</td></tr>').join('');
 }
 function quotas(){return FORMATIONS[el('formation').value]||FORMATIONS[433]}
 function clubCounts(list){return list.reduce((m,p)=>(m[p.team]=(m[p.team]||0)+1,m),{})}
@@ -673,7 +647,7 @@ el('parseCsv').onclick=()=>{try{players=parseCsvText(el('csvInput').value);if(!p
 el('sampleCsv').onclick=()=>el('csvInput').value='Player,Team,Pos,MP,Min,Gls,Ast,xG,xA,xG90,xA90,Price,Penalty,Corner,Form4Plus\n';
 el('squadBtn').onclick=buildSquad;el('compareBtn').onclick=compareAllStrategies;el('closeCompare').onclick=()=>el('comparePanel').classList.add('hidden');el('formation').onchange=()=>{if(squad.length){chooseStartingXI();renderPitch();renderBench();updateRuleBadges()}if(!el('comparePanel').classList.contains('hidden'))compareAllStrategies()};
 el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
-(function init(){const cached=localStorage.getItem(LS_DATA),ts=num(localStorage.getItem(LS_TIME));if(cached){try{players=JSON.parse(cached).map(norm);renderAll();el('lastUpdate').textContent=ts?new Date(ts).toLocaleString('tr-TR'):'—'}catch{}}fetchData(false);setInterval(()=>fetchData(true),86400000)})();
+(function init(){fetchData(true);setInterval(()=>fetchData(true),86400000)})();
 </script>
 </body>
 </html>
