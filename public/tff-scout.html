@@ -114,6 +114,30 @@ tbody tr:hover{background:#ffffff05}
 .player-profile-photo,.player-profile-fallback{width:92px;height:92px;border-radius:16px;border:1px solid #d7b86a66;background:#172234}.player-profile-photo{object-fit:cover}.player-profile-fallback{display:grid;place-items:center;font-size:24px;font-weight:900}
 .spinner{width:17px;height:17px;border:2px solid #ffffff22;border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 
+
+/* V10 fantasy photo cards */
+.player-card{width:96px;height:128px;max-width:none;border-radius:13px;overflow:visible;filter:drop-shadow(0 8px 14px #0008)}
+.player-card .fantasy-card{position:relative;width:100%;height:100%;overflow:hidden;border-radius:13px;border:1px solid rgba(215,184,106,.42);background:linear-gradient(155deg,var(--kit1,#1e293b),var(--kit2,#334155));box-shadow:inset 0 0 0 1px #ffffff0b,0 7px 16px #0008}
+.player-card .fantasy-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.player-card .fantasy-fallback{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 20%,color-mix(in srgb,var(--kit1) 78%,white),var(--kit2));font-size:24px;font-weight:900;color:#ffffffd8}
+.player-card .fantasy-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,9,16,.04) 15%,rgba(4,9,16,.10) 34%,rgba(4,9,16,.68) 69%,rgba(4,9,16,.97) 100%)}
+.player-card .fantasy-top{position:absolute;inset:6px 6px auto;display:flex;align-items:flex-start;justify-content:space-between;z-index:3}
+.player-card .fantasy-pos{display:grid;place-items:center;min-width:21px;height:21px;padding:0 5px;border-radius:6px;background:rgba(8,15,25,.82);border:1px solid #ffffff28;color:#fff;font-size:8px;font-weight:900;backdrop-filter:blur(4px)}
+.player-card .fantasy-badge{display:flex;gap:3px}
+.player-card .fantasy-meta{position:absolute;z-index:3;left:6px;right:6px;bottom:6px;text-align:left;color:#fff}
+.player-card .fantasy-name{font-size:9px;font-weight:900;line-height:1.08;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 5px #000}
+.player-card .fantasy-team{font-size:6.8px;color:#c9d5df;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-card .fantasy-stats{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:4px}
+.player-card .fantasy-stat{border-radius:5px;background:rgba(8,15,25,.68);border:1px solid #ffffff16;padding:3px 4px;backdrop-filter:blur(3px)}
+.player-card .fantasy-stat span{display:block;font-size:5.5px;color:#92a6ba;line-height:1}
+.player-card .fantasy-stat b{display:block;font-size:7px;color:#fff;line-height:1.15;margin-top:1px}
+.player-card .fantasy-foot{display:flex;align-items:center;justify-content:space-between;gap:3px;margin-top:3px;font-size:5.8px;color:#b9c7d4}
+.player-card .fantasy-foot .ok{color:#72d9ad}.player-card .fantasy-foot .risk{color:#f0b35c}.player-card .fantasy-foot .bad{color:#ee7b86}
+.player-card [data-profile]{position:absolute;inset:0;z-index:4;border:0;background:transparent;border-radius:13px}
+.player-card [data-profile]:focus-visible{outline:2px solid #f0d278;outline-offset:2px}
+.player-card .badge-c,.player-card .badge-c2{width:21px;height:21px;margin:0;font-size:8px;border:1px solid #ffffff88;box-shadow:0 2px 7px #0008}
+.bench-card{padding:4px}.bench-card .player-card{position:relative;transform:none;width:100%;height:108px;filter:none}.bench-card .fantasy-card{border-radius:10px}.bench-card .fantasy-name{font-size:8px}.bench-card .fantasy-stat{padding:2px 3px}.bench-card .fantasy-stat span{font-size:5px}.bench-card .fantasy-stat b{font-size:6.5px}
+
 .mobile-bottom{display:none}
 
 @media(max-width:1200px){
@@ -121,6 +145,8 @@ tbody tr:hover{background:#ffffff05}
   .side-panel{grid-column:1/-1;position:static}.side-profile{display:grid;grid-template-columns:1fr 1.4fr;gap:12px}
 }
 @media(max-width:900px){
+  .player-card{width:78px;height:108px}.player-card .fantasy-name{font-size:7.5px}.player-card .fantasy-team{font-size:5.8px}.player-card .fantasy-stat span{font-size:4.8px}.player-card .fantasy-stat b{font-size:6.2px}.player-card .fantasy-foot{font-size:5px}.bench-card .player-card{height:96px}
+
   .app-shell{padding:0 9px 76px}.topbar{grid-template-columns:1fr auto;height:60px;padding:0 4px}.desktop-nav,.top-actions .icon-btn,.top-actions .profile-chip,.top-actions .pro-badge{display:none}.mobile-menu-btn{display:grid}
   .brand-mark{width:34px;height:34px}.brand-title{font-size:14px}.brand-sub{font-size:9px}
   .mobile-menu.open{display:grid;position:fixed;top:60px;left:9px;right:9px;z-index:70;background:#111827;border:1px solid #263449;border-radius:12px;padding:8px;gap:4px}.mobile-menu a{color:#d6e0ea;text-decoration:none;font-size:11px;padding:10px;border-radius:8px}.mobile-menu a:hover{background:#172033}
@@ -144,7 +170,7 @@ tbody tr:hover{background:#ffffff05}
       <div>
         <div class="brand-title">FUTBOL <span style="color:var(--gold)">IQ</span></div>
         <div class="brand-sub">TFF Fantezi Lig · Canlı Scout</div>
-        <span class="version-badge">PRO UI V9 · DASHBOARD</span>
+        <span class="version-badge">PRO UI V10 · FANTASY CARDS</span>
       </div>
     </div>
     <nav class="desktop-nav">
@@ -976,8 +1002,9 @@ function teamKit(team){
 function cardHtml(p){
  const badge=p.id===captain?.id?'<span class="badge-c">C</span>':p.id===viceCaptain?.id?'<span class="badge-c2">C2</span>':'';
  const kit=teamKit(p.team),initials=esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''));
- const face=p.photo?'<img class="face" src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="face-fallback" style="display:none">'+initials+'</div>':'<div class="face-fallback">'+initials+'</div>';
- return '<div class="kit-shell" style="--kit1:'+kit[0]+';--kit2:'+kit[1]+'"><div class="jersey"></div>'+face+'</div><div class="card-meta">'+badge+'<b>'+esc(p.player)+'</b><small>'+esc(p.team)+' · '+p.pos+'</small><small>'+(p.home===true?'EV ':p.home===false?'D ':'')+esc(p.opponent)+' · baş '+Math.round(p.startProb*100)+'%</small><small>'+(p.suspended?'CEZALI':p.unavailable?'SAKAT':p.doubtful?'ŞÜPHELİ':'UYGUN')+'</small><strong>xP '+p.xp.toFixed(2)+' · '+p.price.toFixed(1)+'M</strong><div class="flex items-center justify-center gap-2 mt-1"><button data-profile="'+esc(p.id)+'" class="text-[9px] text-slate-300">Profil</button><span class="text-slate-600">·</span><button data-why="'+esc(p.id)+'" class="text-[9px] underline text-sky-300">Neden?</button></div></div>';
+ const availability=p.suspended?['CEZALI','bad']:p.unavailable?['SAKAT','bad']:p.doubtful?['ŞÜPHELİ','risk']:['UYGUN','ok'];
+ const photo=p.photo?'<img class="fantasy-photo" src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="fantasy-fallback" style="display:none">'+initials+'</div>':'<div class="fantasy-fallback">'+initials+'</div>';
+ return '<div class="fantasy-card" style="--kit1:'+kit[0]+';--kit2:'+kit[1]+'">'+photo+'<div class="fantasy-shade"></div><div class="fantasy-top"><span class="fantasy-pos">'+p.pos+'</span><span class="fantasy-badge">'+badge+'</span></div><div class="fantasy-meta"><div class="fantasy-name">'+esc(p.player)+'</div><div class="fantasy-team">'+esc(p.team)+' · '+(p.home===true?'EV':p.home===false?'D':'—')+' '+esc(p.opponent)+'</div><div class="fantasy-stats"><div class="fantasy-stat"><span>xP</span><b>'+p.xp.toFixed(1)+'</b></div><div class="fantasy-stat"><span>Fiyat</span><b>'+p.price.toFixed(1)+'M</b></div><div class="fantasy-stat"><span>Başlama</span><b>%'+Math.round(p.startProb*100)+'</b></div><div class="fantasy-stat"><span>xG+xA</span><b>'+(p.xg90+p.xa90).toFixed(2)+'</b></div></div><div class="fantasy-foot"><span class="'+availability[1]+'">'+availability[0]+'</span><span>CS %'+Math.round(p.cleanSheetProb*100)+'</span></div></div><button data-profile="'+esc(p.id)+'" aria-label="'+esc(p.player)+' oyuncu detayını aç"></button></div>';
 }
 function renderPitch(){
  const pitch=el('pitch');[...pitch.querySelectorAll('.player-card')].forEach(n=>n.remove());el('emptyPitch').classList.add('hidden');
