@@ -175,3 +175,62 @@ html body:has(.fiq-team-page) .fiq-empty-slot span{background:#e0eee8!important;
 .fiq-team-page .fiq-team-metrics-v27>[aria-label] span{color:#347567!important}
 .fiq-team-page .fiq-team-metrics-v27>[aria-label]>div:last-child{background:#dce8e2!important;border:0!important;box-shadow:none!important;height:5px!important}
 .fiq-team-page .fiq-team-metrics-v27>[aria-label]>div:last-child>div{background:#488779!important;box-shadow:none!important}
+
+
+/* Transfer centre: the approved search/filter stack and compact player rows. */
+.fiq-team-page .fiq-transfer-panel-v28{height:min(820px,calc(100dvh - 92px))!important;min-height:0!important;overflow:hidden!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-controls{display:flex!important;flex-direction:column!important;flex-shrink:0!important;gap:12px!important;padding:18px 16px 14px!important;border:0!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-heading{display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0!important;margin:0 0 2px!important}
+.fiq-team-page .fiq-transfer-panel-v28 h2{margin:0!important;font-size:22px!important;line-height:28px!important;font-weight:800!important;color:#243447!important;letter-spacing:-.3px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-heading p{display:block!important;margin:3px 0 0!important;font-size:14px!important;line-height:20px!important;font-weight:400!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-player-search{margin:0!important;width:100%!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-player-search input{height:44px!important;padding-left:38px!important;font-weight:400!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-player-search>span{color:#62748a!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-filter-pair{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:12px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-club-filter{min-width:0!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-filter-pair>select,.fiq-team-page .fiq-transfer-panel-v28 .fiq-club-filter>button{height:44px!important;width:100%!important;min-width:0!important;padding:0 12px!important;font-size:14px!important;font-weight:500!important;line-height:20px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-club-filter>button>span:last-child{color:#62748a!important;font-size:10px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-position-tabs{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;margin:2px 0 0!important;gap:6px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-position-tabs button{min-height:38px!important;padding:0 3px!important;font-size:12px!important;font-weight:500!important;background:#eef3f7!important;line-height:18px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-position-tabs button[aria-pressed="true"]{background:#bea451!important;border-color:#b49943!important;color:#fff!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-options{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:6px 12px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-eligible{display:flex!important;align-items:center!important;gap:10px!important;min-height:32px!important;font-size:13px!important;line-height:18px!important;color:#243447!important;cursor:pointer!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-eligible input{appearance:auto!important;width:22px!important;height:22px!important;min-height:22px!important;padding:0!important;margin:0!important;accent-color:#488779!important;cursor:pointer!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-reset{min-height:32px!important;padding:0!important;border:0!important;background:transparent!important;font-size:12px!important;color:#62748a!important;text-decoration:underline!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-results{flex:1 1 0!important;min-height:0!important;padding:0 12px 12px!important;overflow-y:auto!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-row{padding:8px!important;margin-bottom:6px!important;min-height:66px!important;background:#fafdff!important;border:1px solid #e0e7ef!important;border-radius:8px!important;box-shadow:none!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-row>div{display:grid!important;grid-template-columns:44px minmax(0,1fr) 52px 72px!important;align-items:center!important;gap:9px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-avatar{display:block!important;width:44px!important;height:44px!important;min-height:44px!important;overflow:hidden!important;border-radius:50%!important;padding:0!important;border:0!important;touch-action:none;cursor:grab;opacity:1!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-avatar:disabled{cursor:default}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-avatar svg{display:block!important;width:100%!important;height:100%!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-player-info{display:block!important;min-width:0!important;padding:0!important;text-align:left!important;line-height:20px!important;background:transparent!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-player-info strong{display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:14px!important;font-weight:700!important;line-height:21px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-player-info small{display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:11px!important;font-weight:400!important;line-height:18px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-price{font-size:13px!important;line-height:20px!important;text-align:right!important;white-space:nowrap!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-add{justify-self:end!important;display:grid!important;place-items:center!important;width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;background:#f7f9fc!important;color:#243447!important;border:1px solid #b9c8d5!important;border-radius:7px!important;font-size:27px!important;font-weight:400!important;line-height:1!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-add:disabled{opacity:.4!important;cursor:not-allowed!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-owned{display:grid!important;place-items:center!important;min-height:36px!important;border-radius:6px!important;background:#e1f0ec!important;color:#347567!important;font-size:12px!important;font-weight:500!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-row.is-dragging{opacity:.4!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-coach-transfer-row{display:grid!important;grid-template-columns:minmax(0,1fr) 72px!important;align-items:center!important;gap:12px!important;padding:12px!important;margin-bottom:6px!important;border:1px solid #e0e7ef!important;border-radius:8px!important;background:#fafdff!important;color:#243447!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-coach-transfer-row strong{display:block;font-size:14px}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-coach-transfer-row small{display:block;font-size:12px;color:#62748a}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-coach-transfer-row button{height:44px!important;border:1px solid #b9c8d5!important;border-radius:7px!important;background:#f7f9fc!important;color:#243447!important;font-size:22px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-coach-transfer-row button:disabled{background:#e1f0ec!important;color:#347567!important;border:0!important;font-size:12px!important}
+.fiq-team-page .fiq-transfer-panel-v28 #fiq-club-menu{right:auto!important;width:max(100%,280px)!important;max-width:calc(100vw - 56px)!important}
+@media(max-width:1100px){
+ .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-row>div{grid-template-columns:36px minmax(0,1fr) 44px 58px!important;gap:6px!important}
+ .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-avatar{width:36px!important;height:36px!important;min-height:36px!important}
+ .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-owned{font-size:11px!important}
+ .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-player-info strong{font-size:13px!important}
+}
+@media(max-width:900px) and (orientation:portrait){
+ .fiq-team-page .fiq-transfer-panel-v28{height:min(660px,calc(100dvh - 110px))!important}
+ .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-controls{padding:12px!important;gap:9px!important}
+ .fiq-team-page .fiq-transfer-panel-v28 h2{font-size:20px!important}
+}
+@media(orientation:landscape) and (max-height:600px){
+ .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-controls{padding:10px!important;gap:6px!important}
+ .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-heading p{display:none!important}
+}
+
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-empty{color:#62748a!important}
