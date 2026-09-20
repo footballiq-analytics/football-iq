@@ -44,3 +44,20 @@
 /* Flat player information, while add/drag controls retain their tactile treatment. */
 .fiq-team-page .fiq-transfer-row .fiq-transfer-player-info{background-image:none;box-shadow:none!important}
 .fiq-team-page .fiq-transfer-row .fiq-transfer-player-info:is(:active,[data-fiq-pressed="true"]){background-image:none;box-shadow:0 0 8px #eec95855!important}
+
+/* Calm homepage navigation press feedback: no glow, no jump. */
+body:has(.fiq-home) .fiq-header .fiq-desktop-nav a{
+ transition:background-color 120ms ease,color 120ms ease,border-color 120ms ease,transform 90ms ease!important;
+}
+body:has(.fiq-home) .fiq-header .fiq-desktop-nav a:is(:active,[data-fiq-pressed="true"]){
+ scale:1!important;
+ transform:translateY(1px)!important;
+ filter:none!important;
+ outline:none!important;
+ box-shadow:none!important;
+ border-color:var(--line)!important;
+}
+body:has(.fiq-home) .fiq-header .fiq-desktop-nav a.active:is(:active,[data-fiq-pressed="true"]){
+ border-bottom-color:var(--accent)!important;
+ background:color-mix(in srgb,var(--accent) 10%,transparent)!important;
+}
