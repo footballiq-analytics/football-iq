@@ -16,7 +16,7 @@ const navigation=[["Ana Sayfa","/"],["Kadrom","/team"]] as const;
 
 export function ScoutVisualButton(){
  const base=process.env.NEXT_PUBLIC_BASE_PATH||"/football-iq";
- const image=`${base}/game-ui/futbol-iq-analysis-entry-v30.svg`;
+ const image=`${base}/game-ui/futbol-iq-analysis-approved.webp`;
  return <a href={`${base}/tff-scout.html`} className="fiq-scout-visual" aria-label="FUTBOL IQ analiz sayfasını aç">
   <img className="fiq-scout-banner-image" src={image} alt="FUTBOL IQ analiz sayfasına giriş"/>
  </a>
