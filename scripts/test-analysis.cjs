@@ -17,9 +17,9 @@ const changed=JSON.parse(JSON.stringify(data));changed.matches.filter(m=>m.week>
 assert.deepEqual(E.rates(changed,data.recommendedWeek),E.rates(data,data.recommendedWeek));
 const elements=new Map();const el=id=>{if(!elements.has(id))elements.set(id,{value:id==='formation'?'433':'balanced',addEventListener(){},classList:{add(){},remove(){},toggle(){},contains(){return true}},style:{}});return elements.get(id)};
 const html=fs.readFileSync('public/tff-scout.html','utf8');const source=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(x=>x[1]).find(x=>x.includes('function calc'));
-const sandbox={console,ScoutEngine:E,document:{getElementById:el,addEventListener(){}},data,raw:JSON.parse(fs.readFileSync('public/data/tff-scout.json')).players,catalog:JSON.parse(fs.readFileSync('out/analysis-catalog.json')).players};vm.createContext(sandbox);
+const sandbox={console,ScoutEngine:E,ScoutRules:require('../public/scout-rules.js'),setInterval(){},document:{getElementById:el,addEventListener(){}},data,raw:JSON.parse(fs.readFileSync('public/data/tff-scout.json')).players,catalog:JSON.parse(fs.readFileSync('out/analysis-catalog.json')).players};vm.createContext(sandbox);
 vm.runInContext(source.replace(/\(function init\(\)\{[\s\S]*?\}\)\(\);/,''),sandbox);
-vm.runInContext(`analysisData=data;selectedWeek=data.recommendedWeek;analysisContext=ScoutEngine.prepare(data,selectedWeek);const indexed=new Map(raw.map(p=>[ScoutEngine.club(p.team)+'|'+ScoutEngine.key(p.player),p]));players=catalog.map(p=>norm({...indexed.get(ScoutEngine.club(p.club)+'|'+ScoutEngine.key(p.name)),id:p.id,player:p.name,team:p.club,pos:({DEF:'DF',MID:'MF',FWD:'FW'})[p.position]||p.position,price:p.price}));`,sandbox);
+vm.runInContext(`analysisData=data;analysisEvidence={players:Object.fromEntries(catalog.map(p=>[p.id,{week:data.recommendedWeek,source:'TEST FIXTURE ONLY',verifiedAt:new Date().toISOString(),availability:'available',startProbability:.95,allCompetitionsComplete:true,nextKickoff:new Date(Date.now()+86400000).toISOString(),recentAppearances:[]}]))};selectedWeek=data.recommendedWeek;analysisContext=ScoutEngine.prepare(data,selectedWeek);const indexed=new Map(raw.map(p=>[ScoutEngine.club(p.team)+'|'+ScoutEngine.key(p.player),p]));players=catalog.map(p=>norm({...indexed.get(ScoutEngine.club(p.club)+'|'+ScoutEngine.key(p.name)),id:p.id,player:p.name,team:p.club,pos:({DEF:'DF',MID:'MF',FWD:'FW'})[p.position]||p.position,price:p.price}));`,sandbox);
 for(const formation of ['433','442','343','352','532'])for(const mode of ['balanced','safe','differential']){
  el('formation').value=formation;el('strategy').value=mode;
  const result=vm.runInContext(`squad=generateSquadFor('${mode}');if(!squad)throw Error('No squad');chooseStartingXI();({valid:validFullSquad(squad),ids:squad.map(p=>p.id),cost:totalCost(squad),bench:bench.map(p=>p.pos),first:starters.length,cap:captain.id,vice:viceCaptain.id})`,sandbox);
@@ -45,3 +45,18 @@ console.log('PASS: exact 15-player import, captains, duplicate/budget/age/versio
 const cardMarkup=vm.runInContext('cardHtml(squad[0])',sandbox);
 assert.equal((cardMarkup.match(/<div\b/g)||[]).length,(cardMarkup.match(/<\/div>/g)||[]).length);
 console.log('PASS: balanced player-card markup for bench grid');
+const R=require('../public/scout-rules.js');const now=Date.now();
+const rounds={matches:[...Array.from({length:9},(_,i)=>({week:1,status:'finished',kickoff:new Date(now-7*86400000).toISOString()})),...Array.from({length:9},(_,i)=>({week:2,status:'scheduled',kickoff:new Date(now+(i+1)*3600000).toISOString()})),...Array.from({length:9},(_,i)=>({week:3,status:'scheduled',kickoff:new Date(now+7*86400000).toISOString()}))]};
+assert.equal(R.weeks(rounds,now).recommendation,2);assert.equal(R.weeks(rounds,now).forecast,2);
+const start=now+3600000;assert.equal(R.weeks(rounds,start).recommendation,3);assert.equal(R.weeks(rounds,start).forecast,2);
+rounds.matches.filter(m=>m.week===2).forEach(m=>m.status='finished');assert.equal(R.weeks(rounds,start).forecast,3);assert.equal(R.weeks(rounds,start).completed,2);
+rounds.matches.find(m=>m.week===2).status='postponed';assert.equal(R.weeks(rounds,start).forecast,2);
+const player={id:'one',injuryRisk:0};const evidence={players:{one:{week:3,source:'TEST',verifiedAt:new Date(now).toISOString(),availability:'available',startProbability:.9,allCompetitionsComplete:true,nextKickoff:new Date(now+86400000).toISOString(),recentAppearances:[]}}};
+assert(R.eligibility(player,evidence,3,now).eligible);assert(!R.eligibility(player,null,3,now).eligible);
+for(const field of [{startProbability:.79},{availability:'doubtful'},{verifiedAt:new Date(now-73*3600000).toISOString()},{riskFlags:['Seyahat sonrası yorgunluk']},{allCompetitionsComplete:false}]){const e={players:{one:{...evidence.players.one,...field}}};assert(!R.eligibility(player,e,3,now).eligible);}
+const tired={...evidence.players.one,recentAppearances:[{source:'TEST',verifiedAt:new Date(now).toISOString(),kickoff:new Date(now-24*3600000).toISOString(),minutes:90}]};assert(R.workload(tired,now).highRisk);assert(!R.eligibility(player,{players:{one:tired}},3,now).eligible);
+assert(R.weeklyBest([],null,1,{GK:1,DF:4,MF:3,FW:3}).error);
+const actualPool=['GK','DF','MF','FW'].flatMap(pos=>Array.from({length:6},(_,i)=>({id:pos+i,pos,player:pos+i})));
+const scores={weeklyScores:{week:1,complete:true,source:'TEST',players:actualPool.map((p,i)=>({id:p.id,points:i%6}))}};
+const historical=R.weeklyBest(actualPool,scores,1,{GK:1,DF:4,MF:3,FW:3});assert.equal(historical.xi.length,11);assert.equal(historical.bench.length,4);assert.equal(historical.xi.filter(p=>p.pos==='GK')[0].actualPoints,5);assert(!R.weeklyBest(actualPool,scores,2,{GK:1}).xi);
+console.log('PASS: kickoff boundary, forecast lock, postponed match, stale/unknown/risky exclusion, workload, real weekly points');
