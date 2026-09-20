@@ -61,3 +61,9 @@ body:has(.fiq-home) .fiq-header .fiq-desktop-nav a.active:is(:active,[data-fiq-p
  border-bottom-color:var(--accent)!important;
  background:color-mix(in srgb,var(--accent) 10%,transparent)!important;
 }
+
+/* Navigation feedback changes colour without moving the link or flashing gold. */
+html body .fiq-header nav.fiq-desktop-nav a[href],html body .mobile-drawer>a[href]{transition:background-color 140ms ease,color 140ms ease!important;transform:none!important;scale:1!important;filter:none!important;box-shadow:none!important}
+html body .fiq-header nav.fiq-desktop-nav a[href]:is(:active,[data-fiq-pressed="true"]),html body .mobile-drawer>a[href]:is(:active,[data-fiq-pressed="true"]){transform:none!important;scale:1!important;filter:none!important;box-shadow:none!important;background-color:#dce9e8!important;color:#294d4a!important;border-color:transparent!important;outline:none!important}
+html body .fiq-header nav.fiq-desktop-nav a[href]:focus-visible,html body .mobile-drawer>a[href]:focus-visible{outline:2px solid #488779!important;outline-offset:2px!important}
+@media(prefers-reduced-motion:reduce){html body .fiq-header nav.fiq-desktop-nav a[href],html body .mobile-drawer>a[href]{transition:none!important}}

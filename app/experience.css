@@ -675,3 +675,12 @@ html.dark .fiq-home .home-rule-captain p{color:var(--ink)}
  .home-analysis-copy em{font-size:9px}
  .home-analysis-copy>span{font-size:8px}
 }
+
+/* Render the supplied artwork itself, at its intrinsic ratio. */
+.fiq-home .home-analysis-entry.home-analysis-art{display:block!important;aspect-ratio:1376/768!important;height:auto!important;min-height:0!important;padding:0!important;background:#edf5f8!important;overflow:hidden!important;border:1px solid #d5e1e8!important;border-radius:10px!important;box-shadow:none!important}
+.fiq-home .home-analysis-art .home-analysis-image{display:block!important;position:static!important;width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:1376/768!important;object-fit:contain!important;opacity:1!important;visibility:visible!important;filter:none!important}
+.fiq-home .home-rule-chips-simple>div{gap:8px!important;padding:9px 7px!important;background:#f5f8fa!important;border:1px solid #dbe4e9!important;border-radius:8px!important;box-shadow:none!important}
+.fiq-home .home-rule-icon{display:block!important;flex:0 0 24px!important;width:24px!important;height:24px!important;color:#607c87!important;filter:none!important}
+.fiq-home .home-rule-chips-simple p{font-size:11px!important;line-height:1.4!important;color:#2e4756!important;font-weight:700!important;white-space:nowrap!important}
+.fiq-home .home-rule-chips-simple b{margin-top:2px!important;font-size:9px!important;font-weight:400!important;color:#6a7f8c!important}
+@media(max-width:420px){.fiq-home .home-rule-chips-simple>div{gap:5px!important;padding:8px 5px!important}.fiq-home .home-rule-icon{flex-basis:20px!important;width:20px!important;height:20px!important}.fiq-home .home-rule-chips-simple p{font-size:10px!important}.fiq-home .home-rule-chips-simple b{font-size:8px!important}}
