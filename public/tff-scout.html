@@ -1028,16 +1028,16 @@ function cardHtml(p){
  const kit=teamKit(p.team),initials=esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''));
  const availability=p.suspended?['CEZALI','bad']:p.unavailable?['SAKAT','bad']:p.doubtful?['ŞÜPHELİ','risk']:['UYGUN','ok'];
  const photo=p.photo?'<img class="fantasy-photo" src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="fantasy-fallback" style="display:none">'+initials+'</div>':'<div class="fantasy-fallback">'+initials+'</div>';
- return '<div class="fantasy-card" style="--kit1:'+kit[0]+';--kit2:'+kit[1]+'">'+photo+'<div class="fantasy-shade"></div><div class="fantasy-top"><span class="fantasy-pos">'+p.pos+'</span><span class="fantasy-badge">'+badge+'</span></div><div class="fantasy-meta"><div class="fantasy-name">'+esc(p.player)+'</div><div class="fantasy-team">'+esc(p.team)+' · '+(p.home===true?'EV':p.home===false?'D':'—')+' '+esc(p.opponent)+'</div><div class="fantasy-stats"><div class="fantasy-stat"><span>xP</span><b>'+p.xp.toFixed(1)+'</b></div><div class="fantasy-stat"><span>Fiyat</span><b>'+p.price.toFixed(1)+'M</b></div><div class="fantasy-stat"><span>Başlama</span><b>%'+Math.round(p.startProb*100)+'</b></div><div class="fantasy-stat"><span>xG+xA</span><b>'+(p.xg90+p.xa90).toFixed(2)+'</b></div></div><div class="fantasy-foot"><span class="'+availability[1]+'">'+availability[0]+'</span><span>CS %'+Math.round(p.cleanSheetProb*100)+'</span></div></div><button data-profile="'+esc(p.id)+'" aria-label="'+esc(p.player)+' oyuncu detayını aç"></button></div>';
+ return '<div class="fantasy-card" style="--kit1:'+kit[0]+';--kit2:'+kit[1]+'">'+photo+'<div class="fantasy-shade"></div><div class="fantasy-top"><span class="fantasy-pos">'+p.pos+'</span><span class="fantasy-badge">'+badge+'</span></div><div class="fantasy-meta"><div class="fantasy-name">'+esc(p.player)+'</div><div class="fantasy-team">'+esc(p.team)+' · '+(p.home===true?'EV':p.home===false?'D':'—')+' '+esc(p.opponent)+'</div><div class="fantasy-stats"><div class="fantasy-stat"><span>xP</span><b>'+p.xp.toFixed(1)+'</b></div><div class="fantasy-stat"><span>Fiyat</span><b>'+p.price.toFixed(1)+'M</b></div><div class="fantasy-stat"><span>Başlama</span><b>%'+Math.round(p.startProb*100)+'</b></div><div class="fantasy-stat"><span>xG+xA</span><b>'+(p.xg90+p.xa90).toFixed(2)+'</b></div></div><div class="fantasy-foot"><span class="'+availability[1]+'">'+availability[0]+'</span><span>CS %'+Math.round(p.cleanSheetProb*100)+'</span></div></div><button data-profile="'+esc(p.id)+'" aria-label="'+esc(p.player)+' oyuncu detayını aç"></button>';
 }
 function renderPitch(){
  const pitch=el('pitch');[...pitch.querySelectorAll('.player-card')].forEach(n=>n.remove());el('emptyPitch').classList.add('hidden');
- const q=quotas(),rows=[['GK',q.GK],['DF',q.DF],['MF',q.MF],['FW',q.FW]],ys={GK:88,DF:68,MF:43,FW:17};
- rows.forEach(([pos])=>{const arr=starters.filter(p=>p.pos===pos);arr.forEach((p,i)=>{const x=(i+1)*100/(arr.length+1);const node=document.createElement('div');node.className='player-card';node.style.left=x+'%';node.style.top=ys[pos]+'%';node.innerHTML=cardHtml(p);pitch.appendChild(node)})});
+ const q=quotas(),rows=[['GK',q.GK],['DF',q.DF],['MF',q.MF],['FW',q.FW]],ys={GK:87,DF:63,MF:38,FW:13};
+ rows.forEach(([pos])=>{const arr=starters.filter(p=>p.pos===pos);arr.forEach((p,i)=>{const x=(i+1)*100/(arr.length+1);const node=document.createElement('div');node.className='player-card';node.style.setProperty('--row-count',String(arr.length+1));node.style.left=x+'%';node.style.top=ys[pos]+'%';node.innerHTML=cardHtml(p);pitch.appendChild(node)})});
  const used=totalCost(squad),xp=starters.reduce((s,p)=>s+p.xp,0);el('budgetUsed').textContent=used.toFixed(1);if(el('budgetUsedMirror'))el('budgetUsedMirror').textContent=used.toFixed(1);if(el('budgetRemaining'))el('budgetRemaining').textContent=Math.max(0,100-used).toFixed(1);if(el('squadXP'))el('squadXP').textContent=xp.toFixed(1);if(el('projectedScore'))el('projectedScore').textContent=(xp+(captain?.xp||0)).toFixed(1);el('budgetBar').style.width=Math.min(100,used)+'%';el('budgetBar').style.background=used>100?'#E35D6A':used>=95?'#D9A441':'#38C98D';
 }
 function renderBench(){
- el('bench').innerHTML=bench.map((p,i)=>'<div class="bench-card"><div class="text-[9px] text-iq font-black mb-1">'+(p.pos==='GK'?'YEDEK KALECİ':'YEDEK '+i)+'</div>'+cardHtml(p)+'</div>').join('');
+ el('bench').innerHTML=bench.map((p,i)=>'<div class="bench-card"><div class="text-[9px] text-iq font-black mb-1">'+(p.pos==='GK'?'YEDEK KALECİ':'YEDEK '+i)+'</div><div class="player-card">'+cardHtml(p)+'</div></div>').join('');
  el('captainInfo').innerHTML=(captain?'<span class="badge-c">C</span>'+esc(captain.player):'')+(viceCaptain?' &nbsp; <span class="badge-c2">C2</span>'+esc(viceCaptain.player):'');
 }
 const FANTASY_IMPORT_KEY='futbol-iq-scout-xi-import-v1';
@@ -1057,6 +1057,7 @@ async function runAction(label,fn,{needsData=true}={}){
  try{
    if(needsData&&!(await ensurePlayerData())){setStatus(label+' için oyuncu verisi yüklenemedi.','err');return}
    setStatus(label+' hazırlanıyor…','load');
+   await new Promise(resolve=>setTimeout(resolve,0));
    await fn();
  }catch(err){
    console.error(label,err);
