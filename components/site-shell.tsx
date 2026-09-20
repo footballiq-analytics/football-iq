@@ -15,8 +15,11 @@ import { shareOrCopy } from "@/lib/share";
 const navigation=[["Ana Sayfa","/"],["Kadrom","/team"]] as const;
 
 export function ScoutVisualButton(){
- return <a href="./tff-scout.html" className="fiq-scout-visual" aria-label="FUTBOL IQ analiz sayfasını aç">
-  <img className="fiq-scout-banner-image" src="./game-ui/futbol-iq-brain-ball.webp" alt="FUTBOL IQ analiz sayfası"/>
+ const base=process.env.NEXT_PUBLIC_BASE_PATH||"/football-iq";
+ const image=`${base}/game-ui/futbol-iq-brain-ball.webp`;
+ return <a href={`${base}/tff-scout.html`} className="fiq-scout-visual" aria-label="FUTBOL IQ analiz sayfasını aç" style={{backgroundImage:`linear-gradient(90deg,rgba(4,17,27,.08),rgba(4,17,27,.08)),url("${image}")`}}>
+  <img className="fiq-scout-banner-image" src={image} alt="FUTBOL IQ analiz sayfası"/>
+  <span className="fiq-scout-fallback" aria-hidden="true"><b>FUTBOL IQ</b><small>ANALİZ SAYFASINA GİT</small></span>
  </a>
 }
 export function Header(){
