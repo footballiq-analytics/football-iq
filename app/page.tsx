@@ -1,9 +1,9 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { ScoutVisualButton } from "@/components/site-shell";
 import { FANTASY_PLAYER_POOL } from "@/data/fantasy-player-pool";
 
 const base=process.env.NEXT_PUBLIC_BASE_PATH??"";
+const analysisImage=`${base}/game-ui/futbol-iq-analysis-approved.webp`;
 const positions=[["GK","KL","Kaleci"],["DEF","DEF","Defans"],["MID","ORT","Orta Saha"],["FWD","FOR","Forvet"]] as const;
 const weeklyBest=positions.map(([position,short,label])=>({
  position,short,label,
@@ -29,7 +29,7 @@ export default function Home(){
   </header>
 
   <main className="v31-main">
-   <section className="v31-hero-pair"><div className="v31-analysis"><ScoutVisualButton/></div><Stadium/></section>
+   <section className="v31-hero-pair"><a className="v31-analysis v31-analysis-direct" href={`${base}/tff-scout.html`} aria-label="FUTBOL IQ analiz sayfasına git"><img src={analysisImage} alt="FUTBOL IQ analiz sayfası giriş görseli"/></a><Stadium/></section>
 
    <section className="v31-actions" aria-label="Ana işlemler">
     <Link href="/team" className="v31-action-card v31-action-team">
