@@ -89,19 +89,19 @@ export default function PlayerCard({ player, tier = "gold", captain = false, vic
       >
         <div className="pointer-events-none absolute inset-0 z-[11] bg-[linear-gradient(180deg,rgba(255,255,255,.02),transparent_42%,rgba(4,9,16,.70)_78%,rgba(4,9,16,.95))]" />
         {substitute ? <span className="fiq-card-substitute absolute right-1.5 top-1.5 z-40 rounded-full border border-[#f3ca40]/30 bg-[#101521]/88 px-1.5 py-0.5 text-[6px] font-black tracking-[.09em] text-[#f7d85e]">YEDEK</span> : null}
-        <div className="fiq-card-position absolute left-1.5 top-1.5 z-40 min-w-[30px] rounded-md border-2 border-[#ffe778]/90 bg-[#02070c]/95 px-2 py-[3px] text-center text-[9px] font-black leading-none tracking-[.045em] text-white shadow-[0_0_0_1px_rgba(0,0,0,.8),0_4px_10px_rgba(0,0,0,.55),0_0_10px_rgba(243,202,64,.18)] backdrop-blur-md">{positionLabel[player.position]}</div>
+        <div data-position={player.position} className="fiq-card-position absolute left-1.5 top-1.5 z-40 min-w-[30px] rounded-md border-2 border-[#ffe778]/90 bg-[#02070c]/95 px-2 py-[3px] text-center text-[9px] font-black leading-none tracking-[.045em] text-white shadow-[0_0_0_1px_rgba(0,0,0,.8),0_4px_10px_rgba(0,0,0,.55),0_0_10px_rgba(243,202,64,.18)] backdrop-blur-md">{positionLabel[player.position]}</div>
         <div className="fiq-card-portrait pointer-events-none relative z-20 mx-auto mt-1 h-[72px] w-[72px] overflow-hidden rounded-[44%_44%_38%_38%/38%_38%_58%_58%] [transform:translateZ(8px)]">
           <PlayerPortrait key={`${player.id}:${safePhoto??""}`} name={player.name} club={player.club} src={safePhoto}/>
         </div>
         <div className="fiq-card-info relative z-30 -mt-1 min-w-0 px-1.5 text-center [transform:translateZ(18px)]">
           <div className="rounded-md border border-white/15 bg-[#080d1a]/88 px-1 py-0.5"><strong title={player.name} className="fiq-card-name block truncate text-[9px] font-black leading-tight text-white">{player.name}</strong></div>
-          <div className="fiq-card-stats mt-1 grid grid-cols-2 gap-1 text-[7px] font-black leading-none"><span className="rounded border border-white/15 bg-black/40 px-1 py-[3px] text-[#ffe676]">{formatFantasyPrice(player.price)}M</span><span className="rounded border border-emerald-300/10 bg-black/40 px-1 py-[3px] text-[#00e676]">{player.points} P</span></div>
+          <div className="fiq-card-stats mt-1 grid grid-cols-2 gap-1 text-[7px] font-black leading-none"><span className="rounded border border-white/15 bg-black/40 px-1 py-[3px] text-[#ffe676]">{formatFantasyPrice(player.price)}M</span><span className="rounded border border-emerald-300/10 bg-black/40 px-1 py-[3px] text-[#00e676]">{player.points} P</span><span className="fiq-bench-position" data-position={player.position}>{positionLabel[player.position]}</span></div>
         </div>
       </div>
 
       {invalidPosition ? <span className="absolute -left-1.5 -top-1.5 z-[80] rounded-full border border-rose-200/70 bg-rose-600 px-1.5 py-0.5 text-[6px] font-black text-white shadow-[0_0_16px_rgba(244,63,94,.55)]">MEVKİ HATASI</span> : null}
       {badge ? (
-        <span className={[
+        <span data-leadership={viceCaptain && !captain && !tripleCaptain ? "vice" : "captain"} className={[
           "fiq-card-captain absolute -right-2 -top-2 z-[100] grid h-7 w-7 place-items-center rounded-full border text-[10px] font-black shadow-[0_4px_10px_rgba(0,0,0,.45)]",
           viceCaptain && !captain && !tripleCaptain
             ? "border-[#d7ecff] bg-[radial-gradient(circle_at_32%_22%,#f6fbff_0%,#86c4ff_28%,#378de8_64%,#0c3d78_100%)] text-[#031b36] shadow-[0_0_0_3px_rgba(88,169,255,.20),0_0_12px_rgba(188,225,255,.9),0_0_30px_rgba(57,146,239,.85),0_8px_16px_rgba(0,0,0,.55)]"

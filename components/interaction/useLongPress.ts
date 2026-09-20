@@ -63,9 +63,7 @@ export function useLongPress(onLongPress?: () => void, options: LongPressOptions
 
     // iPad/Safari'de sürükleme başlarken uzun basmanın da tetiklenmesini engelle.
     // Touch için toleransı DnD aktivasyon mesafesinin altında tutuyoruz.
-    const tolerance = start.pointerType === "touch"
-      ? Math.min(moveTolerance, 6)
-      : moveTolerance;
+    const tolerance = moveTolerance;
 
     if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > tolerance) {
       triggeredRef.current = true;

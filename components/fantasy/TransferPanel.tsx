@@ -35,7 +35,7 @@ type SortMode = "POINTS" | "PRICE_ASC" | "PRICE_DESC" | "POPULAR";
 const tabLabel: Record<FilterTab, string> = { ALL:"Tümü", GK:"KL", DEF:"DEF", MID:"ORT", FWD:"FOR", COACH:"TD" };
 const BUDGET = 100;
 
-export default function TransferPanel({onClose,coachRequest,target,onClearTarget,players,coaches,clubs,selectedIds,selectedCoachId,availableSlots,onQuickAdd,onSelectCoach,onPlayerClick}:TransferPanelProps){
+export default function TransferPanel({onClose,coachRequest,target,onClearTarget,players,coaches,clubs,selectedIds,selectedCoachId,availableSlots,onQuickAdd,onRemovePlayer,onSelectCoach,onPlayerClick}:TransferPanelProps){
  const[query,setQuery]=useState("");
  const[debouncedQuery,setDebouncedQuery]=useState("");
  const[selectedClubs,setSelectedClubs]=useState<string[]>([]);
@@ -117,26 +117,26 @@ export default function TransferPanel({onClose,coachRequest,target,onClearTarget
    <span className="sr-only" role="status">{resultCount} {showingCoaches?"teknik direktör":"oyuncu"} listeleniyor</span>
   </div>
 
-  <div aria-label="Transfer sonuçları" tabIndex={0} className="fiq-transfer-results relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-8 pt-1.5 touch-pan-y [-webkit-overflow-scrolling:touch]">{showingCoaches?filteredCoaches.map(c=><CoachRow key={c.id} coach={c} selected={c.id===selectedCoachId} onSelectCoach={onSelectCoach}/>):filteredPlayers.map(player=><TransferDraggable key={String(player.id)} player={player} selected={selectedSet.has(String(player.id))} assessment={transferAssessments.get(String(player.id))??{eligible:false,reason:null}} onQuickAdd={onQuickAdd} onPlayerClick={onPlayerClick}/>)}{!resultCount?<div className="fiq-transfer-empty grid min-h-36 place-items-center px-4 text-center text-sm">{smartOnly||target?"Kadro kurallarına uyan transfer bulunamadı.":"Bu filtrelerle eşleşen kayıt bulunamadı."}</div>:null}</div>
+  <div aria-label="Transfer sonuçları" tabIndex={0} className="fiq-transfer-results relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-8 pt-1.5 touch-pan-y [-webkit-overflow-scrolling:touch]">{showingCoaches?filteredCoaches.map(c=><CoachRow key={c.id} coach={c} selected={c.id===selectedCoachId} onSelectCoach={onSelectCoach}/>):filteredPlayers.map(player=><TransferDraggable key={String(player.id)} player={player} selected={selectedSet.has(String(player.id))} assessment={transferAssessments.get(String(player.id))??{eligible:false,reason:null}} onQuickAdd={onQuickAdd} onRemovePlayer={onRemovePlayer} onPlayerClick={onPlayerClick}/>)}{!resultCount?<div className="fiq-transfer-empty grid min-h-36 place-items-center px-4 text-center text-sm">{smartOnly||target?"Kadro kurallarına uyan transfer bulunamadı.":"Bu filtrelerle eşleşen kayıt bulunamadı."}</div>:null}</div>
  </aside>
 }
 
 function CoachRow({coach,selected,onSelectCoach}:{coach:FantasyCoach;selected:boolean;onSelectCoach:(c:FantasyCoach)=>void}){
  return <div className="fiq-coach-transfer-row"><div><strong>{coach.name}</strong><small>{coach.club} · TD</small></div><button type="button" disabled={selected} aria-label={`${coach.name} ${selected?"seçili":"teknik direktör seç"}`} onClick={()=>onSelectCoach(coach)}>{selected?"Seçili":"+"}</button></div>;
 }
-function TransferDraggable({player,selected,assessment,onQuickAdd,onPlayerClick}:{player:FantasyPlayer;selected:boolean;assessment:TransferAssessment;onQuickAdd:(p:FantasyPlayer)=>void;onPlayerClick?:(p:FantasyPlayer)=>void}){
+function TransferDraggable({player,selected,assessment,onQuickAdd,onRemovePlayer,onPlayerClick}:{player:FantasyPlayer;selected:boolean;assessment:TransferAssessment;onQuickAdd:(p:FantasyPlayer)=>void;onRemovePlayer:(p:FantasyPlayer)=>void;onPlayerClick?:(p:FantasyPlayer)=>void}){
  const d=useDraggable({id:`transfer:${player.id}`,disabled:selected,data:{sourceSlotId:"transfer",playerId:String(player.id),sourceType:"transfer"}});
  const photo=resolveFantasyMedia(player.photo,player.photoMedia);
- return <div ref={d.setNodeRef} data-fiq-dnd="true" data-selected={selected} className={`fiq-transfer-row${d.isDragging?" is-dragging":""}`}>
+ return <div ref={d.setNodeRef} {...d.listeners} data-fiq-dnd="true" data-selected={selected} className={`fiq-transfer-row${d.isDragging?" is-dragging":""}`}>
   <div>
-   <button ref={d.setActivatorNodeRef} type="button" disabled={selected} {...d.listeners} {...d.attributes} aria-label={`${player.name} oyuncusunu sürükle`} className="fiq-transfer-avatar">
+   <button type="button" disabled={selected} {...d.attributes} aria-label={`${player.name} oyuncusunu sürükle`} className="fiq-transfer-avatar">
     <PlayerPortrait key={`${player.id}:${photo??""}`} name={player.name} club={player.club} src={photo}/>
    </button>
-   <button type="button" onClick={()=>onPlayerClick?.(player)} aria-label={`${player.name} oyuncu bilgileri`} className="fiq-transfer-player-info">
+   <button type="button" onClick={()=>selected?onRemovePlayer(player):onPlayerClick?.(player)} aria-label={`${player.name} ${selected?"kadrodan çıkar":"oyuncu bilgileri"}`} className="fiq-transfer-player-info">
     <strong title={player.name}>{player.name}</strong><small>{player.club} · {tabLabel[player.position]}</small>
    </button>
    <b className="fiq-transfer-price">{formatFantasyPrice(player.price)}M</b>
-   {selected?<span className="fiq-transfer-owned">Kadroda</span>:<button type="button" className="fiq-transfer-add" disabled={!assessment.eligible} aria-label={`${player.name} kadroya ekle`} title={assessment.reason??"Kadroya ekle"} onPointerDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();onQuickAdd(player)}}>+</button>}
+   {selected?<button type="button" className="fiq-transfer-owned" aria-label={`${player.name} kadrodan çıkar`} title="Tek tıkla kadrodan çıkar" onMouseDown={e=>e.stopPropagation()} onTouchStart={e=>e.stopPropagation()} onPointerDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();onRemovePlayer(player)}}>Kadroda</button>:<button type="button" className="fiq-transfer-add" disabled={!assessment.eligible} aria-label={`${player.name} kadroya ekle`} title={assessment.reason??"Kadroya ekle"} onMouseDown={e=>e.stopPropagation()} onTouchStart={e=>e.stopPropagation()} onPointerDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();onQuickAdd(player)}}>+</button>}
   </div>
  </div>;
 }

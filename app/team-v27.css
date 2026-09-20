@@ -235,3 +235,33 @@ html body:has(.fiq-team-page) .fiq-empty-slot span{background:#e0eee8!important;
 
 .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-empty{color:#62748a!important}
 .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-filter-pair>.fiq-club-filter{grid-column:auto!important;grid-row:auto!important}
+
+/* Restore the reference HUD and bench labels without removing card actions. */
+.fiq-team-page .fiq-hud-cell{display:flex!important;align-items:center!important;gap:12px!important}
+.fiq-team-page .fiq-hud-cell small,.fiq-team-page .fiq-hud-cell strong{display:block!important}
+.fiq-team-page .fiq-hud-icon{display:grid!important;place-items:center!important;flex:0 0 48px!important;width:48px!important;height:48px!important;border-radius:50%!important}
+.fiq-team-page .fiq-hud-icon-gold{background:#f4f0e4!important;color:#b89b46!important}
+.fiq-team-page .fiq-hud-icon-green{background:#e0eee8!important;color:#3e806a!important}
+.fiq-team-page .fiq-hud-icon-white{background:#e5edf1!important;color:#5e7886!important}
+body:has(.fiq-team-page) .fiq-card-position{top:auto!important;bottom:5px!important;left:6px!important}
+body:has(.fiq-team-page) .fiq-card-stats{display:flex!important;justify-content:flex-end!important;gap:5px!important}
+body:has(.fiq-team-page) .fiq-card-position[data-position="DEF"],body:has(.fiq-team-page) .fiq-bench-position[data-position="DEF"]{background:#dcedf8!important;color:#2d6384!important}
+body:has(.fiq-team-page) .fiq-bench-position{display:none!important}
+body:has(.fiq-team-page) .fiq-bench-grid .fiq-card-info{bottom:6px!important}
+body:has(.fiq-team-page) .fiq-bench-grid .fiq-card-stats{justify-content:flex-start!important;align-items:center!important;font-size:9px!important;gap:3px!important}
+body:has(.fiq-team-page) .fiq-bench-grid .fiq-bench-position{display:inline-block!important;order:-1!important;padding:1px 4px!important;border-radius:4px!important;background:#d6ebe3!important;color:#24584c!important;line-height:12px!important;font-size:9px!important}
+body:has(.fiq-team-page) .fiq-card-captain[data-leadership="vice"]{background:#dcedf8!important;color:#285b85!important;border-color:#8fb8d3!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-row{cursor:grab!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-player-info,.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-avatar{touch-action:none!important;user-select:none!important;-webkit-touch-callout:none!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-row .fiq-transfer-owned{width:100%!important;min-height:44px!important;border:0!important;background:#e1f0ec!important;color:#347567!important;cursor:pointer!important;font-size:12px!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-owned:hover{background:#cee5dd!important}
+@media(max-width:600px){
+ .fiq-team-page .fiq-team-metrics-v27>.grid>div{padding:0 6px!important}
+ .fiq-team-page .fiq-hud-cell{gap:6px!important}
+ .fiq-team-page .fiq-hud-icon{flex-basis:30px!important;width:30px!important;height:30px!important}
+ .fiq-team-page .fiq-hud-icon svg{width:22px!important;height:22px!important}
+ .fiq-team-page .fiq-team-metrics-v27 strong{font-size:16px!important}
+}
+@media(max-width:900px) and (orientation:portrait){
+ .fiq-team-page #fiq-transfer-drawer.is-dragging{visibility:visible!important;opacity:0!important;pointer-events:none!important}
+}
