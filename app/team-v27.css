@@ -234,3 +234,4 @@ html body:has(.fiq-team-page) .fiq-empty-slot span{background:#e0eee8!important;
 }
 
 .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-empty{color:#62748a!important}
+.fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-filter-pair>.fiq-club-filter{grid-column:auto!important;grid-row:auto!important}
