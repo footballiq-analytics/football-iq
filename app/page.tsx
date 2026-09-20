@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { ScoutVisualButton } from "@/components/site-shell";
 import { FANTASY_PLAYER_POOL } from "@/data/fantasy-player-pool";
 
@@ -12,7 +13,7 @@ const weeklyBest=positions.map(([position,short,label])=>({
 function HomeNavIcon({emoji}:{emoji:string}){return <span className="v31-nav-icon" aria-hidden="true">{emoji}</span>}
 
 export default function Home(){
- return <div className="fiq-home-v31">
+ return <div className="fiq-home-v31" style={{"--home-athletes":`url(${base}/game-ui/home-athletes.webp)`} as CSSProperties}>
   <header className="v31-topbar">
    <a href={`${base}/`} className="v31-brand" aria-label="FUTBOL IQ ana sayfa"><span className="v31-crown">♛</span><strong>FUTBOL <b>IQ</b></strong><small>FANTEZİ LİGİ</small></a>
    <nav className="v31-nav" aria-label="Ana sayfa menüsü">
