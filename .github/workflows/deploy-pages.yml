@@ -58,8 +58,9 @@ jobs:
         run: |
           test -f out/tff-scout.html
           test -f out/data/tff-scout.json
-          test -s out/game-ui/futbol-iq-analysis-approved.webp
-          grep -q "home-analysis-native" out/index.html
+          test -s out/game-ui/analysis-original-20260920.jpg
+          grep -q "home-analysis-art" out/index.html
+          grep -q '/football-iq/game-ui/analysis-original-20260920.jpg' out/index.html
           grep -q "/football-iq/tff-scout.html" out/index.html
           grep -q "PRO UI V10.4 · IMPORT GUARANTEE" out/tff-scout.html
           node - <<'NODE'
