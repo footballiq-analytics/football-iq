@@ -19,6 +19,7 @@ import "./platform.css";
 import "./home.css";
 import "./experience.css";
 import "./team-v27.css";
+import "./home-v31.css";
 import PullToRefresh from "@/components/interaction/PullToRefresh";
 import ButtonFeedback from "@/components/interaction/ButtonFeedback";
 import { Footer, Header } from "@/components/site-shell";
