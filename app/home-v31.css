@@ -58,3 +58,76 @@ body:has(.fiq-home-v31) main{display:block!important}
  .v31-player-grid{grid-template-columns:repeat(2,1fr);gap:8px}.v31-player{min-height:235px;padding:14px 8px 9px}.v31-player-photo{height:110px}.v31-player h3{font-size:12px}.v31-player>strong{font-size:22px}
  .v31-benefits{grid-template-columns:repeat(2,1fr);margin-inline:0;gap:14px}.v31-benefits>div{justify-content:flex-start}.v31-benefits span{font-size:24px}
 }
+
+/* V31.1 approved artwork + restored squad visual */
+.v31-hero-pair{
+ display:grid;
+ grid-template-columns:minmax(0,1.55fr) minmax(280px,.75fr);
+ gap:16px;
+ align-items:stretch;
+ margin-bottom:20px;
+}
+.v31-hero-pair .v31-analysis{
+ min-width:0;
+ height:100%;
+}
+.v31-hero-pair .v31-analysis .fiq-scout-visual{
+ width:100%!important;
+ height:100%!important;
+ min-height:270px!important;
+ aspect-ratio:auto!important;
+ border-radius:16px!important;
+}
+.v31-hero-pair .v31-analysis .fiq-scout-banner-image{
+ width:100%!important;
+ height:100%!important;
+ object-fit:cover!important;
+ object-position:center!important;
+}
+.v31-squad-wrap{
+ position:relative;
+ display:block;
+ min-width:0;
+ min-height:270px;
+ overflow:hidden;
+ border:1px solid #dce8f4;
+ border-radius:16px;
+ background:linear-gradient(180deg,#f8fbfe,#eef5fa);
+ box-shadow:0 10px 24px rgba(45,74,105,.08);
+ text-decoration:none;
+}
+.v31-squad-wrap .home-stadium{
+ width:100%;
+ height:100%;
+ min-height:270px;
+ padding:0;
+}
+.v31-squad-wrap .home-stadium-motto{
+ top:10px;
+ left:0;
+ right:0;
+ z-index:3;
+ color:#29445d;
+ font-size:9px;
+ letter-spacing:.08em;
+}
+.v31-squad-wrap .home-pitch{
+ inset:30px 8px 52px;
+}
+.v31-squad-wrap .home-bench{
+ left:20%;
+ right:20%;
+ bottom:8px;
+ height:52px;
+}
+.v31-squad-wrap:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(45,74,105,.12)}
+@media(max-width:900px){
+ .v31-hero-pair{grid-template-columns:1.35fr .85fr;gap:12px}
+ .v31-hero-pair .v31-analysis .fiq-scout-visual,.v31-squad-wrap,.v31-squad-wrap .home-stadium{min-height:230px}
+ .v31-squad-wrap .home-pitch{inset:28px 6px 48px}
+}
+@media(max-width:640px){
+ .v31-hero-pair{grid-template-columns:1fr;gap:10px}
+ .v31-hero-pair .v31-analysis .fiq-scout-visual{min-height:0!important;aspect-ratio:525/203!important;height:auto!important}
+ .v31-squad-wrap,.v31-squad-wrap .home-stadium{min-height:250px}
+}
