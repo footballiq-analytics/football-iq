@@ -394,3 +394,177 @@ html.dark .fiq-home .home-rule-captain p{color:var(--ink)}
  .fiq-home .home-action-emoji{width:23px!important;height:23px!important;font-size:17px!important}
  .home-analysis-slot{width:100%!important}
 }
+
+/* Home V31.4 compact calm mode */
+.fiq-home{max-width:1180px!important;padding:0 18px 18px!important}
+.fiq-home .home-hero{
+ min-height:0!important;
+ grid-template-columns:minmax(0,.92fr) minmax(420px,1.08fr)!important;
+ gap:16px!important;
+ padding:18px 0 14px!important;
+ align-items:center!important;
+}
+.fiq-home .home-hero h1{
+ font-size:clamp(28px,3vw,40px)!important;
+ line-height:1.06!important;
+ margin-bottom:10px!important;
+}
+.fiq-home .home-eyebrow{
+ font-size:8px!important;
+ letter-spacing:.16em!important;
+ margin-bottom:8px!important;
+}
+.fiq-home .home-intro{
+ font-size:13px!important;
+ line-height:1.45!important;
+}
+.home-analysis-slot{
+ width:min(100%,460px)!important;
+ margin:12px 0 8px!important;
+}
+.home-analysis-entry{
+ border-radius:10px!important;
+ box-shadow:0 4px 12px rgba(15,38,60,.08)!important;
+}
+.fiq-home .home-actions{
+ margin:10px 0!important;
+ gap:6px!important;
+}
+.fiq-home .home-actions a{
+ min-height:34px!important;
+ padding:6px 10px!important;
+ border-radius:9px!important;
+ font-size:9px!important;
+ box-shadow:none!important;
+}
+.fiq-home .home-action-emoji{
+ width:22px!important;
+ height:22px!important;
+ font-size:15px!important;
+ background:transparent!important;
+ box-shadow:none!important;
+}
+.fiq-home .home-actions a>b{font-size:13px!important}
+.fiq-home .home-rule-chips{
+ max-width:460px!important;
+ gap:5px!important;
+}
+.fiq-home .home-rule-chips>div{
+ min-height:46px!important;
+ padding:6px!important;
+ border-radius:8px!important;
+ box-shadow:none!important;
+}
+.fiq-home .home-rule-emoji{
+ width:25px!important;
+ height:25px!important;
+ font-size:16px!important;
+ border-radius:7px!important;
+ filter:none!important;
+}
+.fiq-home .home-rule-lira{font-size:18px!important}
+.fiq-home .home-rule-chips p{font-size:9px!important}
+.fiq-home .home-rule-chips b{font-size:8px!important}
+.fiq-home .home-stadium{
+ height:300px!important;
+}
+.fiq-home .home-stadium-motto{
+ font-size:8px!important;
+ padding:3px 7px!important;
+ background:color-mix(in srgb,var(--panel) 62%,transparent)!important;
+}
+.fiq-home .home-pitch{
+ inset:24px 0 44px!important;
+ filter:drop-shadow(0 6px 12px rgba(0,0,0,.32))!important;
+}
+.fiq-home .home-shield{
+ width:clamp(31px,3vw,45px)!important;
+ height:clamp(38px,3.8vw,54px)!important;
+}
+.fiq-home .home-bench{
+ height:52px!important;
+ padding-top:5px!important;
+}
+.fiq-home .home-bench .home-shield{
+ width:27px!important;
+ height:34px!important;
+}
+.fiq-home .home-players{
+ margin-top:8px!important;
+}
+.fiq-home .home-panel{
+ padding:10px 12px!important;
+ border-radius:10px!important;
+ box-shadow:none!important;
+}
+.fiq-home .home-panel-title{
+ margin-bottom:8px!important;
+ padding-bottom:6px!important;
+}
+.fiq-home .home-panel-title h2{
+ font-size:14px!important;
+}
+.fiq-home .home-panel-title h2 svg{
+ width:17px!important;
+ height:17px!important;
+}
+.fiq-home .home-panel-title>a{
+ min-height:30px!important;
+ padding:0 9px!important;
+ font-size:9px!important;
+}
+.fiq-home .home-position-cards{
+ gap:6px!important;
+}
+.fiq-home .home-position-card{
+ min-height:88px!important;
+ padding:9px 10px!important;
+ border-radius:8px!important;
+}
+.fiq-home .home-weekly-rank{
+ margin-bottom:10px!important;
+}
+.fiq-home .home-weekly-rank span{
+ min-height:20px!important;
+ padding:0 6px!important;
+ font-size:8px!important;
+}
+.fiq-home .home-weekly-rank b{
+ width:22px!important;
+ height:22px!important;
+ font-size:8px!important;
+}
+.fiq-home .home-weekly-copy h3{font-size:12px!important}
+.fiq-home .home-weekly-copy p{font-size:8px!important}
+.fiq-home .home-weekly-copy strong{
+ margin-top:5px!important;
+ padding:2px 6px!important;
+ font-size:8px!important;
+}
+.fiq-home .home-next{
+ display:none!important;
+}
+.fiq-home .home-signoff{
+ padding-top:10px!important;
+ font-size:8px!important;
+}
+.fiq-home .home-signoff>span:first-child{
+ font-size:10px!important;
+ letter-spacing:.12em!important;
+}
+@media(max-width:760px){
+ .fiq-home{padding-inline:10px!important}
+ .fiq-home .home-hero{
+   grid-template-columns:1fr!important;
+   gap:8px!important;
+   padding:14px 0 10px!important;
+ }
+ .fiq-home .home-hero h1{font-size:30px!important}
+ .fiq-home .home-intro{font-size:12px!important}
+ .home-analysis-slot{width:100%!important;margin:10px 0 7px!important}
+ .fiq-home .home-actions a{min-height:32px!important;padding:5px 7px!important}
+ .fiq-home .home-rule-chips{max-width:none!important}
+ .fiq-home .home-stadium{height:235px!important}
+ .fiq-home .home-position-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .fiq-home .home-signoff{display:none!important}
+}
