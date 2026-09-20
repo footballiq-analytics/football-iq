@@ -49,3 +49,11 @@ body .fiq-header{position:sticky;top:0}
 @media(hover:hover){.home-next>a:hover{border-color:#eed18c;background:#153340;transform:translateY(-2px)}}
 @media(max-width:1000px){.home-next{grid-template-columns:repeat(3,1fr)}.home-next>div{grid-column:1/-1}.home-next>a{padding:14px 10px;gap:8px}}
 @media(max-width:600px){.home-next{grid-template-columns:1fr;gap:8px;margin-bottom:18px}.home-next>a{padding:13px 14px}.home-next>div{padding:6px 0}.home-next>a>span{font-size:15px}.home-next strong{font-size:11px}.home-panel-title h2{font-size:16px}}
+
+/* Stable isolated analysis entry: intentionally independent of legacy .fiq-scout-* rules. */
+.home-analysis-slot{width:min(100%,570px);margin:16px 0 10px}
+.home-analysis-entry{display:block;position:relative;width:100%;aspect-ratio:1050/406;overflow:hidden;border:1px solid #d7b960;border-radius:12px;background-color:#0b1c29;background-position:center;background-size:cover;background-repeat:no-repeat;box-shadow:0 7px 18px rgba(0,0,0,.22);text-decoration:none;touch-action:manipulation}
+.home-analysis-image{display:block;width:100%;height:100%;object-fit:cover;object-position:center;border:0}
+.home-analysis-entry:hover{filter:brightness(1.03)}
+.home-analysis-entry:focus-visible{outline:2px solid #ffdf80;outline-offset:3px}
+@media(max-width:760px){.home-analysis-slot{width:100%;margin:14px 0 8px}.home-analysis-entry{border-radius:10px}}
