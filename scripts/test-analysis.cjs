@@ -42,3 +42,6 @@ assert.throws(()=>validate({...payload,createdAt:'2020-01-01'},catalog));
 assert.throws(()=>validate(payload,catalog.map(p=>({...p,price:100}))));
 assert.throws(()=>validate({...payload,version:1},catalog));
 console.log('PASS: exact 15-player import, captains, duplicate/budget/age/version rejection');
+const cardMarkup=vm.runInContext('cardHtml(squad[0])',sandbox);
+assert.equal((cardMarkup.match(/<div\b/g)||[]).length,(cardMarkup.match(/<\/div>/g)||[]).length);
+console.log('PASS: balanced player-card markup for bench grid');
