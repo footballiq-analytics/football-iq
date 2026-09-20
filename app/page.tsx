@@ -1,82 +1,18 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { FANTASY_PLAYER_POOL } from "@/data/fantasy-player-pool";
-
 const base=process.env.NEXT_PUBLIC_BASE_PATH??"";
 const analysisImage=`${base}/game-ui/futbol-iq-analysis-approved.webp`;
-const positions=[["GK","KL","Kaleci"],["DEF","DEF","Defans"],["MID","ORT","Orta Saha"],["FWD","FOR","Forvet"]] as const;
-const weeklyBest=positions.map(([position,short,label])=>({
- position,short,label,
- player:[...FANTASY_PLAYER_POOL].filter(p=>p.position===position).sort((a,b)=>b.points-a.points||b.price-a.price)[0]
-}));
-
+const positions=[["GK","Kaleci"],["DEF","Defans"],["MID","Orta Saha"],["FWD","Forvet"]] as const;
+const weeklyBest=positions.map(([position,label])=>({position,label,player:[...FANTASY_PLAYER_POOL].filter(p=>p.position===position).sort((a,b)=>b.points-a.points||b.price-a.price)[0]}));
+function Symbol({kind}:{kind:"calendar"|"cup"|"iq"|"star"|"weekly"}){const paths={calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6m10-6v6M3 11h18M7 15h3m4 0h3"/></>,cup:<><path d="M8 3h8v7a4 4 0 0 1-8 0V3ZM8 5H4v3a4 4 0 0 0 4 4m8-7h4v3a4 4 0 0 1-4 4M12 14v6m-5 1h10"/></>,iq:<><path d="M8 17c0-4-3-5-3-8a7 7 0 0 1 14 0c0 3-3 4-3 8ZM9 21h6m-3-9V7"/></>,star:<path d="m12 2 3 6 7 1-5 5 1 8-6-4-6 4 1-8-5-5 7-1Z"/>,weekly:<><path d="M8 3h8v5a4 4 0 0 1-8 0V3Z"/><path d="M6 4H3v2a4 4 0 0 0 5 4M18 4h3v2a4 4 0 0 1-5 4M12 12v4M8 20h8"/><path d="m12 15 1.2 2.3 2.6.4-1.9 1.8.5 2.5-2.4-1.2L9.6 22l.5-2.5-1.9-1.8 2.6-.4L12 15Z"/></>};return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">{paths[kind]}</svg>}
+function PanelTitle({kind,title,href,action}:{kind:"calendar"|"cup"|"star"|"weekly";title:string;href:string;action:string}){return <div className="home-panel-title"><h2><Symbol kind={kind}/>{title}</h2><Link href={href}>{action} <span aria-hidden="true">→</span></Link></div>}
 function Shield({style}:{style?:CSSProperties}){return <div className="home-shield" style={style}><svg viewBox="0 0 50 60" aria-hidden="true"><circle cx="25" cy="19" r="8"/><path d="M9 50v-9c0-14 32-14 32 0v9Z"/></svg></div>}
-function Stadium(){const spots=[[32,17],[50,12],[68,17],[27,39],[50,36],[73,39],[17,62],[39,60],[61,60],[83,62],[50,82]];return <Link href="/team" className="v31-squad-wrap" aria-label="Kadronu kur sayfasına git"><div className="home-stadium" role="img" aria-label="4-3-3 dizilişinde temsili kadro"><span className="home-stadium-motto">KADRONU KUR<br/>SAHAYA ÇIK</span><div className="home-pitch"><svg className="home-pitch-lines" viewBox="0 0 600 400" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#d7f3c0" strokeWidth="2" opacity=".65"><path d="M116 12h368l103 373H13ZM64 201h472M239 12l-8 45h138l-8-45M192 385l12-77h192l12 77M260 12l-3 20h86l-3-20M242 385l4-34h108l4 34"/><ellipse cx="300" cy="201" rx="54" ry="31"/></g></svg>{spots.map(([x,y],i)=><Shield key={i} style={{left:`${x}%`,top:`${y}%`}}/>)}</div><div className="home-bench" style={{backgroundImage:`url(${base}/game-ui/dugout-realistic.webp)`}}>{Array.from({length:4},(_,i)=><Shield key={i}/>)}</div></div></Link>}
-function HomeNavIcon({emoji}:{emoji:string}){return <span className="v31-nav-icon" aria-hidden="true">{emoji}</span>}
-
-export default function Home(){
- return <div className="fiq-home-v31" style={{"--home-athletes":`url(${base}/game-ui/home-athletes.webp)`,"--home-stadium":`url(${base}/game-ui/stadium-bowl.webp)`} as CSSProperties}>
-  <header className="v31-topbar">
-   <a href={`${base}/`} className="v31-brand" aria-label="FUTBOL IQ ana sayfa"><span className="v31-crown">♛</span><strong>FUTBOL <b>IQ</b></strong><small>FANTEZİ LİGİ</small></a>
-   <nav className="v31-nav" aria-label="Ana sayfa menüsü">
-    <a className="active" href={`${base}/`}><HomeNavIcon emoji="🏠"/>Ana Sayfa</a>
-    <Link href="/team"><HomeNavIcon emoji="👕"/>Kadro Kur</Link>
-    <a href={`${base}/tff-scout.html`}><HomeNavIcon emoji="📊"/>Analiz</a>
-    <Link href="/today"><HomeNavIcon emoji="📅"/>Fikstür</Link>
-    <Link href="/leagues/super-lig"><HomeNavIcon emoji="🏆"/>Puan Durumu</Link>
-   </nav>
-   <Link href="/team" className="v31-join">Hemen Katıl</Link>
-  </header>
-
-  <main className="v31-main">
-   <section className="v31-hero-pair"><a className="v31-analysis v31-analysis-direct" href={`${base}/tff-scout.html`} aria-label="FUTBOL IQ analiz sayfasına git"><img src={analysisImage} alt="FUTBOL IQ analiz sayfası giriş görseli"/></a><Stadium/></section>
-
-   <section className="v31-actions" aria-label="Ana işlemler">
-    <Link href="/team" className="v31-action-card v31-action-team">
-     <span className="v31-action-emoji" aria-hidden="true">👕</span>
-     <span><strong>KADRONU KUR</strong><small>Kendi kadronu oluştur</small></span>
-     <b aria-hidden="true">›</b>
-    </Link>
-    <Link href="/rules" className="v31-action-card v31-action-rules">
-     <span className="v31-action-emoji" aria-hidden="true">📄</span>
-     <span><strong>OYUN KURALLARI</strong><small>Tüm kuralları incele</small></span>
-     <b aria-hidden="true">›</b>
-    </Link>
-   </section>
-
-   <section className="v31-rule-grid" aria-label="Oyun kuralları özeti">
-    <article className="v31-rule v31-rule-budget"><span aria-hidden="true">₺</span><div><strong>₺ 100M</strong><small>Bütçe</small></div></article>
-    <article className="v31-rule v31-rule-players"><span aria-hidden="true">👥</span><div><strong>15</strong><small>Oyuncu · 11 + 4</small></div></article>
-    <article className="v31-rule v31-rule-club"><span aria-hidden="true">🛡️</span><div><small>Kulüp Başına</small><strong>En Fazla 3</strong></div></article>
-    <article className="v31-rule v31-rule-captain"><span aria-hidden="true">👑</span><div><strong>Kaptan ×2</strong><small>Puan</small></div></article>
-   </section>
-
-   <section className="v31-weekly">
-    <div className="v31-section-title">
-     <div><span aria-hidden="true">🏆</span><div><h2>HAFTANIN OYUNCULARI</h2><p>Bu haftanın öne çıkan isimleri</p></div></div>
-     <Link href="/team">Tümünü Gör <b aria-hidden="true">→</b></Link>
-    </div>
-    <div className="v31-player-grid">
-     {weeklyBest.map(({short,label,player},i)=><Link href="/team" key={short} className={`v31-player v31-player-${i}`}>
-       <span className="v31-pos">{short}</span>
-       <div className="v31-player-photo" aria-hidden="true"/>
-       <h3>{player?.name??label}</h3>
-       <p>{player?.club??"Süper Lig"}</p>
-       <strong>{player?.points&&player.points>0?player.points.toFixed(1):"—"}</strong>
-       <small>Fantasy Puanı</small>
-       <em>{player? `${player.price.toFixed(1)}M · ${label}` : label}</em>
-      </Link>)}
-    </div>
-   </section>
-
-   <section className="v31-benefits" aria-label="FUTBOL IQ avantajları">
-    <div><span>📊</span><b>Veriye Dayalı<br/>Analizler</b></div>
-    <div><span>🛡️</span><b>Stratejik<br/>Kararlar</b></div>
-    <div><span>🏆</span><b>Rekabetçi<br/>Lig Deneyimi</b></div>
-    <div><span>👥</span><b>Sen de Katıl<br/>Futbol IQ Ailesine</b></div>
-   </section>
-
-   <footer className="v31-footer"><strong>FUTBOL <b>IQ</b></strong><span>Sadece Bir Oyun Değil,<br/>Bir Zihin Oyunu</span></footer>
-  </main>
- </div>
-}
+function Stadium(){const spots=[[32,17],[50,12],[68,17],[27,39],[50,36],[73,39],[17,62],[39,60],[61,60],[83,62],[50,82]];return <div className="home-stadium" role="img" aria-label="4-3-3 dizilişinde 11 futbolcu ve 4 yedekten oluşan temsili kadro"><span className="home-stadium-motto">İYİ HAMLELER<br/>BÜYÜK HİKÂYELER YAZAR</span><div className="home-pitch"><svg className="home-pitch-lines" viewBox="0 0 600 400" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#d7f3c0" strokeWidth="2" opacity=".65"><path d="M116 12h368l103 373H13ZM64 201h472M239 12l-8 45h138l-8-45M192 385l12-77h192l12 77M260 12l-3 20h86l-3-20M242 385l4-34h108l4 34"/><ellipse cx="300" cy="201" rx="54" ry="31"/></g></svg>{spots.map(([x,y],i)=><Shield key={i} style={{left:`${x}%`,top:`${y}%`}}/>)}</div><div className="home-bench" style={{backgroundImage:`url(${base}/game-ui/dugout-realistic.webp)`}}>{Array.from({length:4},(_,i)=><Shield key={i}/>)}</div></div>}
+export default function Home(){return <div className="fiq-home" style={{"--home-stadium":`url(${base}/game-ui/stadium-bowl.webp)`,"--home-athletes":`url(${base}/game-ui/home-athletes.webp)`} as CSSProperties}>
+ <section className="home-hero"><div className="home-hero-copy"><p className="home-eyebrow">SÜPER LİG FANTEZİ FUTBOL</p><h1>Futbolu oku.<br/>Kadronla fark yarat.</h1><p className="home-intro">Bilgini sahaya yansıt. Kendi takımını kur,<br className="home-desktop-break"/> haftanın heyecanına ortak ol.</p><div className="home-scout-banner"><a className="fiq-scout-visual" href={`${base}/tff-scout.html`} aria-label="FUTBOL IQ analiz sayfasını aç"><img className="fiq-scout-banner-image" src={analysisImage} alt="FUTBOL IQ analiz sayfasına giriş"/></a></div><div className="home-actions"><Link href="/team"><span className="home-action-emoji" aria-hidden="true">👥</span><span>KADRONU KUR</span><b aria-hidden="true">→</b></Link><Link href="/rules"><span className="home-action-emoji" aria-hidden="true">📜</span><span>OYUN KURALLARI</span></Link></div><div className="home-rule-chips" aria-label="Kadro kuralları"><div className="home-rule-budget"><span className="home-rule-emoji home-rule-lira" aria-hidden="true">₺</span><p>100M<b>Bütçe</b></p></div><div className="home-rule-players"><span className="home-rule-emoji" aria-hidden="true">👥</span><p>11 + 4<b>Oyuncu</b></p></div><div className="home-rule-club"><span className="home-rule-emoji" aria-hidden="true">🛡️</span><p>Kulüp Başına<b>En fazla 3</b></p></div><div className="home-rule-captain"><span className="home-rule-emoji" aria-hidden="true">👑</span><p>Kaptan<b>×2 puan</b></p></div></div></div><Stadium/></section>
+ <section className="home-panel home-players"><PanelTitle kind="weekly" title="Haftanın Oyuncuları" href="/team" action="Kadroyu Aç"/><div className="home-position-cards">{weeklyBest.map(({label,player},i)=><Link href="/team" key={label} className={`home-position-card home-position-${i}`}><div className="home-weekly-rank"><span>{label}</span><b>#{i+1}</b></div><div className="home-weekly-copy"><h3>{player?.name??"Veri bekleniyor"}</h3><i/><p>{player?player.club:"Oyuncu verisi bekleniyor."}</p>{player?<strong>{player.points} P</strong>:null}</div><span className="home-position-arrow" aria-hidden="true">↗</span></Link>)}</div></section>
+ <section className="home-next" aria-label="Hızlı başlangıç"><div><span className="home-eyebrow">SIRADAKİ HAMLE SENİN</span><h2>Maça hazırlan.</h2><p>Kadronu kur, oyuncuları incele ve FUTBOL IQ analizlerini kullan.</p></div><Link href="/team"><b>01</b><span>Kadrom<strong>Takımını sahaya çıkar</strong></span><i aria-hidden="true">↗</i></Link></section>
+ 
+ <div className="home-signoff"><span>FUTBOL IQ <b>DAHA FAZLA DÜŞÜN. DAHA İYİ OYNA.</b></span><span>2026–27 · GELİŞTİRME ÖNİZLEMESİ</span></div>
+ </div>}
