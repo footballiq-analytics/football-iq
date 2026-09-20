@@ -59,7 +59,8 @@ jobs:
           test -f out/tff-scout.html
           test -f out/data/tff-scout.json
           test -s out/game-ui/futbol-iq-analysis-approved.webp
-          grep -q "data:image/webp;base64,UklG" out/index.html
+          grep -q "home-analysis-native" out/index.html
+          grep -q "/football-iq/tff-scout.html" out/index.html
           grep -q "PRO UI V10.4 · IMPORT GUARANTEE" out/tff-scout.html
           node - <<'NODE'
           const fs = require('fs');
