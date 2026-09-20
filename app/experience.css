@@ -568,3 +568,110 @@ html.dark .fiq-home .home-rule-captain p{color:var(--ink)}
  .fiq-home .home-position-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
  .fiq-home .home-signoff{display:none!important}
 }
+
+/* Home V31.5 — native analysis card + calm semantic symbols */
+.home-analysis-native{
+ display:grid!important;
+ grid-template-columns:auto 1fr auto;
+ align-items:center;
+ gap:12px;
+ min-height:112px!important;
+ padding:14px 16px!important;
+ border:1px solid #cfdde8!important;
+ border-radius:12px!important;
+ background:linear-gradient(135deg,#f8fbfd 0%,#edf5fa 100%)!important;
+ box-shadow:none!important;
+ color:#17324b!important;
+ text-decoration:none!important;
+}
+.home-analysis-native:hover{background:linear-gradient(135deg,#f5fafd,#e8f2f8)!important}
+.home-analysis-symbols{
+ display:flex;
+ align-items:center;
+ gap:0;
+ width:66px;
+ flex:none;
+}
+.home-analysis-symbols span{
+ display:grid;
+ place-items:center;
+ width:38px;
+ height:38px;
+ border-radius:50%;
+ background:#fff;
+ border:1px solid #d7e4ed;
+ font-size:24px;
+ line-height:1;
+ box-shadow:0 2px 6px rgba(20,55,80,.06);
+}
+.home-analysis-symbols span+span{margin-left:-10px}
+.home-analysis-copy{display:grid;gap:2px;min-width:0}
+.home-analysis-copy small{
+ font-size:7px;
+ letter-spacing:.18em;
+ color:#6a8193;
+ font-weight:800;
+}
+.home-analysis-copy strong{
+ font-size:21px;
+ line-height:1;
+ font-weight:950;
+ letter-spacing:-.03em;
+ color:#102b47;
+}
+.home-analysis-copy strong b{color:#c9972e}
+.home-analysis-copy em{
+ font-size:11px;
+ font-style:normal;
+ letter-spacing:.16em;
+ font-weight:900;
+ color:#2d89b8;
+}
+.home-analysis-copy>span{
+ margin-top:3px;
+ font-size:9px;
+ color:#708395;
+}
+.home-analysis-native>i{
+ font-style:normal;
+ font-size:22px;
+ color:#7d93a4;
+}
+.fiq-home .home-rule-number,
+.fiq-home .home-rule-c{
+ font-family:Arial,Helvetica,sans-serif!important;
+ font-weight:950!important;
+ background:#f4f7fa!important;
+ color:#334b60!important;
+ border-color:#d5e0e8!important;
+}
+.fiq-home .home-rule-c{
+ background:#fff7df!important;
+ color:#8b6920!important;
+ border-color:#ead79c!important;
+}
+.fiq-home .home-rule-players .home-rule-emoji{
+ background:#eef5fb!important;
+ border-color:#d5e4f0!important;
+}
+.fiq-home .home-rule-budget .home-rule-emoji{
+ background:#eef9f3!important;
+ color:#228b55!important;
+ border-color:#cfe7d9!important;
+}
+.fiq-home .home-rule-chips>div{
+ background:color-mix(in srgb,var(--panel) 96%,transparent)!important;
+ border-color:var(--line)!important;
+}
+@media(max-width:760px){
+ .home-analysis-native{
+   min-height:96px!important;
+   padding:11px 12px!important;
+   gap:9px!important;
+ }
+ .home-analysis-symbols{width:56px}
+ .home-analysis-symbols span{width:32px;height:32px;font-size:20px}
+ .home-analysis-copy strong{font-size:17px}
+ .home-analysis-copy em{font-size:9px}
+ .home-analysis-copy>span{font-size:8px}
+}
