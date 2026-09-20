@@ -1,0 +1,3070 @@
+{
+  "schemaVersion": 1,
+  "season": "2026-2027",
+  "source": "https://www.tff.org/default.aspx?pageID=198",
+  "updatedAt": "2026-09-20T10:23:53.701909+00:00",
+  "currentWeek": 6,
+  "recommendedWeek": 7,
+  "matches": [
+    {
+      "id": "317790",
+      "week": 1,
+      "homeId": "3604",
+      "awayId": "3199",
+      "home": "Galatasaray",
+      "away": "Çorum FK",
+      "homeGoals": 2,
+      "awayGoals": 2
+    },
+    {
+      "id": "317789",
+      "week": 1,
+      "homeId": "3600",
+      "awayId": "3631",
+      "home": "Konyaspor",
+      "away": "Çaykur Rizespor",
+      "homeGoals": 0,
+      "awayGoals": 1
+    },
+    {
+      "id": "317784",
+      "week": 1,
+      "homeId": "3672",
+      "awayId": "51",
+      "home": "Gaziantep FK",
+      "away": "Alanyaspor",
+      "homeGoals": 1,
+      "awayGoals": 1
+    },
+    {
+      "id": "317788",
+      "week": 1,
+      "homeId": "3606",
+      "awayId": "3592",
+      "home": "Gençlerbirliği",
+      "away": "Fenerbahçe",
+      "homeGoals": 2,
+      "awayGoals": 1
+    },
+    {
+      "id": "317785",
+      "week": 1,
+      "homeId": "39",
+      "awayId": "3596",
+      "home": "Kasımpaşa",
+      "away": "Trabzonspor",
+      "homeGoals": 1,
+      "awayGoals": 1
+    },
+    {
+      "id": "317791",
+      "week": 1,
+      "homeId": "3590",
+      "awayId": "3610",
+      "home": "Beşiktaş",
+      "away": "Eyüpspor",
+      "homeGoals": 1,
+      "awayGoals": 0
+    },
+    {
+      "id": "317787",
+      "week": 1,
+      "homeId": "3678",
+      "awayId": "4123",
+      "home": "Amed SK",
+      "away": "Erzurumspor FK",
+      "homeGoals": 3,
+      "awayGoals": 0
+    },
+    {
+      "id": "317786",
+      "week": 1,
+      "homeId": "3665",
+      "awayId": "132",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Kocaelispor",
+      "homeGoals": 2,
+      "awayGoals": 0
+    },
+    {
+      "id": "317792",
+      "week": 1,
+      "homeId": "3597",
+      "awayId": "3688",
+      "home": "Samsunspor",
+      "away": "Göztepe",
+      "homeGoals": 3,
+      "awayGoals": 3
+    },
+    {
+      "id": "317801",
+      "week": 2,
+      "homeId": "4123",
+      "awayId": "3604",
+      "home": "Erzurumspor FK",
+      "away": "Galatasaray",
+      "homeGoals": 0,
+      "awayGoals": 4
+    },
+    {
+      "id": "317796",
+      "week": 2,
+      "homeId": "3631",
+      "awayId": "3597",
+      "home": "Çaykur Rizespor",
+      "away": "Samsunspor",
+      "homeGoals": 0,
+      "awayGoals": 2
+    },
+    {
+      "id": "317799",
+      "week": 2,
+      "homeId": "3592",
+      "awayId": "3600",
+      "home": "Fenerbahçe",
+      "away": "Konyaspor",
+      "homeGoals": 4,
+      "awayGoals": 2
+    },
+    {
+      "id": "317798",
+      "week": 2,
+      "homeId": "3199",
+      "awayId": "39",
+      "home": "Çorum FK",
+      "away": "Kasımpaşa",
+      "homeGoals": 0,
+      "awayGoals": 1
+    },
+    {
+      "id": "317794",
+      "week": 2,
+      "homeId": "3610",
+      "awayId": "3672",
+      "home": "Eyüpspor",
+      "away": "Gaziantep FK",
+      "homeGoals": 0,
+      "awayGoals": 1
+    },
+    {
+      "id": "317793",
+      "week": 2,
+      "homeId": "3596",
+      "awayId": "3665",
+      "home": "Trabzonspor",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": 2,
+      "awayGoals": 1
+    },
+    {
+      "id": "317795",
+      "week": 2,
+      "homeId": "51",
+      "awayId": "3590",
+      "home": "Alanyaspor",
+      "away": "Beşiktaş",
+      "homeGoals": 1,
+      "awayGoals": 0
+    },
+    {
+      "id": "317797",
+      "week": 2,
+      "homeId": "3688",
+      "awayId": "3606",
+      "home": "Göztepe",
+      "away": "Gençlerbirliği",
+      "homeGoals": 0,
+      "awayGoals": 1
+    },
+    {
+      "id": "317800",
+      "week": 2,
+      "homeId": "132",
+      "awayId": "3678",
+      "home": "Kocaelispor",
+      "away": "Amed SK",
+      "homeGoals": 2,
+      "awayGoals": 0
+    },
+    {
+      "id": "317806",
+      "week": 3,
+      "homeId": "3606",
+      "awayId": "4123",
+      "home": "Gençlerbirliği",
+      "away": "Erzurumspor FK",
+      "homeGoals": 1,
+      "awayGoals": 1
+    },
+    {
+      "id": "317802",
+      "week": 3,
+      "homeId": "3672",
+      "awayId": "3631",
+      "home": "Gaziantep FK",
+      "away": "Çaykur Rizespor",
+      "homeGoals": 1,
+      "awayGoals": 2
+    },
+    {
+      "id": "317808",
+      "week": 3,
+      "homeId": "3604",
+      "awayId": "3688",
+      "home": "Galatasaray",
+      "away": "Göztepe",
+      "homeGoals": 3,
+      "awayGoals": 2
+    },
+    {
+      "id": "317807",
+      "week": 3,
+      "homeId": "3600",
+      "awayId": "132",
+      "home": "Konyaspor",
+      "away": "Kocaelispor",
+      "homeGoals": 1,
+      "awayGoals": 2
+    },
+    {
+      "id": "317803",
+      "week": 3,
+      "homeId": "3610",
+      "awayId": "51",
+      "home": "Eyüpspor",
+      "away": "Alanyaspor",
+      "homeGoals": 2,
+      "awayGoals": 1
+    },
+    {
+      "id": "317804",
+      "week": 3,
+      "homeId": "3665",
+      "awayId": "39",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Kasımpaşa",
+      "homeGoals": 1,
+      "awayGoals": 1
+    },
+    {
+      "id": "317810",
+      "week": 3,
+      "homeId": "3597",
+      "awayId": "3592",
+      "home": "Samsunspor",
+      "away": "Fenerbahçe",
+      "homeGoals": 0,
+      "awayGoals": 2
+    },
+    {
+      "id": "317805",
+      "week": 3,
+      "homeId": "3678",
+      "awayId": "3596",
+      "home": "Amed SK",
+      "away": "Trabzonspor",
+      "homeGoals": 2,
+      "awayGoals": 1
+    },
+    {
+      "id": "317809",
+      "week": 3,
+      "homeId": "3590",
+      "awayId": "3199",
+      "home": "Beşiktaş",
+      "away": "Çorum FK",
+      "homeGoals": 6,
+      "awayGoals": 2
+    },
+    {
+      "id": "317813",
+      "week": 4,
+      "homeId": "3665",
+      "awayId": "3604",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Galatasaray",
+      "homeGoals": 2,
+      "awayGoals": 3
+    },
+    {
+      "id": "317819",
+      "week": 4,
+      "homeId": "4123",
+      "awayId": "3600",
+      "home": "Erzurumspor FK",
+      "away": "Konyaspor",
+      "homeGoals": 1,
+      "awayGoals": 0
+    },
+    {
+      "id": "317817",
+      "week": 4,
+      "homeId": "3592",
+      "awayId": "3590",
+      "home": "Fenerbahçe",
+      "away": "Beşiktaş",
+      "homeGoals": 1,
+      "awayGoals": 2
+    },
+    {
+      "id": "317818",
+      "week": 4,
+      "homeId": "132",
+      "awayId": "3597",
+      "home": "Kocaelispor",
+      "away": "Samsunspor",
+      "homeGoals": 1,
+      "awayGoals": 0
+    },
+    {
+      "id": "317816",
+      "week": 4,
+      "homeId": "3199",
+      "awayId": "3610",
+      "home": "Çorum FK",
+      "away": "Eyüpspor",
+      "homeGoals": 3,
+      "awayGoals": 0
+    },
+    {
+      "id": "317811",
+      "week": 4,
+      "homeId": "3596",
+      "awayId": "3606",
+      "home": "Trabzonspor",
+      "away": "Gençlerbirliği",
+      "homeGoals": 5,
+      "awayGoals": 0
+    },
+    {
+      "id": "317812",
+      "week": 4,
+      "homeId": "39",
+      "awayId": "3678",
+      "home": "Kasımpaşa",
+      "away": "Amed SK",
+      "homeGoals": 2,
+      "awayGoals": 2
+    },
+    {
+      "id": "317815",
+      "week": 4,
+      "homeId": "3688",
+      "awayId": "3672",
+      "home": "Göztepe",
+      "away": "Gaziantep FK",
+      "homeGoals": 2,
+      "awayGoals": 4
+    },
+    {
+      "id": "317814",
+      "week": 4,
+      "homeId": "3631",
+      "awayId": "51",
+      "home": "Çaykur Rizespor",
+      "away": "Alanyaspor",
+      "homeGoals": 0,
+      "awayGoals": 1
+    },
+    {
+      "id": "317827",
+      "week": 5,
+      "homeId": "3590",
+      "awayId": "4123",
+      "home": "Beşiktaş",
+      "away": "Erzurumspor FK",
+      "homeGoals": 3,
+      "awayGoals": 0
+    },
+    {
+      "id": "317828",
+      "week": 5,
+      "homeId": "3597",
+      "awayId": "3199",
+      "home": "Samsunspor",
+      "away": "Çorum FK",
+      "homeGoals": 1,
+      "awayGoals": 5
+    },
+    {
+      "id": "317821",
+      "week": 5,
+      "homeId": "3610",
+      "awayId": "3631",
+      "home": "Eyüpspor",
+      "away": "Çaykur Rizespor",
+      "homeGoals": 0,
+      "awayGoals": 2
+    },
+    {
+      "id": "317822",
+      "week": 5,
+      "homeId": "51",
+      "awayId": "3688",
+      "home": "Alanyaspor",
+      "away": "Göztepe",
+      "homeGoals": 2,
+      "awayGoals": 2
+    },
+    {
+      "id": "317825",
+      "week": 5,
+      "homeId": "3600",
+      "awayId": "3596",
+      "home": "Konyaspor",
+      "away": "Trabzonspor",
+      "homeGoals": 1,
+      "awayGoals": 0
+    },
+    {
+      "id": "317824",
+      "week": 5,
+      "homeId": "3606",
+      "awayId": "39",
+      "home": "Gençlerbirliği",
+      "away": "Kasımpaşa",
+      "homeGoals": 1,
+      "awayGoals": 2
+    },
+    {
+      "id": "317823",
+      "week": 5,
+      "homeId": "3678",
+      "awayId": "3665",
+      "home": "Amed SK",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": 5,
+      "awayGoals": 0
+    },
+    {
+      "id": "317826",
+      "week": 5,
+      "homeId": "3604",
+      "awayId": "132",
+      "home": "Galatasaray",
+      "away": "Kocaelispor",
+      "homeGoals": 1,
+      "awayGoals": 0
+    },
+    {
+      "id": "317820",
+      "week": 5,
+      "homeId": "3672",
+      "awayId": "3592",
+      "home": "Gaziantep FK",
+      "away": "Fenerbahçe",
+      "homeGoals": 0,
+      "awayGoals": 0
+    },
+    {
+      "id": "317830",
+      "week": 6,
+      "homeId": "39",
+      "awayId": "3600",
+      "home": "Kasımpaşa",
+      "away": "Konyaspor",
+      "homeGoals": 0,
+      "awayGoals": 0
+    },
+    {
+      "id": "317829",
+      "week": 6,
+      "homeId": "3596",
+      "awayId": "3604",
+      "home": "Trabzonspor",
+      "away": "Galatasaray",
+      "homeGoals": 4,
+      "awayGoals": 0
+    },
+    {
+      "id": "317831",
+      "week": 6,
+      "homeId": "3665",
+      "awayId": "3606",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Gençlerbirliği",
+      "homeGoals": 4,
+      "awayGoals": 0
+    },
+    {
+      "id": "317836",
+      "week": 6,
+      "homeId": "132",
+      "awayId": "3672",
+      "home": "Kocaelispor",
+      "away": "Gaziantep FK",
+      "homeGoals": 2,
+      "awayGoals": 0
+    },
+    {
+      "id": "317834",
+      "week": 6,
+      "homeId": "3199",
+      "awayId": "51",
+      "home": "Çorum FK",
+      "away": "Alanyaspor",
+      "homeGoals": 1,
+      "awayGoals": 2
+    },
+    {
+      "id": "317833",
+      "week": 6,
+      "homeId": "3688",
+      "awayId": "3631",
+      "home": "Göztepe",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317835",
+      "week": 6,
+      "homeId": "3592",
+      "awayId": "3610",
+      "home": "Fenerbahçe",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317832",
+      "week": 6,
+      "homeId": "3678",
+      "awayId": "3590",
+      "home": "Amed SK",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317837",
+      "week": 6,
+      "homeId": "4123",
+      "awayId": "3597",
+      "home": "Erzurumspor FK",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317844",
+      "week": 7,
+      "homeId": "3604",
+      "awayId": "39",
+      "home": "Galatasaray",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317842",
+      "week": 7,
+      "homeId": "3606",
+      "awayId": "3678",
+      "home": "Gençlerbirliği",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317840",
+      "week": 7,
+      "homeId": "51",
+      "awayId": "4123",
+      "home": "Alanyaspor",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317846",
+      "week": 7,
+      "homeId": "3597",
+      "awayId": "3596",
+      "home": "Samsunspor",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317841",
+      "week": 7,
+      "homeId": "3631",
+      "awayId": "3592",
+      "home": "Çaykur Rizespor",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317838",
+      "week": 7,
+      "homeId": "3672",
+      "awayId": "3199",
+      "home": "Gaziantep FK",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317843",
+      "week": 7,
+      "homeId": "3600",
+      "awayId": "3665",
+      "home": "Konyaspor",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317845",
+      "week": 7,
+      "homeId": "3590",
+      "awayId": "132",
+      "home": "Beşiktaş",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317839",
+      "week": 7,
+      "homeId": "3610",
+      "awayId": "3688",
+      "home": "Eyüpspor",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317852",
+      "week": 8,
+      "homeId": "3199",
+      "awayId": "3631",
+      "home": "Çorum FK",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317853",
+      "week": 8,
+      "homeId": "3592",
+      "awayId": "51",
+      "home": "Fenerbahçe",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317855",
+      "week": 8,
+      "homeId": "4123",
+      "awayId": "3610",
+      "home": "Erzurumspor FK",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317851",
+      "week": 8,
+      "homeId": "3606",
+      "awayId": "3604",
+      "home": "Gençlerbirliği",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317850",
+      "week": 8,
+      "homeId": "3678",
+      "awayId": "3600",
+      "home": "Amed SK",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317848",
+      "week": 8,
+      "homeId": "39",
+      "awayId": "3597",
+      "home": "Kasımpaşa",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317854",
+      "week": 8,
+      "homeId": "132",
+      "awayId": "3688",
+      "home": "Kocaelispor",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317849",
+      "week": 8,
+      "homeId": "3665",
+      "awayId": "3672",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317847",
+      "week": 8,
+      "homeId": "3596",
+      "awayId": "3590",
+      "home": "Trabzonspor",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317858",
+      "week": 9,
+      "homeId": "51",
+      "awayId": "132",
+      "home": "Alanyaspor",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317864",
+      "week": 9,
+      "homeId": "3597",
+      "awayId": "3678",
+      "home": "Samsunspor",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317857",
+      "week": 9,
+      "homeId": "3610",
+      "awayId": "39",
+      "home": "Eyüpspor",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317856",
+      "week": 9,
+      "homeId": "3672",
+      "awayId": "4123",
+      "home": "Gaziantep FK",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317860",
+      "week": 9,
+      "homeId": "3688",
+      "awayId": "3199",
+      "home": "Göztepe",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317861",
+      "week": 9,
+      "homeId": "3600",
+      "awayId": "3606",
+      "home": "Konyaspor",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317862",
+      "week": 9,
+      "homeId": "3604",
+      "awayId": "3592",
+      "home": "Galatasaray",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317859",
+      "week": 9,
+      "homeId": "3631",
+      "awayId": "3596",
+      "home": "Çaykur Rizespor",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317863",
+      "week": 9,
+      "homeId": "3590",
+      "awayId": "3665",
+      "home": "Beşiktaş",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317870",
+      "week": 10,
+      "homeId": "3600",
+      "awayId": "3604",
+      "home": "Konyaspor",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317872",
+      "week": 10,
+      "homeId": "132",
+      "awayId": "3631",
+      "home": "Kocaelispor",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317873",
+      "week": 10,
+      "homeId": "4123",
+      "awayId": "3199",
+      "home": "Erzurumspor FK",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317871",
+      "week": 10,
+      "homeId": "3592",
+      "awayId": "3688",
+      "home": "Fenerbahçe",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317865",
+      "week": 10,
+      "homeId": "3596",
+      "awayId": "3672",
+      "home": "Trabzonspor",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317868",
+      "week": 10,
+      "homeId": "3678",
+      "awayId": "3610",
+      "home": "Amed SK",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317867",
+      "week": 10,
+      "homeId": "3665",
+      "awayId": "3597",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317866",
+      "week": 10,
+      "homeId": "39",
+      "awayId": "3590",
+      "home": "Kasımpaşa",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317869",
+      "week": 10,
+      "homeId": "3606",
+      "awayId": "51",
+      "home": "Gençlerbirliği",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317874",
+      "week": 11,
+      "homeId": "3672",
+      "awayId": "39",
+      "home": "Gaziantep FK",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317880",
+      "week": 11,
+      "homeId": "3604",
+      "awayId": "3678",
+      "home": "Galatasaray",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317878",
+      "week": 11,
+      "homeId": "3688",
+      "awayId": "3665",
+      "home": "Göztepe",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317882",
+      "week": 11,
+      "homeId": "3597",
+      "awayId": "3600",
+      "home": "Samsunspor",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317875",
+      "week": 11,
+      "homeId": "3610",
+      "awayId": "132",
+      "home": "Eyüpspor",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317881",
+      "week": 11,
+      "homeId": "3590",
+      "awayId": "3606",
+      "home": "Beşiktaş",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317879",
+      "week": 11,
+      "homeId": "3199",
+      "awayId": "3592",
+      "home": "Çorum FK",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317876",
+      "week": 11,
+      "homeId": "51",
+      "awayId": "3596",
+      "home": "Alanyaspor",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317877",
+      "week": 11,
+      "homeId": "3631",
+      "awayId": "4123",
+      "home": "Çaykur Rizespor",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317886",
+      "week": 12,
+      "homeId": "3678",
+      "awayId": "3631",
+      "home": "Amed SK",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317887",
+      "week": 12,
+      "homeId": "3606",
+      "awayId": "3672",
+      "home": "Gençlerbirliği",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317889",
+      "week": 12,
+      "homeId": "3604",
+      "awayId": "3597",
+      "home": "Galatasaray",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317890",
+      "week": 12,
+      "homeId": "132",
+      "awayId": "3592",
+      "home": "Kocaelispor",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317888",
+      "week": 12,
+      "homeId": "3600",
+      "awayId": "3590",
+      "home": "Konyaspor",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317883",
+      "week": 12,
+      "homeId": "3596",
+      "awayId": "3610",
+      "home": "Trabzonspor",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317891",
+      "week": 12,
+      "homeId": "4123",
+      "awayId": "3688",
+      "home": "Erzurumspor FK",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317884",
+      "week": 12,
+      "homeId": "39",
+      "awayId": "51",
+      "home": "Kasımpaşa",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317885",
+      "week": 12,
+      "homeId": "3665",
+      "awayId": "3199",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317895",
+      "week": 13,
+      "homeId": "3631",
+      "awayId": "39",
+      "home": "Çaykur Rizespor",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317894",
+      "week": 13,
+      "homeId": "51",
+      "awayId": "3600",
+      "home": "Alanyaspor",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317900",
+      "week": 13,
+      "homeId": "3597",
+      "awayId": "3606",
+      "home": "Samsunspor",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317892",
+      "week": 13,
+      "homeId": "3672",
+      "awayId": "3678",
+      "home": "Gaziantep FK",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317898",
+      "week": 13,
+      "homeId": "3592",
+      "awayId": "4123",
+      "home": "Fenerbahçe",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317893",
+      "week": 13,
+      "homeId": "3610",
+      "awayId": "3665",
+      "home": "Eyüpspor",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317897",
+      "week": 13,
+      "homeId": "3199",
+      "awayId": "132",
+      "home": "Çorum FK",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317899",
+      "week": 13,
+      "homeId": "3590",
+      "awayId": "3604",
+      "home": "Beşiktaş",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317896",
+      "week": 13,
+      "homeId": "3688",
+      "awayId": "3596",
+      "home": "Göztepe",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317907",
+      "week": 14,
+      "homeId": "3604",
+      "awayId": "3631",
+      "home": "Galatasaray",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317906",
+      "week": 14,
+      "homeId": "3600",
+      "awayId": "3672",
+      "home": "Konyaspor",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317904",
+      "week": 14,
+      "homeId": "3678",
+      "awayId": "51",
+      "home": "Amed SK",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317903",
+      "week": 14,
+      "homeId": "3665",
+      "awayId": "3592",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317908",
+      "week": 14,
+      "homeId": "3590",
+      "awayId": "3597",
+      "home": "Beşiktaş",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317905",
+      "week": 14,
+      "homeId": "3606",
+      "awayId": "3610",
+      "home": "Gençlerbirliği",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317901",
+      "week": 14,
+      "homeId": "3596",
+      "awayId": "3199",
+      "home": "Trabzonspor",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317909",
+      "week": 14,
+      "homeId": "4123",
+      "awayId": "132",
+      "home": "Erzurumspor FK",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317902",
+      "week": 14,
+      "homeId": "39",
+      "awayId": "3688",
+      "home": "Kasımpaşa",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317915",
+      "week": 15,
+      "homeId": "3199",
+      "awayId": "3678",
+      "home": "Çorum FK",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317918",
+      "week": 15,
+      "homeId": "4123",
+      "awayId": "39",
+      "home": "Erzurumspor FK",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317911",
+      "week": 15,
+      "homeId": "3610",
+      "awayId": "3604",
+      "home": "Eyüpspor",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317912",
+      "week": 15,
+      "homeId": "51",
+      "awayId": "3597",
+      "home": "Alanyaspor",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317916",
+      "week": 15,
+      "homeId": "3592",
+      "awayId": "3596",
+      "home": "Fenerbahçe",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317914",
+      "week": 15,
+      "homeId": "3688",
+      "awayId": "3600",
+      "home": "Göztepe",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317917",
+      "week": 15,
+      "homeId": "132",
+      "awayId": "3606",
+      "home": "Kocaelispor",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317913",
+      "week": 15,
+      "homeId": "3631",
+      "awayId": "3665",
+      "home": "Çaykur Rizespor",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317910",
+      "week": 15,
+      "homeId": "3672",
+      "awayId": "3590",
+      "home": "Gaziantep FK",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317920",
+      "week": 16,
+      "homeId": "39",
+      "awayId": "3592",
+      "home": "Kasımpaşa",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317922",
+      "week": 16,
+      "homeId": "3678",
+      "awayId": "3688",
+      "home": "Amed SK",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317921",
+      "week": 16,
+      "homeId": "3665",
+      "awayId": "4123",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317924",
+      "week": 16,
+      "homeId": "3600",
+      "awayId": "3610",
+      "home": "Konyaspor",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317925",
+      "week": 16,
+      "homeId": "3604",
+      "awayId": "51",
+      "home": "Galatasaray",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317926",
+      "week": 16,
+      "homeId": "3590",
+      "awayId": "3631",
+      "home": "Beşiktaş",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317923",
+      "week": 16,
+      "homeId": "3606",
+      "awayId": "3199",
+      "home": "Gençlerbirliği",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317927",
+      "week": 16,
+      "homeId": "3597",
+      "awayId": "3672",
+      "home": "Samsunspor",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317919",
+      "week": 16,
+      "homeId": "3596",
+      "awayId": "132",
+      "home": "Trabzonspor",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317930",
+      "week": 17,
+      "homeId": "51",
+      "awayId": "3665",
+      "home": "Alanyaspor",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317934",
+      "week": 17,
+      "homeId": "3592",
+      "awayId": "3678",
+      "home": "Fenerbahçe",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317935",
+      "week": 17,
+      "homeId": "132",
+      "awayId": "39",
+      "home": "Kocaelispor",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317931",
+      "week": 17,
+      "homeId": "3631",
+      "awayId": "3606",
+      "home": "Çaykur Rizespor",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317928",
+      "week": 17,
+      "homeId": "3672",
+      "awayId": "3604",
+      "home": "Gaziantep FK",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317933",
+      "week": 17,
+      "homeId": "3199",
+      "awayId": "3600",
+      "home": "Çorum FK",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317932",
+      "week": 17,
+      "homeId": "3688",
+      "awayId": "3590",
+      "home": "Göztepe",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317936",
+      "week": 17,
+      "homeId": "4123",
+      "awayId": "3596",
+      "home": "Erzurumspor FK",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317929",
+      "week": 17,
+      "homeId": "3610",
+      "awayId": "3597",
+      "home": "Eyüpspor",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317945",
+      "week": 18,
+      "homeId": "3688",
+      "awayId": "3597",
+      "home": "Göztepe",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317944",
+      "week": 18,
+      "homeId": "3610",
+      "awayId": "3590",
+      "home": "Eyüpspor",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317941",
+      "week": 18,
+      "homeId": "3592",
+      "awayId": "3606",
+      "home": "Fenerbahçe",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317943",
+      "week": 18,
+      "homeId": "3199",
+      "awayId": "3604",
+      "home": "Çorum FK",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317942",
+      "week": 18,
+      "homeId": "3631",
+      "awayId": "3600",
+      "home": "Çaykur Rizespor",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317938",
+      "week": 18,
+      "homeId": "3596",
+      "awayId": "39",
+      "home": "Trabzonspor",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317937",
+      "week": 18,
+      "homeId": "51",
+      "awayId": "3672",
+      "home": "Alanyaspor",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317940",
+      "week": 18,
+      "homeId": "4123",
+      "awayId": "3678",
+      "home": "Erzurumspor FK",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317939",
+      "week": 18,
+      "homeId": "132",
+      "awayId": "3665",
+      "home": "Kocaelispor",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317949",
+      "week": 19,
+      "homeId": "3597",
+      "awayId": "3631",
+      "home": "Samsunspor",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317951",
+      "week": 19,
+      "homeId": "39",
+      "awayId": "3199",
+      "home": "Kasımpaşa",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317954",
+      "week": 19,
+      "homeId": "3604",
+      "awayId": "4123",
+      "home": "Galatasaray",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317950",
+      "week": 19,
+      "homeId": "3606",
+      "awayId": "3688",
+      "home": "Gençlerbirliği",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317948",
+      "week": 19,
+      "homeId": "3590",
+      "awayId": "51",
+      "home": "Beşiktaş",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317947",
+      "week": 19,
+      "homeId": "3672",
+      "awayId": "3610",
+      "home": "Gaziantep FK",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317952",
+      "week": 19,
+      "homeId": "3600",
+      "awayId": "3592",
+      "home": "Konyaspor",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317946",
+      "week": 19,
+      "homeId": "3665",
+      "awayId": "3596",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317953",
+      "week": 19,
+      "homeId": "3678",
+      "awayId": "132",
+      "home": "Amed SK",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317963",
+      "week": 20,
+      "homeId": "3592",
+      "awayId": "3597",
+      "home": "Fenerbahçe",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317962",
+      "week": 20,
+      "homeId": "3199",
+      "awayId": "3590",
+      "home": "Çorum FK",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317956",
+      "week": 20,
+      "homeId": "51",
+      "awayId": "3610",
+      "home": "Alanyaspor",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317959",
+      "week": 20,
+      "homeId": "4123",
+      "awayId": "3606",
+      "home": "Erzurumspor FK",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317960",
+      "week": 20,
+      "homeId": "132",
+      "awayId": "3600",
+      "home": "Kocaelispor",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317961",
+      "week": 20,
+      "homeId": "3688",
+      "awayId": "3604",
+      "home": "Göztepe",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317955",
+      "week": 20,
+      "homeId": "3631",
+      "awayId": "3672",
+      "home": "Çaykur Rizespor",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317958",
+      "week": 20,
+      "homeId": "3596",
+      "awayId": "3678",
+      "home": "Trabzonspor",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317957",
+      "week": 20,
+      "homeId": "39",
+      "awayId": "3665",
+      "home": "Kasımpaşa",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317966",
+      "week": 21,
+      "homeId": "3604",
+      "awayId": "3665",
+      "home": "Galatasaray",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317967",
+      "week": 21,
+      "homeId": "51",
+      "awayId": "3631",
+      "home": "Alanyaspor",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317972",
+      "week": 21,
+      "homeId": "3600",
+      "awayId": "4123",
+      "home": "Konyaspor",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317969",
+      "week": 21,
+      "homeId": "3610",
+      "awayId": "3199",
+      "home": "Eyüpspor",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317968",
+      "week": 21,
+      "homeId": "3672",
+      "awayId": "3688",
+      "home": "Gaziantep FK",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317965",
+      "week": 21,
+      "homeId": "3678",
+      "awayId": "39",
+      "home": "Amed SK",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317970",
+      "week": 21,
+      "homeId": "3590",
+      "awayId": "3592",
+      "home": "Beşiktaş",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317964",
+      "week": 21,
+      "homeId": "3606",
+      "awayId": "3596",
+      "home": "Gençlerbirliği",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317971",
+      "week": 21,
+      "homeId": "3597",
+      "awayId": "132",
+      "home": "Samsunspor",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317981",
+      "week": 22,
+      "homeId": "3199",
+      "awayId": "3597",
+      "home": "Çorum FK",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317978",
+      "week": 22,
+      "homeId": "3596",
+      "awayId": "3600",
+      "home": "Trabzonspor",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317980",
+      "week": 22,
+      "homeId": "4123",
+      "awayId": "3590",
+      "home": "Erzurumspor FK",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317977",
+      "week": 22,
+      "homeId": "39",
+      "awayId": "3606",
+      "home": "Kasımpaşa",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317979",
+      "week": 22,
+      "homeId": "132",
+      "awayId": "3604",
+      "home": "Kocaelispor",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317974",
+      "week": 22,
+      "homeId": "3631",
+      "awayId": "3610",
+      "home": "Çaykur Rizespor",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317975",
+      "week": 22,
+      "homeId": "3688",
+      "awayId": "51",
+      "home": "Göztepe",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317976",
+      "week": 22,
+      "homeId": "3665",
+      "awayId": "3678",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317973",
+      "week": 22,
+      "homeId": "3592",
+      "awayId": "3672",
+      "home": "Fenerbahçe",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317984",
+      "week": 23,
+      "homeId": "3606",
+      "awayId": "3665",
+      "home": "Gençlerbirliği",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317987",
+      "week": 23,
+      "homeId": "51",
+      "awayId": "3199",
+      "home": "Alanyaspor",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317990",
+      "week": 23,
+      "homeId": "3597",
+      "awayId": "4123",
+      "home": "Samsunspor",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317985",
+      "week": 23,
+      "homeId": "3590",
+      "awayId": "3678",
+      "home": "Beşiktaş",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317983",
+      "week": 23,
+      "homeId": "3600",
+      "awayId": "39",
+      "home": "Konyaspor",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317986",
+      "week": 23,
+      "homeId": "3631",
+      "awayId": "3688",
+      "home": "Çaykur Rizespor",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317988",
+      "week": 23,
+      "homeId": "3610",
+      "awayId": "3592",
+      "home": "Eyüpspor",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317982",
+      "week": 23,
+      "homeId": "3604",
+      "awayId": "3596",
+      "home": "Galatasaray",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317989",
+      "week": 23,
+      "homeId": "3672",
+      "awayId": "132",
+      "home": "Gaziantep FK",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317993",
+      "week": 24,
+      "homeId": "4123",
+      "awayId": "51",
+      "home": "Erzurumspor FK",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317999",
+      "week": 24,
+      "homeId": "3596",
+      "awayId": "3597",
+      "home": "Trabzonspor",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317998",
+      "week": 24,
+      "homeId": "132",
+      "awayId": "3590",
+      "home": "Kocaelispor",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317992",
+      "week": 24,
+      "homeId": "3688",
+      "awayId": "3610",
+      "home": "Göztepe",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317995",
+      "week": 24,
+      "homeId": "3678",
+      "awayId": "3606",
+      "home": "Amed SK",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317997",
+      "week": 24,
+      "homeId": "39",
+      "awayId": "3604",
+      "home": "Kasımpaşa",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317996",
+      "week": 24,
+      "homeId": "3665",
+      "awayId": "3600",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317991",
+      "week": 24,
+      "homeId": "3199",
+      "awayId": "3672",
+      "home": "Çorum FK",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "317994",
+      "week": 24,
+      "homeId": "3592",
+      "awayId": "3631",
+      "home": "Fenerbahçe",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318008",
+      "week": 25,
+      "homeId": "3610",
+      "awayId": "4123",
+      "home": "Eyüpspor",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318005",
+      "week": 25,
+      "homeId": "3631",
+      "awayId": "3199",
+      "home": "Çaykur Rizespor",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318002",
+      "week": 25,
+      "homeId": "3672",
+      "awayId": "3665",
+      "home": "Gaziantep FK",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318003",
+      "week": 25,
+      "homeId": "3600",
+      "awayId": "3678",
+      "home": "Konyaspor",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318001",
+      "week": 25,
+      "homeId": "3597",
+      "awayId": "39",
+      "home": "Samsunspor",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318004",
+      "week": 25,
+      "homeId": "3604",
+      "awayId": "3606",
+      "home": "Galatasaray",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318000",
+      "week": 25,
+      "homeId": "3590",
+      "awayId": "3596",
+      "home": "Beşiktaş",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318006",
+      "week": 25,
+      "homeId": "51",
+      "awayId": "3592",
+      "home": "Alanyaspor",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318007",
+      "week": 25,
+      "homeId": "3688",
+      "awayId": "132",
+      "home": "Göztepe",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318016",
+      "week": 26,
+      "homeId": "3665",
+      "awayId": "3590",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318017",
+      "week": 26,
+      "homeId": "3678",
+      "awayId": "3597",
+      "home": "Amed SK",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318010",
+      "week": 26,
+      "homeId": "39",
+      "awayId": "3610",
+      "home": "Kasımpaşa",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318015",
+      "week": 26,
+      "homeId": "3592",
+      "awayId": "3604",
+      "home": "Fenerbahçe",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318014",
+      "week": 26,
+      "homeId": "3606",
+      "awayId": "3600",
+      "home": "Gençlerbirliği",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318013",
+      "week": 26,
+      "homeId": "3199",
+      "awayId": "3688",
+      "home": "Çorum FK",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318011",
+      "week": 26,
+      "homeId": "132",
+      "awayId": "51",
+      "home": "Kocaelispor",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318009",
+      "week": 26,
+      "homeId": "4123",
+      "awayId": "3672",
+      "home": "Erzurumspor FK",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318012",
+      "week": 26,
+      "homeId": "3596",
+      "awayId": "3631",
+      "home": "Trabzonspor",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318026",
+      "week": 27,
+      "homeId": "3199",
+      "awayId": "4123",
+      "home": "Çorum FK",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318020",
+      "week": 27,
+      "homeId": "3597",
+      "awayId": "3665",
+      "home": "Samsunspor",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318021",
+      "week": 27,
+      "homeId": "3610",
+      "awayId": "3678",
+      "home": "Eyüpspor",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318019",
+      "week": 27,
+      "homeId": "3590",
+      "awayId": "39",
+      "home": "Beşiktaş",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318023",
+      "week": 27,
+      "homeId": "3604",
+      "awayId": "3600",
+      "home": "Galatasaray",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318022",
+      "week": 27,
+      "homeId": "51",
+      "awayId": "3606",
+      "home": "Alanyaspor",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318018",
+      "week": 27,
+      "homeId": "3672",
+      "awayId": "3596",
+      "home": "Gaziantep FK",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318024",
+      "week": 27,
+      "homeId": "3688",
+      "awayId": "3592",
+      "home": "Göztepe",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318025",
+      "week": 27,
+      "homeId": "3631",
+      "awayId": "132",
+      "home": "Çaykur Rizespor",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318035",
+      "week": 28,
+      "homeId": "3600",
+      "awayId": "3597",
+      "home": "Konyaspor",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318034",
+      "week": 28,
+      "homeId": "3606",
+      "awayId": "3590",
+      "home": "Gençlerbirliği",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318028",
+      "week": 28,
+      "homeId": "132",
+      "awayId": "3610",
+      "home": "Kocaelispor",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318032",
+      "week": 28,
+      "homeId": "3592",
+      "awayId": "3199",
+      "home": "Fenerbahçe",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318033",
+      "week": 28,
+      "homeId": "3678",
+      "awayId": "3604",
+      "home": "Amed SK",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318031",
+      "week": 28,
+      "homeId": "3665",
+      "awayId": "3688",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318029",
+      "week": 28,
+      "homeId": "3596",
+      "awayId": "51",
+      "home": "Trabzonspor",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318027",
+      "week": 28,
+      "homeId": "39",
+      "awayId": "3672",
+      "home": "Kasımpaşa",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318030",
+      "week": 28,
+      "homeId": "4123",
+      "awayId": "3631",
+      "home": "Erzurumspor FK",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318038",
+      "week": 29,
+      "homeId": "3199",
+      "awayId": "3665",
+      "home": "Çorum FK",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318044",
+      "week": 29,
+      "homeId": "3688",
+      "awayId": "4123",
+      "home": "Göztepe",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318039",
+      "week": 29,
+      "homeId": "3631",
+      "awayId": "3678",
+      "home": "Çaykur Rizespor",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318037",
+      "week": 29,
+      "homeId": "51",
+      "awayId": "39",
+      "home": "Alanyaspor",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318042",
+      "week": 29,
+      "homeId": "3597",
+      "awayId": "3604",
+      "home": "Samsunspor",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318041",
+      "week": 29,
+      "homeId": "3590",
+      "awayId": "3600",
+      "home": "Beşiktaş",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318040",
+      "week": 29,
+      "homeId": "3672",
+      "awayId": "3606",
+      "home": "Gaziantep FK",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318036",
+      "week": 29,
+      "homeId": "3610",
+      "awayId": "3596",
+      "home": "Eyüpspor",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318043",
+      "week": 29,
+      "homeId": "3592",
+      "awayId": "132",
+      "home": "Fenerbahçe",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318053",
+      "week": 30,
+      "homeId": "3606",
+      "awayId": "3597",
+      "home": "Gençlerbirliği",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318052",
+      "week": 30,
+      "homeId": "3604",
+      "awayId": "3590",
+      "home": "Galatasaray",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318051",
+      "week": 30,
+      "homeId": "4123",
+      "awayId": "3592",
+      "home": "Erzurumspor FK",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318046",
+      "week": 30,
+      "homeId": "3665",
+      "awayId": "3610",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318047",
+      "week": 30,
+      "homeId": "3600",
+      "awayId": "51",
+      "home": "Konyaspor",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318049",
+      "week": 30,
+      "homeId": "3596",
+      "awayId": "3688",
+      "home": "Trabzonspor",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318045",
+      "week": 30,
+      "homeId": "3678",
+      "awayId": "3672",
+      "home": "Amed SK",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318050",
+      "week": 30,
+      "homeId": "132",
+      "awayId": "3199",
+      "home": "Kocaelispor",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318048",
+      "week": 30,
+      "homeId": "39",
+      "awayId": "3631",
+      "home": "Kasımpaşa",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318056",
+      "week": 31,
+      "homeId": "3592",
+      "awayId": "3665",
+      "home": "Fenerbahçe",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318062",
+      "week": 31,
+      "homeId": "132",
+      "awayId": "4123",
+      "home": "Kocaelispor",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318057",
+      "week": 31,
+      "homeId": "51",
+      "awayId": "3678",
+      "home": "Alanyaspor",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318055",
+      "week": 31,
+      "homeId": "3688",
+      "awayId": "39",
+      "home": "Göztepe",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318058",
+      "week": 31,
+      "homeId": "3610",
+      "awayId": "3606",
+      "home": "Eyüpspor",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318059",
+      "week": 31,
+      "homeId": "3672",
+      "awayId": "3600",
+      "home": "Gaziantep FK",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318060",
+      "week": 31,
+      "homeId": "3631",
+      "awayId": "3604",
+      "home": "Çaykur Rizespor",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318061",
+      "week": 31,
+      "homeId": "3597",
+      "awayId": "3590",
+      "home": "Samsunspor",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318054",
+      "week": 31,
+      "homeId": "3199",
+      "awayId": "3596",
+      "home": "Çorum FK",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318069",
+      "week": 32,
+      "homeId": "3596",
+      "awayId": "3592",
+      "home": "Trabzonspor",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318064",
+      "week": 32,
+      "homeId": "3604",
+      "awayId": "3610",
+      "home": "Galatasaray",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318065",
+      "week": 32,
+      "homeId": "3597",
+      "awayId": "51",
+      "home": "Samsunspor",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318067",
+      "week": 32,
+      "homeId": "3600",
+      "awayId": "3688",
+      "home": "Konyaspor",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318071",
+      "week": 32,
+      "homeId": "39",
+      "awayId": "4123",
+      "home": "Kasımpaşa",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318068",
+      "week": 32,
+      "homeId": "3678",
+      "awayId": "3199",
+      "home": "Amed SK",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318066",
+      "week": 32,
+      "homeId": "3665",
+      "awayId": "3631",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318063",
+      "week": 32,
+      "homeId": "3590",
+      "awayId": "3672",
+      "home": "Beşiktaş",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318070",
+      "week": 32,
+      "homeId": "3606",
+      "awayId": "132",
+      "home": "Gençlerbirliği",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318074",
+      "week": 33,
+      "homeId": "4123",
+      "awayId": "3665",
+      "home": "Erzurumspor FK",
+      "away": "İstanbul Başakşehir FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318075",
+      "week": 33,
+      "homeId": "3688",
+      "awayId": "3678",
+      "home": "Göztepe",
+      "away": "Amed SK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318073",
+      "week": 33,
+      "homeId": "3592",
+      "awayId": "39",
+      "home": "Fenerbahçe",
+      "away": "Kasımpaşa",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318076",
+      "week": 33,
+      "homeId": "3199",
+      "awayId": "3606",
+      "home": "Çorum FK",
+      "away": "Gençlerbirliği",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318078",
+      "week": 33,
+      "homeId": "51",
+      "awayId": "3604",
+      "home": "Alanyaspor",
+      "away": "Galatasaray",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318077",
+      "week": 33,
+      "homeId": "3610",
+      "awayId": "3600",
+      "home": "Eyüpspor",
+      "away": "Konyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318079",
+      "week": 33,
+      "homeId": "3631",
+      "awayId": "3590",
+      "home": "Çaykur Rizespor",
+      "away": "Beşiktaş",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318072",
+      "week": 33,
+      "homeId": "132",
+      "awayId": "3596",
+      "home": "Kocaelispor",
+      "away": "Trabzonspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318080",
+      "week": 33,
+      "homeId": "3672",
+      "awayId": "3597",
+      "home": "Gaziantep FK",
+      "away": "Samsunspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318087",
+      "week": 34,
+      "homeId": "3678",
+      "awayId": "3592",
+      "home": "Amed SK",
+      "away": "Fenerbahçe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318082",
+      "week": 34,
+      "homeId": "3597",
+      "awayId": "3610",
+      "home": "Samsunspor",
+      "away": "Eyüpspor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318085",
+      "week": 34,
+      "homeId": "3590",
+      "awayId": "3688",
+      "home": "Beşiktaş",
+      "away": "Göztepe",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318081",
+      "week": 34,
+      "homeId": "3604",
+      "awayId": "3672",
+      "home": "Galatasaray",
+      "away": "Gaziantep FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318084",
+      "week": 34,
+      "homeId": "3606",
+      "awayId": "3631",
+      "home": "Gençlerbirliği",
+      "away": "Çaykur Rizespor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318086",
+      "week": 34,
+      "homeId": "3600",
+      "awayId": "3199",
+      "home": "Konyaspor",
+      "away": "Çorum FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318089",
+      "week": 34,
+      "homeId": "3596",
+      "awayId": "4123",
+      "home": "Trabzonspor",
+      "away": "Erzurumspor FK",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318088",
+      "week": 34,
+      "homeId": "39",
+      "awayId": "132",
+      "home": "Kasımpaşa",
+      "away": "Kocaelispor",
+      "homeGoals": null,
+      "awayGoals": null
+    },
+    {
+      "id": "318083",
+      "week": 34,
+      "homeId": "3665",
+      "awayId": "51",
+      "home": "İstanbul Başakşehir FK",
+      "away": "Alanyaspor",
+      "homeGoals": null,
+      "awayGoals": null
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 "use client";
+import { validateScoutImport } from "@/lib/scout-import";
 import { shareOrCopy } from "@/lib/share";
 import { formatFantasyPrice } from "@/lib/fantasy-price";
 
@@ -43,83 +44,22 @@ export default function TeamBuilderPage(){useMobileCardGeometry();const{formatio
  function selectBenchPlayer(p:FantasyPlayer){if(!targetSlotId){setActionPlayer(p);return}const state=useTeamStore.getState();const target=state.startingSlots.find(s=>s.id===targetSlotId&&!s.playerId);const source=state.benchSlots.find(s=>s.playerId===String(p.id));if(!target||!source){setTargetSlotId(null);setToast("Hedef veya yedek değişti · boş mevkiyi tekrar seç.");return}if(target.position!==p.position){setToast(`Bu hedef için ${positionName(target.position)} seçmelisin.`);return}if(state.movePlayerToEmptySlot(String(p.id),source.id,target.id)){setTargetSlotId(null);haptic()}}
 
  useEffect(()=>{try{
+  const raw=localStorage.getItem(STORAGE_KEY);
+  if(raw){const s=JSON.parse(raw)as{formation?:Formation;startingIds?:(string|null)[];benchIds?:(string|null)[];captain?:string|null;viceCaptain?:string|null;coachId?:string|null};hydrateTeam(players,s.formation??"4-3-3",s.startingIds??initialLineup,s.benchIds??initialBench);setCaptain(s.captain??null);setViceCaptain(s.viceCaptain??null);if(s.coachId===null)setSelectedCoachId(null);else if(s.coachId&&SUPER_LIG_COACHES_2026_27.some(c=>c.id===s.coachId))setSelectedCoachId(s.coachId)}else hydrateTeam(players,"4-3-3",initialLineup,initialBench);
   const importRaw=localStorage.getItem(SCOUT_IMPORT_KEY);
-  const importRequested=new URLSearchParams(window.location.search).get("scoutImport")==="1";
-  if(importRaw&&importRequested){
-   const imported=JSON.parse(importRaw) as {formation?:Formation;starters?:Array<{name?:string;club?:string;position?:string}>;captain?:string|null;viceCaptain?:string|null};
-   const formation=(imported.formation&&FORMATIONS.includes(imported.formation))?imported.formation:"4-3-3";
-   const desired=FORMATION_POSITIONS[formation];
-   const importedStarters=imported.starters??[];
-   const usedPlayerIds=new Set<string>();
-   const usedSourceIndexes=new Set<number>();
-   const clubCounts=new Map<string,number>();
-   let spend=0;
-   const benchPositions:PlayerPosition[]=["GK","DEF","MID","FWD"];
-   const minBenchCost=benchPositions.reduce((sum,pos)=>{
-    const cheapest=players.filter(p=>p.position===pos).sort((a,b)=>a.price-b.price)[0];
-    return sum+(cheapest?.price??0);
-   },0);
-   const ordered:(string|null)[]=desired.map((position,slotIndex)=>{
-    const scoutPos=position==="FWD"?"FW":position==="MID"?"MF":position;
-    const sourceIndexes=importedStarters.map((s,i)=>({s,i})).filter(x=>!usedSourceIndexes.has(x.i)&&(x.s.position??"")===scoutPos);
-    let chosen:StorePlayer|null=null;
-    let chosenSourceIndex:number|null=null;
-    for(const {s,i} of sourceIndexes){
-      const exact=players.find(p=>!usedPlayerIds.has(p.id)&&p.position===position&&normalizeScoutText(p.name)===normalizeScoutText(s.name??"")&&clubAlias(p.club)===clubAlias(s.club??"")&&(clubCounts.get(p.club)??0)<3);
-      if(exact){chosen=exact;chosenSourceIndex=i;break}
-    }
-    if(!chosen){
-      for(const {s,i} of sourceIndexes){
-        const sameClub=players.filter(p=>!usedPlayerIds.has(p.id)&&p.position===position&&clubAlias(p.club)===clubAlias(s.club??"")&&(clubCounts.get(p.club)??0)<3)
-          .sort((a,b)=>b.points-a.points||a.price-b.price)[0];
-        if(sameClub){chosen=sameClub;chosenSourceIndex=i;break}
-      }
-    }
-    if(!chosen){
-      chosen=players.filter(p=>!usedPlayerIds.has(p.id)&&p.position===position&&(clubCounts.get(p.club)??0)<3)
-        .sort((a,b)=>b.points-a.points||a.price-b.price)[0]??null;
-      chosenSourceIndex=sourceIndexes[0]?.i??null;
-    }
-    if(chosen&&spend+chosen.price>Math.max(0,BUDGET-minBenchCost+2)){
-      const cheaper=players.filter(p=>!usedPlayerIds.has(p.id)&&p.position===position&&(clubCounts.get(p.club)??0)<3&&spend+p.price<=Math.max(0,BUDGET-minBenchCost+2))
-        .sort((a,b)=>b.points-a.points||a.price-b.price)[0]??null;
-      if(cheaper)chosen=cheaper;
-    }
-    if(!chosen)return null;
-    usedPlayerIds.add(chosen.id);
-    if(chosenSourceIndex!==null)usedSourceIndexes.add(chosenSourceIndex);
-    clubCounts.set(chosen.club,(clubCounts.get(chosen.club)??0)+1);
-    spend+=chosen.price;
-    return chosen.id;
-   });
-   const starterIds=ordered.filter((id):id is string=>Boolean(id));
-   const benchIds:(string|null)[]=benchPositions.map(position=>{
-    const choices=players.filter(p=>p.position===position&&!starterIds.includes(p.id)&&!usedPlayerIds.has(p.id)&&(clubCounts.get(p.club)??0)<3&&spend+p.price<=BUDGET+0.0001)
-      .sort((a,b)=>a.price-b.price||b.points-a.points);
-    const pick=choices[0]??null;
-    if(!pick)return null;
-    usedPlayerIds.add(pick.id);
-    clubCounts.set(pick.club,(clubCounts.get(pick.club)??0)+1);
-    spend+=pick.price;
-    return pick.id;
-   });
-   hydrateTeam(players,formation,ordered,benchIds);
-   const findByName=(name:string|null|undefined)=>name?players.find(p=>starterIds.includes(p.id)&&normalizeScoutText(p.name)===normalizeScoutText(name))?.id??null:null;
-   const rankedStarters=starterIds.map(id=>players.find(p=>p.id===id)).filter((p):p is StorePlayer=>Boolean(p)).sort((a,b)=>b.points-a.points||b.price-a.price);
-   const importedCaptain=findByName(imported.captain)??rankedStarters[0]?.id??null;
-   const importedVice=(findByName(imported.viceCaptain)??rankedStarters.find(p=>p.id!==importedCaptain)?.id)??null;
-   setCaptain(importedCaptain);
-   setViceCaptain(importedVice);
-   if(ordered.every(Boolean)&&benchIds.every(Boolean)){
-    persistSquad(localStorage,STORAGE_KEY,{formation,startingIds:ordered,benchIds,captain:importedCaptain,viceCaptain:importedVice,coachId:selectedCoachId});
-   }
-   localStorage.removeItem(SCOUT_IMPORT_KEY);
-   const missing=ordered.filter(id=>!id).length;
-   const benchMissing=benchIds.filter(id=>!id).length;
-   setToast(missing||benchMissing?`Scout önerisi uygulandı · ${missing} ilk 11 slotu veya ${benchMissing} yedek tamamlanamadı.`:`Scout önerisi uygulandı · 11 ilk + 4 yedek · ${spend.toFixed(1)}M kullanıldı.`);
-  }else{
-   const raw=localStorage.getItem(STORAGE_KEY);
-   if(raw){const s=JSON.parse(raw)as{formation?:Formation;startingIds?:(string|null)[];benchIds?:(string|null)[];captain?:string|null;viceCaptain?:string|null;coachId?:string|null};hydrateTeam(players,s.formation??"4-3-3",s.startingIds??initialLineup,s.benchIds??initialBench);setCaptain(s.captain??"gs-victor-osimhen");setViceCaptain(s.viceCaptain??null);if(s.coachId===null)setSelectedCoachId(null);else if(s.coachId&&SUPER_LIG_COACHES_2026_27.some(c=>c.id===s.coachId))setSelectedCoachId(s.coachId)}else hydrateTeam(players,"4-3-3",initialLineup,initialBench)
+  if(importRaw&&new URLSearchParams(window.location.search).get("scoutImport")==="1"){
+   try{
+    const imported=validateScoutImport(JSON.parse(importRaw),players);
+    const prior=raw?JSON.parse(raw):null;
+    const next={...imported,coachId:prior?.coachId??selectedCoachId};
+    // Validate and persist the complete snapshot before changing the visible squad.
+    persistSquad(localStorage,STORAGE_KEY,next);
+    hydrateTeam(players,imported.formation,imported.startingIds,imported.benchIds);
+    setCaptain(imported.captain);setViceCaptain(imported.viceCaptain);
+    localStorage.removeItem(SCOUT_IMPORT_KEY);
+    window.history.replaceState(null,"",window.location.pathname);
+    setToast(`Analiz önerisi aynen aktarıldı · 11 + 4 · ${imported.cost.toFixed(1)}M · kaptanlar korundu.`);
+   }catch(error){setToast(`Aktarım uygulanmadı: ${error instanceof Error?error.message:"Öneri doğrulanamadı."} Mevcut kadron korundu.`);}
   }
  }catch{hydrateTeam(players,"4-3-3",initialLineup,initialBench);setToast("Kayıt okunamadı; başlangıç kadrosu yüklendi.")}finally{setHydrated(true)}},[hydrateTeam]);
  useEffect(()=>{if(!hydrated)return;const starters=new Set(startingSlots.map(s=>s.playerId).filter((id):id is string=>Boolean(id)));if(captain&&!starters.has(captain))setCaptain(null);if(viceCaptain&&(!starters.has(viceCaptain)||viceCaptain===captain))setViceCaptain(null)},[captain,hydrated,startingSlots,viceCaptain]);
