@@ -686,3 +686,8 @@ html.dark .fiq-home .home-rule-captain p{color:var(--ink)}
 @media(max-width:420px){.fiq-home .home-rule-chips-simple>div{gap:5px!important;padding:8px 5px!important}.fiq-home .home-rule-icon{flex-basis:20px!important;width:20px!important;height:20px!important}.fiq-home .home-rule-chips-simple p{font-size:10px!important}.fiq-home .home-rule-chips-simple b{font-size:8px!important}}
 /* Keep the reset action beside the formation, above the pitch. */
 html body .fiq-formation-control{flex-wrap:wrap}html body .fiq-formation-control .fiq-clear-squad-top{min-height:32px;padding:5px 9px;border:1px solid #dcb6ba;border-radius:7px;background:#fff3f3!important;background-image:none!important;color:#a5323d!important;box-shadow:none!important;font-size:10px;font-weight:700;white-space:nowrap}
+/* Keep the squad action in the header, clear of the pitch. */
+html body .fiq-team-page .fiq-formation-control{flex-wrap:nowrap!important;height:auto!important;gap:6px!important}
+html body .fiq-team-page .fiq-formation-control select{width:86px!important;flex:0 0 86px}
+html body .fiq-team-page .fiq-formation-control .fiq-clear-squad-top{height:38px!important;min-height:38px!important;flex-shrink:0}
+@media(max-width:600px){html body .fiq-team-page .fiq-pitch-rails{grid-template-columns:1fr auto!important}html body .fiq-team-page .fiq-squad-title{grid-column:1/-1}html body .fiq-team-page .fiq-formation-control{justify-self:start}html body .fiq-team-page .fiq-league-select{max-width:115px}}
