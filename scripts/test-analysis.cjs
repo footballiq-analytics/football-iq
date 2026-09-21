@@ -60,3 +60,15 @@ const actualPool=['GK','DF','MF','FW'].flatMap(pos=>Array.from({length:6},(_,i)=
 const scores={weeklyScores:{week:1,complete:true,source:'TEST',players:actualPool.map((p,i)=>({id:p.id,points:i%6}))}};
 const historical=R.weeklyBest(actualPool,scores,1,{GK:1,DF:4,MF:3,FW:3});assert.equal(historical.xi.length,11);assert.equal(historical.bench.length,4);assert.equal(historical.xi.filter(p=>p.pos==='GK')[0].actualPoints,5);assert(!R.weeklyBest(actualPool,scores,2,{GK:1}).xi);
 console.log('PASS: kickoff boundary, forecast lock, postponed match, stale/unknown/risky exclusion, workload, real weekly points');
+assert(R.draftAllowed({id:'missing'},null,7));
+assert(!R.draftAllowed({id:'missing',unavailable:true},null,7));
+assert(!R.draftAllowed({id:'missing',doubtful:true},null,7));
+assert(!R.draftAllowed({id:'one'},{players:{one:{startProbability:.5}}},7));
+vm.runInContext("analysisEvidence={players:{}};recommendationMode='verified';players=players.map(norm)",sandbox);
+assert.equal(vm.runInContext('players.filter(p=>!p.excluded).length',sandbox),0);
+vm.runInContext("recommendationMode='draft';players=players.map(norm);squad=generateSquadFor('balanced');chooseStartingXI();",sandbox);
+assert(vm.runInContext('validFullSquad(squad)&&squad.length===15&&squad.every(p=>p.provisional&&!p.safety.eligible)',sandbox));
+assert.equal((html.match(/id="squadBtn"/g)||[]).length,1);
+assert(html.indexOf('id="squadBtn"')>html.indexOf('id="squadSection"'));
+assert(html.indexOf('class="squad-forecasts"')>html.indexOf('id="bench"'));
+console.log('PASS: missing data produces explicitly provisional draft; known risks stay excluded; single squad action and score placement');

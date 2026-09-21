@@ -684,3 +684,5 @@ html.dark .fiq-home .home-rule-captain p{color:var(--ink)}
 .fiq-home .home-rule-chips-simple p{font-size:11px!important;line-height:1.4!important;color:#2e4756!important;font-weight:700!important;white-space:nowrap!important}
 .fiq-home .home-rule-chips-simple b{margin-top:2px!important;font-size:9px!important;font-weight:400!important;color:#6a7f8c!important}
 @media(max-width:420px){.fiq-home .home-rule-chips-simple>div{gap:5px!important;padding:8px 5px!important}.fiq-home .home-rule-icon{flex-basis:20px!important;width:20px!important;height:20px!important}.fiq-home .home-rule-chips-simple p{font-size:10px!important}.fiq-home .home-rule-chips-simple b{font-size:8px!important}}
+/* Keep the reset action beside the formation, above the pitch. */
+html body .fiq-formation-control{flex-wrap:wrap}html body .fiq-formation-control .fiq-clear-squad-top{min-height:32px;padding:5px 9px;border:1px solid #dcb6ba;border-radius:7px;background:#fff3f3!important;background-image:none!important;color:#a5323d!important;box-shadow:none!important;font-size:10px;font-weight:700;white-space:nowrap}

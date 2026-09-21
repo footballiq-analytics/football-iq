@@ -196,7 +196,7 @@ tbody tr:hover{background:#ffffff05}
 
   <section class="quick-strip" aria-label="Hızlı işlemler">
     <button id="fetchBtn" class="quick-action action-refresh"><span class="qa-icon">↻</span><span><b>Veriyi Yenile</b><small>Oyuncu ve fikstür verisi</small></span></button>
-    <button id="squadBtn" class="quick-action action-best"><span class="qa-icon">🏆</span><span><b>En İyi 15</b><small>11 + 4 öneri</small></span></button>
+    
     <button id="weeklyBtn" class="quick-action action-weekly"><span class="qa-icon">★</span><span><b>Haftanın 11’i</b><small>Gerçek puanlar · 11 + 4</small></span></button>
     <button id="healthBtn" class="quick-action action-health"><span class="qa-icon">♥</span><span><b>Kadro Sağlığı</b><small>Sakat · cezalı · risk</small></span></button>
     <button id="radarBtn" class="quick-action action-radar"><span class="qa-icon">◎</span><span><b>Fikstür Radarı</b><small>Fırsatlar ve zorluklar</small></span></button>
@@ -207,34 +207,27 @@ tbody tr:hover{background:#ffffff05}
     <div class="status-meta"><span>Ortak oyuncu havuzu</span><span>18/18 takım</span><span>Son veri: <b id="lastUpdate">—</b></span></div>
   </div>
 
-  <section id="comparePanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">3 Kadro Karşılaştırması</div><div class="panel-sub">Aynı veriyle üç risk profili</div></div><button id="closeCompare" class="icon-btn">×</button></div><div id="compareCards" class="grid lg:grid-cols-3 gap-3"></div><div id="compareOverlap" class="mt-3 text-xs text-slate-400"></div></section>
+  <section id="comparePanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">3 Kadro Karşılaştırması</div><div class="panel-sub">Aynı veriyle üç risk profili</div></div><button id="closeCompare" class="icon-btn close-dialog" aria-label="Pencereyi kapat">×</button></div><div id="compareCards" class="grid lg:grid-cols-3 gap-3"></div><div id="compareOverlap" class="mt-3 text-xs text-slate-400"></div></section>
   <section class="analysis-panel" aria-label="Haftalık analiz">
  <div class="analysis-heading"><div><h1>Haftanı analiz et</h1><p>Rakip, beklenen dakika ve puan katkısına göre 11 + 4 öneri.</p></div><label>Maç haftası <select id="analysisWeek" aria-label="Analiz haftası"></select></label></div>
  <p id="analysisSummary" role="status">Veriler hazırlanıyor…</p>
- <details><summary>Hesapta neler var?</summary><p>Oynama ve 60 dakika ihtimali; dakika başına xG/xA; varsa son 5 maç; rakibin hücum/savunma formu; ev/deplasman; gol yememe; sakatlık, ceza ve varsa rotasyon/dinlenme bilgisi. Penaltı ve korner rolleri açıklanır, xG/xA içine zaten yansıdığı için ikinci kez puan eklenmez.</p><p>Beklenen puan: oynama + mevkiye göre gol + asist + gol yememe + varsa kurtarış − yenilen gol/kart. Az maçlı istatistikler ortalamaya yaklaştırılır. Güncel maç uygunluğu doğrulanmayan, başlama ihtimali %80 altındaki veya risk işareti taşıyan oyuncular önerilmez. Güvenli havuz yetersizse 15 kişilik kadro üretilmez. Bu model henüz geçmiş haftalarda kalibre edilmedi; kesin sonuç veya matematiksel olarak en iyi kadro garantisi vermez.</p><p>15 kişilik öneri: 100M sınırı, kulüp başına en fazla 3, seçilen diziliş ve her mevkiden 1 yedek. Arama ilk 11’i, kaptanın ×2 katkısını ve yedekleri birlikte değerlendirir.</p></details>
- <section class="glossary" aria-label="Veri kısaltmaları"><h2>Veri kısaltmaları</h2><div class="glossary-scroll"><table><thead><tr><th>Kod</th><th>Anlamı</th></tr></thead><tbody>
-<tr><th>xP</th><td>Beklenen fantezi puanı. Tahmindir; kazanılmış puan değildir.</td></tr>
-<tr><th>%35 Baş / Başlama</th><td>İlk 11’de başlama olasılığı %35. Bu seviyedeki oyuncu önerilmez; öneri eşiği en az %80.</td></tr>
-<tr><th>ORT Başlama</th><td>Kadro için ortalama ilk 11’de başlama olasılığı. Oyuncu kartındaki ORT ise orta saha mevkisidir.</td></tr>
-<tr><th>xG90</th><td>90 dakika başına beklenen gol; şutların kalitesinden hesaplanan gol beklentisi.</td></tr>
-<tr><th>xA90</th><td>90 dakika başına beklenen asist; pozisyon hazırlayan pasların asist beklentisi.</td></tr>
-<tr><th>CS%</th><td>Takımın gol yemeden maçı bitirme olasılığı. Oyuncunun puan alması için oynama süresi de önemlidir.</td></tr>
-</tbody></table></div></section>
-<h2>Haftanın maçları ve skor beklentisi</h2><p id="fixtureSource"></p><div id="matchForecasts" class="forecast-grid"></div>
-</section>
-<section id="radarPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Fikstür Radarı</div><div class="panel-sub">Rakip, EV/D, xP ve başlama ihtimali</div></div><button id="closeRadar" class="icon-btn">×</button></div><div id="radarSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div><div class="grid lg:grid-cols-2 gap-2 mt-3"><div class="mini-panel"><div class="mini-title">En avantajlı 8</div><div id="radarBest" class="mini-list"></div></div><div class="mini-panel"><div class="mini-title">Riskli / uzak dur</div><div id="radarRisk" class="mini-list"></div></div></div></section>
-  <section id="healthPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Kadro Sağlığı</div><div class="panel-sub">Veri kalitesi ve risk kontrolü</div></div><button id="closeHealth" class="icon-btn">×</button></div><div id="healthSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div><div id="healthIssues" class="grid lg:grid-cols-2 gap-2 mt-3"></div></section>
-  <section id="weeklyPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Haftanın 11’i</div><div class="panel-sub">Son tamamlanan hafta · gerçek puanlarla 11 + 4</div></div><button id="closeWeekly" class="icon-btn">×</button></div><div id="weeklyHero"></div><div id="weeklyTop5" class="grid lg:grid-cols-4 gap-2 mt-3"></div></section>
-  <section id="transferPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Transfer Önerileri</div><div class="panel-sub">Kurallara uygun ÇIKAR → AL</div></div><button id="closeTransfer" class="icon-btn">×</button></div><div id="transferSummary" class="text-xs text-slate-400"></div><div id="transferCards" class="grid md:grid-cols-2 xl:grid-cols-3 gap-2 mt-3"></div></section>
+ <details><summary>Hesapta neler var?</summary><p>Oynama ve 60 dakika ihtimali; dakika başına xG/xA; varsa son 5 maç; rakibin hücum/savunma formu; ev/deplasman; gol yememe; sakatlık, ceza ve varsa rotasyon/dinlenme bilgisi. Penaltı ve korner rolleri açıklanır, xG/xA içine zaten yansıdığı için ikinci kez puan eklenmez.</p><p>Beklenen puan: oynama + mevkiye göre gol + asist + gol yememe + varsa kurtarış − yenilen gol/kart. Az maçlı istatistikler ortalamaya yaklaştırılır. Güncel maç uygunluğu doğrulanmayan, başlama ihtimali %80 altındaki veya risk işareti taşıyan oyuncular önerilmez. Güvenli havuz yetersizse bilinen riskler dışlanarak doğrulanmamış taslak oluşturulur; taslak güvenli öneri değildir. Bu model henüz geçmiş haftalarda kalibre edilmedi; kesin sonuç veya matematiksel olarak en iyi kadro garantisi vermez.</p><p>15 kişilik öneri: 100M sınırı, kulüp başına en fazla 3, seçilen diziliş ve her mevkiden 1 yedek. Arama ilk 11’i, kaptanın ×2 katkısını ve yedekleri birlikte değerlendirir.</p></details>
+ 
 
-  <div id="playerModal" class="hidden fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm p-3 sm:p-6"><div class="max-w-xl mx-auto mt-8 glass overflow-hidden"><div class="panel-head p-3 border-b border-white/10"><div><div class="panel-sub">FUTBOL IQ</div><div id="playerModalTitle" class="panel-title">Oyuncu Profili</div></div><button id="closePlayerModal" class="icon-btn">×</button></div><div id="playerModalBody" class="p-4"></div></div></div>
+</section>
+<section id="radarPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Fikstür Radarı</div><div class="panel-sub">Rakip, EV/D, xP ve başlama ihtimali</div></div><button id="closeRadar" class="icon-btn close-dialog" aria-label="Pencereyi kapat">×</button></div><div id="radarSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div><div class="grid lg:grid-cols-2 gap-2 mt-3"><div class="mini-panel"><div class="mini-title">En avantajlı 8</div><div id="radarBest" class="mini-list"></div></div><div class="mini-panel"><div class="mini-title">Riskli / uzak dur</div><div id="radarRisk" class="mini-list"></div></div></div></section>
+  <section id="healthPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Kadro Sağlığı</div><div class="panel-sub">Veri kalitesi ve risk kontrolü</div></div><button id="closeHealth" class="icon-btn close-dialog" aria-label="Pencereyi kapat">×</button></div><div id="healthSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div><div id="healthIssues" class="grid lg:grid-cols-2 gap-2 mt-3"></div></section>
+  <section id="weeklyPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Haftanın 11’i</div><div class="panel-sub">Son tamamlanan hafta · gerçek puanlarla 11 + 4</div></div><button id="closeWeekly" class="icon-btn close-dialog" aria-label="Pencereyi kapat">×</button></div><div id="weeklyHero"></div><div id="weeklyTop5" class="grid lg:grid-cols-4 gap-2 mt-3"></div></section>
+  <section id="transferPanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">Transfer Önerileri</div><div class="panel-sub">Kurallara uygun ÇIKAR → AL</div></div><button id="closeTransfer" class="icon-btn close-dialog" aria-label="Pencereyi kapat">×</button></div><div id="transferSummary" class="text-xs text-slate-400"></div><div id="transferCards" class="grid md:grid-cols-2 xl:grid-cols-3 gap-2 mt-3"></div></section>
+
+  <div id="playerModal" class="hidden fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm p-3 sm:p-6"><div class="max-w-xl mx-auto mt-8 glass overflow-hidden"><div class="panel-head p-3 border-b border-white/10"><div><div class="panel-sub">FUTBOL IQ</div><div id="playerModalTitle" class="panel-title">Oyuncu Profili</div></div><button id="closePlayerModal" class="icon-btn close-dialog" aria-label="Pencereyi kapat">×</button></div><div id="playerModalBody" class="p-4"></div></div></div>
 
   <main id="dashboard" class="dashboard">
     <section id="squadSection" class="panel">
       <div class="panel-pad">
         <div class="panel-head">
           <div><div class="panel-title">Kadrom</div><div class="panel-sub">TFF uyumlu 15 kişilik kadro</div></div>
-          <div class="control-row"><select id="strategy"><option value="balanced">Dengeli</option><option value="safe">Güvenli</option><option value="differential">Diferansiyel</option></select><select id="formation"><option value="433">4-3-3</option><option value="442">4-4-2</option><option value="343">3-4-3</option><option value="352">3-5-2</option><option value="532">5-3-2</option></select><button id="exportTeamBtn" class="export-team-btn">15 OYUNCUYU KADRO KUR’A GÖNDER</button></div>
+          <div class="control-row"><button id="squadBtn" class="quick-action action-best"><span class="qa-icon">🏆</span><span><b>En İyi 15</b><small>11 + 4 öneri</small></span></button><select id="strategy"><option value="balanced">Dengeli</option><option value="safe">Güvenli</option><option value="differential">Diferansiyel</option></select><select id="formation"><option value="433">4-3-3</option><option value="442">4-4-2</option><option value="343">3-4-3</option><option value="352">3-5-2</option><option value="532">5-3-2</option></select><button id="exportTeamBtn" class="export-team-btn">15 OYUNCUYU KADRO KUR’A GÖNDER</button></div>
         </div>
         <div class="metric-inline"><div class="metric-pill">Toplam xP <b id="squadXP">0.0</b></div><div class="metric-pill">Tahmini <b id="projectedScore">0.0</b></div><div class="metric-pill">Bütçe <b><span id="budgetUsed">0.0</span>M</b></div></div>
         <div id="pitch" class="pitch mt-2"><div id="emptyPitch" class="absolute inset-0 grid place-items-center text-center p-8"><div><div class="text-4xl mb-2">⚽</div><b>Henüz kadro kurulmadı</b><p class="text-[10px] text-white/60 mt-1">“En İyi 15” ile otomatik kadro oluştur.</p></div></div></div>
@@ -244,7 +237,7 @@ tbody tr:hover{background:#ffffff05}
         <div class="rules"><div id="rule15" class="rule">15 oyuncu</div><div id="rulePos" class="rule">Her mevkiden 1 yedek</div><div id="ruleClub" class="rule">Kulüp max 3</div><div id="ruleBudget" class="rule">≤100M</div></div>
         <div id="whyPanel" class="mini-panel mt-2"><div class="mini-title">Neden bu oyuncu?</div><div id="whyContent" class="text-[9px] text-slate-400 mt-1">Bir oyuncu seç; FUTBOL IQ gerekçelerini göstersin.</div></div>
       </div>
-    </section>
+    <section class="squad-forecasts"><h2>Haftanın maçları ve skor beklentisi</h2><p id="fixtureSource"></p><div id="matchForecasts" class="forecast-grid"></div></section></section>
 
     <section id="playersSection">
       <div class="panel table-panel">
@@ -263,7 +256,14 @@ tbody tr:hover{background:#ffffff05}
     <aside class="panel side-panel">
       <div id="sideProfile" class="side-profile"><div class="side-empty">Oyuncu listesinden bir oyuncu seç. Detayları burada anında göreceksin.</div></div>
     </aside>
-  </main>
+  </main><section class="glossary" aria-label="Veri kısaltmaları"><h2>Veri kısaltmaları</h2><div class="glossary-scroll"><table><thead><tr><th>Kod</th><th>Anlamı</th></tr></thead><tbody>
+<tr><th>xP</th><td>Beklenen fantezi puanı. Tahmindir; kazanılmış puan değildir.</td></tr>
+<tr><th>%35 Baş / Başlama</th><td>İlk 11’de başlama olasılığı %35. Bu seviyedeki oyuncu önerilmez; öneri eşiği en az %80.</td></tr>
+<tr><th>ORT Başlama</th><td>Kadro için ortalama ilk 11’de başlama olasılığı. Oyuncu kartındaki ORT ise orta saha mevkisidir.</td></tr>
+<tr><th>xG90</th><td>90 dakika başına beklenen gol; şutların kalitesinden hesaplanan gol beklentisi.</td></tr>
+<tr><th>xA90</th><td>90 dakika başına beklenen asist; pozisyon hazırlayan pasların asist beklentisi.</td></tr>
+<tr><th>CS%</th><td>Takımın gol yemeden maçı bitirme olasılığı. Oyuncunun puan alması için oynama süresi de önemlidir.</td></tr>
+</tbody></table></div></section>
 
   <button id="embedBtn" class="hidden">Web sitene göm</button>
 </div>
@@ -305,7 +305,7 @@ const WIKI_SQUADS={
 const LS_DATA='fiq_tff_scout_data_v14',LS_TIME='fiq_tff_scout_time_v14';
 let players=[],squad=[],starters=[],bench=[],captain=null,viceCaptain=null;
 let SQUAD_QUOTAS={GK:2,DF:5,MF:4,FW:4};
-let analysisData=null,analysisContext=null,selectedWeek=null,sourceUpdatedAt=null,analysisEvidence=null,weekPolicy=null;
+let analysisData=null,analysisContext=null,selectedWeek=null,sourceUpdatedAt=null,analysisEvidence=null,weekPolicy=null,recommendationMode='verified';
 const FORMATIONS={433:{GK:1,DF:4,MF:3,FW:3},442:{GK:1,DF:4,MF:4,FW:2},343:{GK:1,DF:3,MF:4,FW:3},352:{GK:1,DF:3,MF:5,FW:2},532:{GK:1,DF:5,MF:3,FW:2}};
 const CLUB_LIMIT=3,BUDGET=100;
 const el=id=>document.getElementById(id);
@@ -325,7 +325,7 @@ function calc(p){
  const check=ScoutRules.eligibility(p,analysisEvidence,selectedWeek);
  const e=check.evidence;
  const rated=ScoutEngine.project({...p,baseStartProb:check.eligible?e.startProbability:p.baseStartProb,restDays:check.health.restHours==null?null:check.health.restHours/24},analysisContext);
- rated.safety=check;rated.excluded=rated.excluded||!check.eligible||rated.startProb<.8;return rated;
+ rated.safety=check;rated.provisional=!check.eligible;rated.excluded=rated.excluded||(recommendationMode==='draft'?!ScoutRules.draftAllowed(p,analysisEvidence,selectedWeek):(!check.eligible||rated.startProb<.8));return rated;
 }
 function strategyScore(p,modeOverride){
  const mode=modeOverride||el('strategy')?.value||'balanced';
@@ -692,14 +692,15 @@ function generateSquadFor(mode){
  return list;
 }
 function buildSquad(){
- enforceWeekPolicy();players=players.map(norm);renderMatchForecasts();
+ enforceWeekPolicy();recommendationMode='verified';players=players.map(norm);renderMatchForecasts();
  if(!players.length){setStatus('Önce veri yüklemelisin.','err');return}
  const mode=el('strategy').value;
- const built=generateSquadFor(mode);
+ let built=generateSquadFor(mode);
+ if(!built){recommendationMode='draft';players=players.map(norm);built=generateSquadFor(mode);}
  if(!built){squad=[];starters=[];bench=[];captain=null;viceCaptain=null;renderPitch();renderBench();el('exportTeamBtn').disabled=true;renderAnalysisSummary();setStatus('Güvenli 15 oluşturulamadı. Riskli veya oynama bilgisi doğrulanmamış oyuncularla kadro tamamlanmadı. Kadro Sağlığı ayrıntılarını incele.','err');return}
  squad=built;el('exportTeamBtn').disabled=false;chooseStartingXI();renderPitch();renderBench();updateRuleBadges();
  const label={safe:'Güvenli',balanced:'Dengeli',differential:'Diferansiyel'}[mode]||'Dengeli';
- setStatus(label+' TFF kadrosu kuruldu: 11 ilk + 4 yedek · '+totalCost(squad).toFixed(1)+'M / 100M');
+ setStatus((recommendationMode==='draft'?'DOĞRULANMAMIŞ TASLAK · ':label+' öneri · ')+'Kadro kuruldu: 11 ilk + 4 yedek · '+totalCost(squad).toFixed(1)+'M / 100M');
  hydrateSquadPhotos();renderAnalysisSummary();
 }
 function squadMetrics(list,mode){
@@ -788,7 +789,7 @@ function showWhy(p){
 }
 function profileInitials(p){return esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''))}
 function availabilityLabel(p){
- return p.suspended?'Cezalı':p.unavailable?'Sakat':p.doubtful?'Şüpheli':p.excluded?'Doğrulanmadı / önerilmiyor':'Uygun';
+ return p.suspended?'Cezalı':p.unavailable?'Sakat':p.doubtful?'Şüpheli':p.provisional?'Doğrulanmadı · taslak':p.excluded?'Doğrulanmadı / önerilmiyor':'Uygun';
 }
 function formLabel(p){
  if(p.form4)return'Formda';
@@ -887,11 +888,11 @@ function renderRadar(){
 }
 function renderHealth(){
  players=players.map(norm);
- const safe=players.filter(p=>!p.excluded),unknown=players.filter(p=>!p.safety.evidence);
+ const safe=players.filter(p=>p.safety.eligible),unknown=players.filter(p=>!p.safety.evidence);
  el('healthSummary').innerHTML=[['Güvenli havuz',safe.length],['Önerilmeyen',players.length-safe.length],['Oynama verisi yok',unknown.length],['Öneri haftası',selectedWeek||'—']].map(([k,v])=>'<div class="metric-card"><small>'+k+'</small><b>'+v+'</b></div>').join('');
  el('healthIssues').innerHTML='<p>En az %80 başlama ihtimali ve son 72 saatte doğrulanmış maç uygunluğu gerekir. Yorgunluk için tüm organizasyonlardaki gerçek oyuncu dakikaları kullanılır. Motivasyon, doğrulanmış açıklama olmadan puanlaştırılmaz.</p><div class="health-list">'+players.map(p=>{
  const h=p.safety.health;
- return '<details><summary>'+esc(p.player)+' · '+esc(p.team)+' · '+(p.excluded?'Önerilmiyor':'Uygun')+'</summary><p>'+p.safety.reasons.map(esc).join(' · ')+'</p><p>Dinlenme: '+(h.restHours==null?'Bilinmiyor':Math.round(h.restHours)+' saat')+' · Son 7 gün: '+(h.minutes7==null?'Dakika verisi eksik':h.minutes7+' dk')+' · '+(p.home===true?'Ev':p.home===false?'Deplasman':'Saha bilgisi yok')+' · '+esc(p.opponent)+'</p><p>Yol: '+(h.travelKm==null?'Uzaklık doğrulanmadı':Math.round(h.travelKm)+' km')+' · '+(h.complete?'Tüm organizasyonlar kontrol edildi':'Avrupa/kupa dâhil maç yükü eksik')+'</p><p>'+esc(h.motivation)+'</p></details>';
+ return '<details><summary>'+esc(p.player)+' · '+esc(p.team)+' · '+(p.safety.eligible?'Uygun':'Doğrulanmadı / önerilmiyor')+'</summary><p>'+p.safety.reasons.map(esc).join(' · ')+'</p><p>Dinlenme: '+(h.restHours==null?'Bilinmiyor':Math.round(h.restHours)+' saat')+' · Son 7 gün: '+(h.minutes7==null?'Dakika verisi eksik':h.minutes7+' dk')+' · '+(p.home===true?'Ev':p.home===false?'Deplasman':'Saha bilgisi yok')+' · '+esc(p.opponent)+'</p><p>Yol: '+(h.travelKm==null?'Uzaklık doğrulanmadı':Math.round(h.travelKm)+' km')+' · '+(h.complete?'Tüm organizasyonlar kontrol edildi':'Avrupa/kupa dâhil maç yükü eksik')+'</p><p>'+esc(h.motivation)+'</p></details>';
  }).join('')+'</div>';
  el('healthPanel').classList.remove('hidden');
 }
@@ -1016,7 +1017,7 @@ function teamKit(team){
 function cardHtml(p){
  const badge=p.id===captain?.id?'<span class="badge-c">C</span>':p.id===viceCaptain?.id?'<span class="badge-c2">C2</span>':'';
  const kit=teamKit(p.team),initials=esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''));
- const availability=p.suspended?['CEZALI','bad']:p.unavailable?['SAKAT','bad']:p.doubtful?['ŞÜPHELİ','risk']:['UYGUN','ok'];
+ const availability=p.suspended?['CEZALI','bad']:p.unavailable?['SAKAT','bad']:p.doubtful?['ŞÜPHELİ','risk']:p.provisional?['TASLAK','risk']:['UYGUN','ok'];
  const photo=p.photo?'<img class="fantasy-photo" src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="fantasy-fallback" style="display:none">'+initials+'</div>':'<div class="fantasy-fallback">'+initials+'</div>';
  return '<div class="fantasy-card" style="--kit1:'+kit[0]+';--kit2:'+kit[1]+'">'+photo+'<div class="fantasy-shade"></div><div class="fantasy-top"><span class="fantasy-pos">'+p.pos+'</span><span class="fantasy-badge">'+badge+'</span></div><div class="fantasy-meta"><div class="fantasy-name">'+esc(p.player)+'</div><div class="fantasy-team">'+esc(p.team)+' · '+(p.home===true?'EV':p.home===false?'D':'—')+' '+esc(p.opponent)+'</div><div class="fantasy-stats"><div class="fantasy-stat"><span>xP</span><b>'+p.xp.toFixed(1)+'</b></div><div class="fantasy-stat"><span>Fiyat</span><b>'+p.price.toFixed(1)+'M</b></div><div class="fantasy-stat"><span>Başlama</span><b>%'+Math.round(p.startProb*100)+'</b></div><div class="fantasy-stat"><span>xG+xA</span><b>'+(p.xg90+p.xa90).toFixed(2)+'</b></div></div><div class="fantasy-foot"><span class="'+availability[1]+'">'+availability[0]+'</span><span>CS %'+Math.round(p.cleanSheetProb*100)+'</span></div></div><button data-profile="'+esc(p.id)+'" aria-label="'+esc(p.player)+' oyuncu detayını aç"></button></div>';
 }
@@ -1036,7 +1037,7 @@ function scoutFormationLabel(){return ({433:'4-3-3',442:'4-4-2',343:'3-4-3',352:
 function exportXIToFantasy(){
  enforceWeekPolicy();squad=squad.map(norm);
  if(starters.length!==11||bench.length!==4||!validFullSquad([...starters,...bench])){setStatus('Aktarım için geçerli 11 + 4 kadro oluştur.','err');return}
- const payload={version:2,source:'FUTBOL IQ Scout',createdAt:new Date().toISOString(),formation:scoutFormationLabel(),startingIds:starters.map(p=>p.id),benchIds:bench.map(p=>p.id),captain:captain?.id||null,viceCaptain:viceCaptain?.id||null,week:selectedWeek};
+ const payload={version:2,source:'FUTBOL IQ Scout',provisional:recommendationMode==='draft',createdAt:new Date().toISOString(),formation:scoutFormationLabel(),startingIds:starters.map(p=>p.id),benchIds:bench.map(p=>p.id),captain:captain?.id||null,viceCaptain:viceCaptain?.id||null,week:selectedWeek};
  try{localStorage.setItem(FANTASY_IMPORT_KEY,JSON.stringify(payload));location.href='./team/?scoutImport=1';}
  catch(err){setStatus('Kadro saklanamadı. Tarayıcı depolama iznini kontrol et.','err');}
 }
@@ -1087,11 +1088,12 @@ function enforceWeekPolicy(){
  if(changed){squad=[];starters=[];bench=[];captain=null;viceCaptain=null;analysisContext=ScoutEngine.prepare(analysisData,selectedWeek);players=players.map(norm);renderPitch();renderBench();el('exportTeamBtn').disabled=true;el('analysisWeek').innerHTML='<option>'+(selectedWeek?selectedWeek+'. hafta · otomatik':'Sezon tamamlandı')+'</option>';renderTable();}
 }
 function renderAnalysisSummary(){
- const eligible=players.filter(p=>!p.excluded).length;
- el('analysisSummary').textContent=(selectedWeek?selectedWeek+'. hafta önerisi':'Sezon tamamlandı')+' · '+eligible+' güvenli oyuncu. '+(squad.length?'11 + 4 · '+totalCost(squad).toFixed(1)+'M.':'Oynama bilgisi doğrulanmamış veya riskli oyuncularla kadro tamamlanmaz.')+' İlk maç başladığında öneri haftası otomatik ilerler.';
+ const eligible=players.filter(p=>p.safety?.eligible).length;
+ el('analysisSummary').textContent=(selectedWeek?selectedWeek+'. hafta önerisi':'Sezon tamamlandı')+' · '+eligible+' güvenli oyuncu. '+(squad.length?(recommendationMode==='draft'?'DOĞRULANMAMIŞ TASLAK: oynama ve maç yükü bilgisi eksik. Güvenli öneri değildir. ':'Doğrulanmış öneri · ')+'11 + 4 · '+totalCost(squad).toFixed(1)+'M.':'En İyi 15 ile kadro oluştur. Bilinen riskler dışlanır; eksik veride sonuç taslak olarak işaretlenir.')+' İlk maç başladığında öneri haftası otomatik ilerler.';
 }
-setInterval(()=>{if(analysisData){enforceWeekPolicy();players=players.map(norm);if(squad.some(p=>!ScoutRules.eligibility(p,analysisEvidence,selectedWeek).eligible)){squad=[];starters=[];bench=[];captain=null;viceCaptain=null;renderPitch();renderBench();el('exportTeamBtn').disabled=true;}renderAnalysisSummary();renderMatchForecasts();}},30000);
+setInterval(()=>{if(analysisData){enforceWeekPolicy();players=players.map(norm);if(squad.some(p=>recommendationMode==='draft'?!ScoutRules.draftAllowed(p,analysisEvidence,selectedWeek):!ScoutRules.eligibility(p,analysisEvidence,selectedWeek).eligible)){squad=[];starters=[];bench=[];captain=null;viceCaptain=null;renderPitch();renderBench();el('exportTeamBtn').disabled=true;}renderAnalysisSummary();renderMatchForecasts();}},30000);
 (function init(){fetchData(true);setInterval(()=>fetchData(true),86400000)})();
 </script>
+<script src="./scout-pull-refresh.js"></script>
 </body>
 </html>

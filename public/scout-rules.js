@@ -51,5 +51,11 @@
   }
   return {xi,bench,source:feed.source,week,total:xi.reduce((s,p)=>s+p.actualPoints,0)};
  }
- return {weeks,eligibility,workload,weeklyBest,fresh};
+ function draftAllowed(p,evidence,week,now=Date.now()){
+  const e=evidence?.players?.[p.id];
+  if(p.unavailable||p.suspended||p.doubtful||p.injuryRisk>0)return false;
+  if(e&&(e.riskFlags?.length||e.rotationRisk>0||e.injuryRisk>0||(e.availability&&e.availability!=='available')||(Number.isFinite(e.startProbability)&&e.startProbability<.8)))return false;
+  return !workload(e,now).highRisk;
+ }
+ return {weeks,eligibility,workload,weeklyBest,fresh,draftAllowed};
 });
