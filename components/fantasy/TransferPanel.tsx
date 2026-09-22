@@ -124,7 +124,7 @@ export default function TransferPanel({onClose,coachRequest,target,onClearTarget
 }
 
 function CoachRow({coach,selected,onSelectCoach}:{coach:FantasyCoach;selected:boolean;onSelectCoach:(c:FantasyCoach)=>void}){
- return <div className="fiq-coach-transfer-row"><div><strong>{coach.name}</strong><small>{coach.club} · TD</small></div><button type="button" disabled={selected} aria-label={`${coach.name} ${selected?"seçili":"teknik direktör seç"}`} onClick={()=>onSelectCoach(coach)}>{selected?"Seçili":"Seç"}</button></div>;
+ return <div className="fiq-transfer-row fiq-coach-row" data-selected={selected}><div><div className="fiq-transfer-avatar" aria-hidden="true"><PlayerPortrait name={coach.name} club={coach.club} src={null}/></div><button type="button" className="fiq-transfer-player-info" onClick={()=>onSelectCoach(coach)} aria-label={`${coach.name} teknik direktör olarak seç`}><strong title={coach.name}>{coach.name}</strong><small>{coach.club} · TD</small></button><b className="fiq-transfer-price" title="Teknik direktör bütçeye dahil değildir">—</b><button type="button" className={selected?"fiq-transfer-owned":"fiq-transfer-add"} disabled={selected} aria-label={`${coach.name} ${selected?"seçili":"teknik direktör seç"}`} onClick={()=>onSelectCoach(coach)}>{selected?"Seçili":"+"}</button></div></div>;
 }
 function TransferDraggable({player,selected,assessment,onQuickAdd,onRemovePlayer,onPlayerClick}:{player:FantasyPlayer;selected:boolean;assessment:TransferAssessment;onQuickAdd:(p:FantasyPlayer)=>void;onRemovePlayer:(p:FantasyPlayer)=>void;onPlayerClick?:(p:FantasyPlayer)=>void}){
  const d=useDraggable({id:`transfer:${player.id}`,disabled:selected,data:{sourceSlotId:"transfer",playerId:String(player.id),sourceType:"transfer"}});

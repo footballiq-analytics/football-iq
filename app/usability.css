@@ -22,3 +22,5 @@ html body .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-player-info,html 
 html body .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-avatar{overflow:visible!important;border-radius:9px!important}
 html body .fiq-manual-share{background:#fff!important;color:#253e4d!important;border-color:#c7d7dd!important}
 html body .fiq-manual-share :is(p,textarea){color:#344f5e!important;background:#f4f8fa!important;font-size:14px!important}
+html body .fiq-team-page .fiq-transfer-panel-v28 .fiq-coach-row{cursor:default!important}
+html body .fiq-team-page .fiq-transfer-panel-v28 .fiq-coach-row .fiq-transfer-avatar{cursor:default!important}
