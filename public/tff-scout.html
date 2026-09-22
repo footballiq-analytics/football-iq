@@ -194,7 +194,7 @@ tbody tr:hover{background:#ffffff05}
   </header>
   <div id="mobileMenu" class="mobile-menu"><a href="./">← Web sitesine geri dön</a><a href="#squadSection">Kadrom</a><a href="#playersSection">Oyuncular</a><a href="#insights">Analizler</a></div>
 
-  <section class="quick-strip" aria-label="Hızlı işlemler">
+  <section class="quick-strip" aria-label="Hızlı işlemler"><button id="scoresBtn" class="quick-action" aria-controls="scoresPanel" aria-expanded="false"><span class="qa-icon" aria-hidden="true">▦</span><span><b>Haftanın maçları</b><small>Skor beklentisi</small></span></button>
     <button id="fetchBtn" class="quick-action action-refresh"><span class="qa-icon">↻</span><span><b>Veriyi Yenile</b><small>Oyuncu ve fikstür verisi</small></span></button>
     
     <button id="weeklyBtn" class="quick-action action-weekly"><span class="qa-icon">★</span><span><b>Haftanın 11’i</b><small>Gerçek puanlar · 11 + 4</small></span></button>
@@ -207,7 +207,8 @@ tbody tr:hover{background:#ffffff05}
     <div class="status-meta"><span>Ortak oyuncu havuzu</span><span>18/18 takım</span><span>Son veri: <b id="lastUpdate">—</b></span></div>
   </div>
 
-  <section id="comparePanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">3 Kadro Karşılaştırması</div><div class="panel-sub">Aynı veriyle üç risk profili</div></div><button id="closeCompare" class="icon-btn close-dialog" aria-label="Pencereyi kapat">×</button></div><div id="compareCards" class="grid lg:grid-cols-3 gap-3"></div><div id="compareOverlap" class="mt-3 text-xs text-slate-400"></div></section>
+  <section id="scoresPanel" class="hidden overlay-panel scores-panel" role="dialog" aria-modal="true" aria-labelledby="scoresTitle"><div class="panel-head"><div><h2 id="scoresTitle" class="panel-title">Haftanın maçları</h2><p class="panel-sub">Skor beklentisi · tahminler kesin sonuç değildir</p></div><button id="closeScores" class="icon-btn close-dialog" aria-label="Pencereyi kapat">×</button></div><p id="fixtureSource"></p><div id="matchForecasts" class="forecast-grid"></div></section>
+<section id="comparePanel" class="hidden overlay-panel"><div class="panel-head"><div><div class="panel-title">3 Kadro Karşılaştırması</div><div class="panel-sub">Aynı veriyle üç risk profili</div></div><button id="closeCompare" class="icon-btn close-dialog" aria-label="Pencereyi kapat">×</button></div><div id="compareCards" class="grid lg:grid-cols-3 gap-3"></div><div id="compareOverlap" class="mt-3 text-xs text-slate-400"></div></section>
   <section class="analysis-panel" aria-label="Haftalık analiz">
  <div class="analysis-heading"><div><h1>Haftanı analiz et</h1><p>Rakip, beklenen dakika ve puan katkısına göre 11 + 4 öneri.</p></div><label>Maç haftası <select id="analysisWeek" aria-label="Analiz haftası"></select></label></div>
  <p id="analysisSummary" role="status">Veriler hazırlanıyor…</p>
@@ -237,7 +238,7 @@ tbody tr:hover{background:#ffffff05}
         <div class="rules"><div id="rule15" class="rule">15 oyuncu</div><div id="rulePos" class="rule">Her mevkiden 1 yedek</div><div id="ruleClub" class="rule">Kulüp max 3</div><div id="ruleBudget" class="rule">≤100M</div></div>
         <div id="whyPanel" class="mini-panel mt-2"><div class="mini-title">Neden bu oyuncu?</div><div id="whyContent" class="text-[9px] text-slate-400 mt-1">Bir oyuncu seç; FUTBOL IQ gerekçelerini göstersin.</div></div>
       </div>
-    <section class="squad-forecasts"><h2>Haftanın maçları ve skor beklentisi</h2><p id="fixtureSource"></p><div id="matchForecasts" class="forecast-grid"></div></section></section>
+    </section>
 
     <section id="playersSection">
       <div class="panel table-panel">
@@ -1063,6 +1064,8 @@ document.addEventListener('change',e=>{const t=e.target;if(t.matches('[data-id]'
 el('strategy').addEventListener('change',()=>runAction('Strateji güncelleme',()=>buildSquad()));el('search').addEventListener('input',renderTable);
 el('fetchBtn').onclick=()=>runAction('Veri yenileme',()=>fetchData(true),{needsData:false});el('exportTeamBtn').onclick=()=>runAction('Fantezi kadrosuna aktarım',()=>{if(starters.length!==11)buildSquad();exportXIToFantasy()});
 el('closePlayerModal').onclick=()=>el('playerModal').classList.add('hidden');el('playerModal').addEventListener('click',e=>{if(e.target===el('playerModal'))el('playerModal').classList.add('hidden')});
+el('scoresBtn').onclick=()=>runAction('Haftanın maçları',()=>{renderMatchForecasts();el('scoresPanel').classList.remove('hidden');el('closeScores').focus()});
+el('closeScores').onclick=()=>{el('scoresPanel').classList.add('hidden');el('scoresBtn').focus()};
 el('squadBtn').onclick=()=>runAction('En iyi 15',()=>buildSquad());
 el('weeklyBtn').onclick=()=>runAction('Haftanın 11’i',()=>renderWeekly());
 el('healthBtn').onclick=()=>runAction('Kadro sağlığı',()=>renderHealth());
@@ -1094,6 +1097,6 @@ function renderAnalysisSummary(){
 setInterval(()=>{if(analysisData){enforceWeekPolicy();players=players.map(norm);if(squad.some(p=>recommendationMode==='draft'?!ScoutRules.draftAllowed(p,analysisEvidence,selectedWeek):!ScoutRules.eligibility(p,analysisEvidence,selectedWeek).eligible)){squad=[];starters=[];bench=[];captain=null;viceCaptain=null;renderPitch();renderBench();el('exportTeamBtn').disabled=true;}renderAnalysisSummary();renderMatchForecasts();}},30000);
 (function init(){fetchData(true);setInterval(()=>fetchData(true),86400000)})();
 </script>
-<script src="./scout-pull-refresh.js"></script>
+<script src="./scout-pull-refresh.js"></script><script src="./scout-dialogs.js"></script>
 </body>
 </html>

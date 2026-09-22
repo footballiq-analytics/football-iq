@@ -19,6 +19,7 @@ import "./platform.css";
 import "./home.css";
 import "./experience.css";
 import "./team-v27.css";
+import "./usability.css";
 import PullToRefresh from "@/components/interaction/PullToRefresh";
 import ButtonFeedback from "@/components/interaction/ButtonFeedback";
 import { Footer, Header } from "@/components/site-shell";
@@ -38,3 +39,4 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   const structuredData = { "@context": "https://schema.org", "@type": "WebSite", name: "FUTBOL IQ Fantasy", description: "Web tabanlı fantasy football platformu.", inLanguage: "tr-TR" };
   return <html lang="tr" suppressHydrationWarning><body><ThemeProvider><ButtonFeedback /><Header /><PullToRefresh /><main>{children}</main><Footer /></ThemeProvider><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></body></html>;
 }
+

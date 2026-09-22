@@ -70,5 +70,6 @@ vm.runInContext("recommendationMode='draft';players=players.map(norm);squad=gene
 assert(vm.runInContext('validFullSquad(squad)&&squad.length===15&&squad.every(p=>p.provisional&&!p.safety.eligible)',sandbox));
 assert.equal((html.match(/id="squadBtn"/g)||[]).length,1);
 assert(html.indexOf('id="squadBtn"')>html.indexOf('id="squadSection"'));
-assert(html.indexOf('class="squad-forecasts"')>html.indexOf('id="bench"'));
+assert(html.includes('id="scoresPanel" class="hidden overlay-panel scores-panel"'));
+assert(!html.includes('class="squad-forecasts"'));
 console.log('PASS: missing data produces explicitly provisional draft; known risks stay excluded; single squad action and score placement');

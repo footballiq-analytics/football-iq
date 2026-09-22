@@ -40,6 +40,8 @@ export default function TransferPanel({onClose,coachRequest,target,onClearTarget
  const[debouncedQuery,setDebouncedQuery]=useState("");
  const[selectedClubs,setSelectedClubs]=useState<string[]>([]);
  const[clubMenuOpen,setClubMenuOpen]=useState(false);
+ const clubFilter=useRef<HTMLDivElement>(null);
+ useEffect(()=>{if(!clubMenuOpen)return;const outside=(e:PointerEvent)=>{if(e.target instanceof Node&&!clubFilter.current?.contains(e.target))setClubMenuOpen(false)};const key=(e:KeyboardEvent)=>{if(e.key==="Escape")setClubMenuOpen(false)};document.addEventListener("pointerdown",outside);document.addEventListener("keydown",key);return()=>{document.removeEventListener("pointerdown",outside);document.removeEventListener("keydown",key)}},[clubMenuOpen]);
  const[position,setPosition]=useState<FilterTab>("ALL");
  const[sort,setSort]=useState<SortMode>("PRICE_DESC");
  const[smartOnly,setSmartOnly]=useState(false);
@@ -98,12 +100,12 @@ export default function TransferPanel({onClose,coachRequest,target,onClearTarget
 
  return <aside className="fiq-transfer-panel fiq-transfer-panel-v28">
   <div className="fiq-transfer-controls">
-   <div className="fiq-transfer-heading"><div><h2>{showingCoaches?"Teknik Direktörler":"Transfer Merkezi"}</h2><p>{showingCoaches?"Teknik direktörünü seç.":"Oyuncu seç ve kadrona ekle."}</p></div><button type="button" className="fiq-transfer-close" aria-label="Transfer panelini kapat" onClick={onClose}><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+   <div className="fiq-transfer-heading"><div><h2>{showingCoaches?"Teknik Direktörler":"Transfer Merkezi"}</h2><p>{showingCoaches?"Teknik direktörünü seç.":"Listeyi kaydır · sürüklemek için görsele basılı tut."}</p></div><button type="button" className="fiq-transfer-close" aria-label="Transfer panelini kapat" onClick={onClose}><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
 
    {target?<div className="fiq-transfer-target" role="status"><strong>HEDEF: {target.label}</strong><button type="button" onClick={onClearTarget} aria-label="Hedef seçimini kaldır">×</button></div>:null}
    <div className="fiq-player-search relative mt-2"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg font-black text-[#f3ca40]">⌕</span><input aria-label={showingCoaches?"Teknik direktör ara":"Oyuncu ara"} value={query} onChange={e=>setQuery(e.target.value)} placeholder={showingCoaches?"Teknik direktör ara...":"Oyuncu ara..."} className="h-10 w-full rounded-lg border-2 border-[#f3ca40]/65 bg-[#050a0f] pl-9 pr-9 text-[13px] font-bold text-white outline-none placeholder:text-white/45 focus:border-[#ffe778]"/>{query?<button type="button" onClick={()=>setQuery("")} aria-label="Aramayı temizle" className="absolute right-1.5 top-1/2 h-7 w-7 -translate-y-1/2 rounded-md border border-[#f3ca40]/60 bg-black text-lg font-black text-[#ffe778]">×</button>:null}</div>
    <div className="fiq-transfer-filter-pair">
-   <div className="fiq-club-filter relative">
+   <div ref={clubFilter} className="fiq-club-filter relative">
     <button type="button" aria-expanded={clubMenuOpen} aria-controls="fiq-club-menu" onClick={()=>setClubMenuOpen(v=>!v)} className={`flex h-10 w-full items-center justify-between rounded-lg border-2 bg-black px-3 text-left text-[13px] font-black text-white shadow-[0_6px_16px_rgba(0,0,0,.25)] ${clubMenuOpen?"border-[#ffe778]":"border-[#f3ca40]/70"}`}><span className="truncate">{clubSummary}</span><span className="ml-2 text-[#ffe778]">{clubMenuOpen?"▲":"▼"}</span></button>
     {clubMenuOpen?<div id="fiq-club-menu" className="absolute left-0 right-0 top-[44px] z-[90] max-h-[300px] overflow-y-auto rounded-xl border-2 border-[#f3ca40]/70 bg-[#050a0f] p-2 shadow-[0_22px_48px_rgba(0,0,0,.7)]"><div className="mb-2 flex items-center justify-between"><b className="text-[9px] text-[#ffe778]">TAKIM FİLTRESİ</b><button type="button" onClick={()=>setSelectedClubs([])} className="rounded-md border border-[#f3ca40]/60 bg-black px-2 py-1 text-[8px] font-black text-[#ffe778]">TÜMÜ</button></div>{sortedClubs.map(item=>{const active=selectedClubs.includes(item);const fixture=getClubFixture(item);const clubLimitReached=(selectedClubCounts.get(item)??0)>=3;return <button type="button" key={item} onClick={()=>toggleClub(item)} className={`mb-1 flex w-full items-center justify-between rounded-lg border px-2.5 py-2 text-left text-[11px] font-bold ${active?"border-[#ffe778] bg-[#f3ca40]/10 text-white":"border-white/10 bg-black/60 text-white/75"}`}><span className="fiq-club-label"><span className="fiq-club-name">{item}{clubLimitReached?<span className="fiq-eligibility-badge fiq-club-limit" data-reason="3 OYUNCU SINIRI">3 OYUNCU SINIRI</span>:null}</span><small className="fiq-club-fixture">{fixture?<><b>{fixture.venue}</b> · {fixture.opponent}</>:"Ev/D · Fikstür bekleniyor"}</small></span><span className={active?"text-emerald-300":"text-white/25"}>{active?"✓":"○"} <small className="ml-1 text-[8px]">{clubCounts.get(item)??0}</small></span></button>})}<button type="button" onClick={()=>setClubMenuOpen(false)} className="sticky bottom-0 mt-1 h-9 w-full rounded-lg border-2 border-[#f3ca40]/70 bg-black text-[10px] font-black text-[#ffe778]">TAMAM</button></div>:null}
    </div>
@@ -122,14 +124,14 @@ export default function TransferPanel({onClose,coachRequest,target,onClearTarget
 }
 
 function CoachRow({coach,selected,onSelectCoach}:{coach:FantasyCoach;selected:boolean;onSelectCoach:(c:FantasyCoach)=>void}){
- return <div className="fiq-coach-transfer-row"><div><strong>{coach.name}</strong><small>{coach.club} · TD</small></div><button type="button" disabled={selected} aria-label={`${coach.name} ${selected?"seçili":"teknik direktör seç"}`} onClick={()=>onSelectCoach(coach)}>{selected?"Seçili":"+"}</button></div>;
+ return <div className="fiq-coach-transfer-row"><div><strong>{coach.name}</strong><small>{coach.club} · TD</small></div><button type="button" disabled={selected} aria-label={`${coach.name} ${selected?"seçili":"teknik direktör seç"}`} onClick={()=>onSelectCoach(coach)}>{selected?"Seçili":"Seç"}</button></div>;
 }
 function TransferDraggable({player,selected,assessment,onQuickAdd,onRemovePlayer,onPlayerClick}:{player:FantasyPlayer;selected:boolean;assessment:TransferAssessment;onQuickAdd:(p:FantasyPlayer)=>void;onRemovePlayer:(p:FantasyPlayer)=>void;onPlayerClick?:(p:FantasyPlayer)=>void}){
  const d=useDraggable({id:`transfer:${player.id}`,disabled:selected,data:{sourceSlotId:"transfer",playerId:String(player.id),sourceType:"transfer"}});
  const photo=resolveFantasyMedia(player.photo,player.photoMedia);
- return <div ref={d.setNodeRef} {...d.listeners} data-fiq-dnd="true" data-selected={selected} className={`fiq-transfer-row${d.isDragging?" is-dragging":""}`}>
+ return <div ref={d.setNodeRef} data-fiq-dnd="true" data-selected={selected} className={`fiq-transfer-row${d.isDragging?" is-dragging":""}`}>
   <div>
-   <button type="button" disabled={selected} {...d.attributes} aria-label={`${player.name} oyuncusunu sürükle`} className="fiq-transfer-avatar">
+   <button type="button" disabled={selected} ref={d.setActivatorNodeRef} {...d.listeners} {...d.attributes} title="Basılı tut ve sürükle" aria-label={`${player.name} oyuncusunu sürükle`} className="fiq-transfer-avatar"><span className="fiq-drag-grip" aria-hidden="true">⠿</span>
     <PlayerPortrait key={`${player.id}:${photo??""}`} name={player.name} club={player.club} src={photo}/>
    </button>
    <button type="button" onClick={()=>selected?onRemovePlayer(player):onPlayerClick?.(player)} aria-label={`${player.name} ${selected?"kadrodan çıkar":"oyuncu bilgileri"}`} className="fiq-transfer-player-info">

@@ -1,0 +1,24 @@
+/* Explicit light dialog palette prevents legacy translucent text disappearing. */
+html body .fiq-readable-dialog,html body .fiq-save-notice,html body .fiq-share-dialog{background:#fff!important;background-image:none!important;color:#223647!important;border:1px solid #cad7df!important;box-shadow:0 18px 60px #162c3b30!important;max-height:85dvh;overflow-y:auto}
+html body .fiq-readable-dialog :is(h2,h3,strong,b),html body .fiq-save-notice h2{color:#203746!important}
+html body .fiq-readable-dialog :is(p,small,span),html body .fiq-readable-dialog [class*="text-"],html body .fiq-save-notice p,html body .fiq-share-dialog p{color:#405566!important;opacity:1!important;text-shadow:none!important}
+html body .fiq-readable-dialog :is(p,small),html body .fiq-readable-dialog [class*="text-[9px]"],html body .fiq-readable-dialog [class*="text-[10px]"]{font-size:13px!important;line-height:1.6!important}
+html body .fiq-readable-dialog h3,html body .fiq-save-notice h2{font-size:21px!important;line-height:1.35!important}
+html body .fiq-readable-dialog button,html body .fiq-save-notice button{background:#eaf2f1!important;background-image:none!important;color:#244e46!important;border:1px solid #b9d2ca!important;box-shadow:none!important;min-height:42px;font-size:13px!important}
+html body .fiq-readable-dialog [class*="text-rose-100"]{background:#fff2f2!important;border-color:#ebc9cd!important;color:#812f3b!important;font-size:14px!important;line-height:1.55!important}
+html body .fiq-readable-dialog [class*="bg-white/"]{background:#f2f6f8!important;border-color:#d5dfe6!important}
+html body .fiq-team-page .fiq-coach-summary{display:flex!important;align-items:center;justify-content:space-between;gap:12px;grid-column:1/-1!important;width:100%!important;height:auto!important;min-height:46px!important;padding:10px 14px!important;background:#fff!important;border:1px solid #a9c7bb!important;border-radius:9px!important;color:#284d43!important;font-size:13px!important;box-shadow:none!important}
+html body .fiq-coach-summary strong{padding:5px 10px;border-radius:6px;background:#e8f2ed;color:#245d49;font-size:12px;white-space:nowrap}
+html body .fiq-transfer-row{touch-action:pan-y!important}
+html body .fiq-transfer-avatar{position:relative;touch-action:pan-y!important;cursor:grab}
+.fiq-drag-grip{position:absolute;right:-4px;bottom:-3px;z-index:2;background:#fff;color:#496575;border:1px solid #c6d6de;border-radius:4px;padding:0 2px;font-size:15px;line-height:17px}
+html body .fiq-transfer-player-info{touch-action:pan-y!important}
+html body .fiq-coach-transfer-row button{min-width:58px;color:#255344!important;background:#edf5f0!important}
+html body .fiq-header nav.fiq-desktop-nav a[href],html body .mobile-drawer>a[href],html body .fiq-team-mobile-nav :is(a,button){border-radius:8px!important;transition:background-color 150ms ease,color 150ms ease,box-shadow 150ms ease!important;transform:none!important;scale:1!important;filter:none!important;background-image:none!important;box-shadow:none!important}
+@media(hover:hover){html body .fiq-header nav.fiq-desktop-nav a[href]:hover,html body .mobile-drawer>a[href]:hover{background-color:#e9f1ef!important;color:#25574b!important}}
+html body .fiq-header nav.fiq-desktop-nav a[href]:is(:active,[data-fiq-pressed="true"]),html body .mobile-drawer>a[href]:is(:active,[data-fiq-pressed="true"]),html body .fiq-team-mobile-nav :is(a,button):is(:active,[data-fiq-pressed="true"]){background:#d9e9e3!important;color:#214f42!important;box-shadow:inset 0 1px 3px #244b4320!important;outline:none!important;border-color:transparent!important;transform:none!important;scale:1!important;filter:none!important}
+@media(prefers-reduced-motion:reduce){html body .fiq-header nav.fiq-desktop-nav a[href],html body .mobile-drawer>a[href],html body .fiq-team-mobile-nav :is(a,button){transition:none!important}}
+html body .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-player-info,html body .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-avatar{touch-action:pan-y!important}
+html body .fiq-team-page .fiq-transfer-panel-v28 .fiq-transfer-avatar{overflow:visible!important;border-radius:9px!important}
+html body .fiq-manual-share{background:#fff!important;color:#253e4d!important;border-color:#c7d7dd!important}
+html body .fiq-manual-share :is(p,textarea){color:#344f5e!important;background:#f4f8fa!important;font-size:14px!important}
