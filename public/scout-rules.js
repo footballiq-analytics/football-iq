@@ -31,12 +31,14 @@
   const verified=!!(e?.source&&fresh(e?.verifiedAt,now));
   const kickoff=time(e?.nextKickoff);
   const ms=verified&&Array.isArray(e?.recentAppearances)?e.recentAppearances.filter(m=>m.source&&fresh(m.verifiedAt,now)&&Number.isFinite(time(m.kickoff))&&time(m.kickoff)<kickoff&&Number.isFinite(m.minutes)&&m.minutes>=0&&m.minutes<=130):[];
-  const last=ms.slice().sort((a,b)=>time(b.kickoff)-time(a.kickoff))[0];
+  const unique=ms.filter((m,i,a)=>a.findIndex(x=>(x.fixtureId||x.kickoff)===(m.fixtureId||m.kickoff))===i);
+  const last=unique.slice().sort((a,b)=>time(b.kickoff)-time(a.kickoff))[0];
   const rest=last?(kickoff-time(last.kickoff))/3600000:null;
-  const minutes7=ms.filter(m=>kickoff-time(m.kickoff)<=7*86400000).reduce((s,m)=>s+m.minutes,0);
+  const minutes7=unique.filter(m=>kickoff-time(m.kickoff)<=7*86400000).reduce((s,m)=>s+m.minutes,0);
   const complete=verified&&e?.allCompetitionsComplete===true&&Number.isFinite(kickoff);
   const highRisk=complete&&((rest!==null&&rest<72&&last.minutes>=60)||(Number.isFinite(e?.travelKm)&&e.travelKm>=1500&&rest!==null&&rest<96&&last.minutes>=60)||minutes7>=240);
-  return {restHours:rest,minutes7:complete?minutes7:null,complete,highRisk,travelKm:verified&&Number.isFinite(e?.travelKm)&&e.travelKm>=0?e.travelKm:null,venue:verified&&typeof e?.home==='boolean'?(e.home?'Ev':'Deplasman'):'Bilinmiyor',motivation:verified&&e?.motivationSource&&typeof e?.motivationNote==='string'?e.motivationNote:'Doğrulanmış motivasyon bilgisi yok'};
+  const minutes14=unique.filter(m=>kickoff-time(m.kickoff)<=14*86400000).reduce((s,m)=>s+m.minutes,0);
+  return {minutes14:complete?minutes14:null,restHours:rest,minutes7:complete?minutes7:null,complete,highRisk,travelKm:verified&&Number.isFinite(e?.travelKm)&&e.travelKm>=0?e.travelKm:null,venue:verified&&typeof e?.home==='boolean'?(e.home?'Ev':'Deplasman'):'Bilinmiyor',motivation:verified&&e?.motivationSource&&typeof e?.motivationNote==='string'?e.motivationNote:'Doğrulanmış motivasyon bilgisi yok'};
  }
  function weeklyBest(catalog,evidence,week,formation){
   const feed=evidence?.weeklyScores;

@@ -60,6 +60,13 @@ jobs:
         env:
           GITHUB_ACTIONS: "true"
 
+      - name: Refresh optional verified analysis evidence
+        continue-on-error: true
+        run: python3 scripts/update_analysis_evidence.py
+        env:
+          ANALYSIS_EVIDENCE_URL: ${{ vars.ANALYSIS_EVIDENCE_URL }}
+          ANALYSIS_EVIDENCE_TOKEN: ${{ secrets.ANALYSIS_EVIDENCE_TOKEN }}
+
       - name: Verify analysis model and squad rules
         run: node scripts/test-analysis.cjs
 

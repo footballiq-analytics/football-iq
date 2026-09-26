@@ -73,3 +73,18 @@ assert(html.indexOf('id="squadBtn"')>html.indexOf('id="squadSection"'));
 assert(html.includes('id="scoresPanel" class="hidden overlay-panel scores-panel"'));
 assert(!html.includes('class="squad-forecasts"'));
 console.log('PASS: missing data produces explicitly provisional draft; known risks stay excluded; single squad action and score placement');
+// V12 model: valid finite history only, strict chronological exclusions and normalized distributions.
+const miniature={matches:[{id:'a',week:1,status:'finished',home:'A',away:'B',homeGoals:2,awayGoals:0},{id:'b',week:2,status:'finished',home:'B',away:'A',homeGoals:1,awayGoals:1},{id:'c',week:3,status:'scheduled',home:'A',away:'B',homeGoals:null,awayGoals:null}]};
+const r2=E.rates(miniature,3);assert.equal(r2.historyCount,2);
+const badHistory={matches:[...miniature.matches,{...miniature.matches[0]},{id:'bad',week:1,status:'finished',home:'A',away:'B',homeGoals:NaN,awayGoals:0},{id:'live',week:2,status:'live',home:'A',away:'B',homeGoals:1,awayGoals:0},{id:'late',week:1,status:'finished',home:'A',away:'B',homeGoals:8,awayGoals:0,kickoff:new Date(Date.now()+86400000).toISOString()}]};
+assert.deepEqual(E.rates(badHistory,3),r2);
+const enriched={...miniature,matchStats:{a:{source:'https://example.org/results',availableAt:new Date(Date.now()-86400000).toISOString(),homeXg:.2,awayXg:3}}};
+assert.equal(E.rates(enriched,3).xgCount,1);assert.equal(E.rates(enriched,3,{resultsOnly:true}).xgCount,0);
+enriched.matchStats.a.availableAt=new Date(Date.now()+86400000).toISOString();assert.equal(E.rates(enriched,3).xgCount,0);
+for(const [h,a] of [[.15,.15],[4.5,4.5],[4.5,.15]]){const d=E.distribution(h,a);assert(Math.abs(d.homeWin+d.draw+d.awayWin-1)<1e-10);assert.equal(d.top.length,3);assert(d.top[0].prob>=d.top[1].prob);assert(d.over25>=0&&d.over25<=1);}
+const report=E.backtest(data);assert(report.count>0);assert(report.brier>=0&&report.brier<=2);assert(Number.isFinite(report.logLoss));assert(report.bins.every(b=>b.observed>=0&&b.observed<=1));
+const futureData=structuredClone(data);futureData.matches.push({id:'FUTURE',week:35,status:'finished',home:'A',away:'B',homeGoals:20,awayGoals:0});
+assert.deepEqual(E.backtest(futureData).records.filter(r=>r.week<=34),report.records);
+const dupLoad={...tired,recentAppearances:[...tired.recentAppearances,...tired.recentAppearances]};assert.equal(R.workload(dupLoad,now).minutes7,90);assert.equal(R.workload(dupLoad,now).minutes14,90);
+const verified=E.project({...sample,verifiedStartProbability:.91},ctx);assert.equal(verified.startProb,.91);assert.equal(E.project(verified,ctx).xp,verified.xp);
+console.log('PASS: V12 opponent model, invalid/duplicate/live/future exclusions, xG provenance time, probability tails, retrospective metrics, workload deduplication');
