@@ -1,4 +1,4 @@
-import json, re, sys, time, os, unicodedata, pathlib
+import json, re, sys, time, os, unicodedata, pathlib, math
 from datetime import datetime, timezone
 import requests
 from bs4 import BeautifulSoup
@@ -148,7 +148,7 @@ def fetch_full_rosters():
                 pid=m.get("id")
                 out.append({
                     "id":f"fotmob-{pid or key(team)+'-'+key(name)}",
-                    "fotmobId":pid,
+                    "fotmobId":pid,"fotmobTeamId":tid,
                     "player":name,"team":team,"pos":pos,
                     "shirtNumber":m.get("shirtNumber"),"age":m.get("age"),
                     "photo":f"https://images.fotmob.com/image_resources/playerimages/{pid}.png" if pid else "",
@@ -170,7 +170,7 @@ def fetch_full_rosters():
 
     if len(team_names)<18 or len(out)<350:
         raise RuntimeError(f"Full roster validation failed: {len(out)} players / {len(team_names)} teams")
-    return out,league_url
+    return out,league_url,league
 
 def txt(row,name):
     el=row.select_one(f'[data-stat="{name}"]')
@@ -217,16 +217,62 @@ def fetch_fbref_stats():
         }
     return out,used
 
+def stat_rows(payload,name):
+    blocks=[x for x in payload.get('TopLists',[]) if x.get('StatName')==name]
+    if len(blocks)!=1:raise ValueError('Unexpected statistic response')
+    result={}
+    for row in blocks[0].get('StatList',[]):
+        pid=row.get('ParticiantId');tid=row.get('TeamId')
+        if not isinstance(pid,int) or not isinstance(tid,int):continue
+        key=(str(pid),str(tid))
+        if key in result:raise ValueError('Duplicate player statistic')
+        result[key]=row
+    return result
+
+def combine_stats(payloads):
+    rows={name:stat_rows(payload,name) for name,payload in payloads.items()}
+    def valid(v,lo,hi):return not isinstance(v,bool) and isinstance(v,(float,int)) and math.isfinite(v) and lo<=v<=hi
+    out={}
+    for key,m in rows['mins_played'].items():
+        g=rows['expected_goals'].get(key);a=rows['expected_assists'].get(key)
+        if not g or not a:continue  # Missing ranking row is not a zero.
+        minutes=m.get('MinutesPlayed');games=m.get('MatchesPlayed')
+        if not valid(minutes,1,4000) or not valid(games,1,40):continue
+        if any(r.get('MinutesPlayed')!=minutes or r.get('MatchesPlayed')!=games for r in (g,a)):continue
+        if not valid(g.get('StatValue'),0,100) or not valid(a.get('StatValue'),0,100):continue
+        if not valid(g.get('SubStatValue'),0,100) or not valid(a.get('SubStatValue'),0,100):continue
+        out[key]=dict(mp=games,min=minutes,gls=g['SubStatValue'],ast=a['SubStatValue'],xg=g['StatValue'],xa=a['StatValue'],xg90=g['StatValue']*90/minutes,xa90=a['StatValue']*90/minutes,minutesPerMatch=minutes/games,startProb=max(.25,min(.98,minutes/games/75)),rosterOnly=False)
+    return out
+
+def fetch_fotmob_stats(league):
+    names=('mins_played','expected_goals','expected_assists');payloads={};season_ids=set()
+    try:
+        for name in names:
+            matches=[r for r in league.get('stats',{}).get('players',[]) if r.get('name')==name]
+            if len(matches)!=1:raise ValueError('Missing statistic link')
+            url=matches[0].get('fetchAllUrl','')
+            match=re.fullmatch(r'https://data\.fotmob\.com/stats/71/season/(\d+)/'+name+r'\.json',url)
+            if not match:raise ValueError('Unexpected statistic URL')
+            season_ids.add(match[1]);payloads[name]=get_json(url,retries=2)
+        if len(season_ids)!=1:raise ValueError('Statistic seasons differ')
+        return combine_stats(payloads),'https://www.fotmob.com/leagues/71/stats'
+    except Exception:
+        print('Optional FotMob player statistics unavailable; no missing value inferred.',file=sys.stderr)
+        return {},None
+
 def main():
     previous=load_previous()
-    players,league_url=fetch_full_rosters()
-    stats,fbref_url=fetch_fbref_stats()
+    players,league_url,league=fetch_full_rosters()
+    stats,stats_url=fetch_fotmob_stats(league)
+    stats_by_id=bool(stats)
+    if not stats:stats,stats_url=fetch_fbref_stats()
 
     for p in players:
         k=(key(p["player"]),key(canon_team(p["team"])))
         prev=previous.get(k,{})
-        if k in stats:
-            p.update(stats[k]);p['statsUpdatedAt']=datetime.now(timezone.utc).isoformat();p['statsSourceUrl']=fbref_url
+        sk=(str(p["fotmobId"]),str(p["fotmobTeamId"])) if stats_by_id else k
+        if sk in stats:
+            p.update(stats[sk]);p['statsUpdatedAt']=datetime.now(timezone.utc).isoformat();p['statsSourceUrl']=stats_url
         elif prev.get('rosterOnly') is False:
             # Keep the actual age of retained statistics; refreshing a roster is not refreshing xG.
             for fld in ['mp','min','starts','startRate','minutesPerMatch','gls','ast','xg','xa','xg90','xa90','yellow','red','pk','pkAtt','startProb','rosterOnly','statsUpdatedAt','statsSourceUrl']:
@@ -247,9 +293,9 @@ def main():
     normalize=lambda k:{'istanbulbasaksehirfk':'istanbulbasaksehir','gaziantepfk':'gaziantep','erzurumsporfk':'erzurumspor'}.get(k,k)
     if {normalize(k) for k in expected}!={normalize(k) for k in actual}:raise ValueError('Roster clubs do not match the TFF season')
     out={
-        "source":"FotMob full squads + optional FBref stats",
+        "source":"FotMob squads, listed injuries and sourced player statistics",
         "sourceUrl":league_url,
-        "statsSourceUrl":fbref_url,
+        "statsSourceUrl":stats_url,
         "updatedAt":datetime.now(timezone.utc).isoformat(),
         "season":context['season'],
         "statsUpdatedAt":datetime.now(timezone.utc).isoformat() if stats else None,

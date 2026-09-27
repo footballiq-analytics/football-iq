@@ -1,8 +1,23 @@
 import unittest
+import copy
 from unittest.mock import patch
 import update_tff_scout as scout
 
 class RefreshTests(unittest.TestCase):
+ def test_stat_identity_and_missing_values(self):
+  row={'ParticiantId':10,'TeamId':20,'MinutesPlayed':180,'MatchesPlayed':3,'StatValue':2,'SubStatValue':1}
+  payload={n:{'TopLists':[{'StatName':n,'StatList':[dict(row)]}]} for n in ('mins_played','expected_goals','expected_assists')}
+  self.assertEqual(scout.combine_stats(payload)[('10','20')]['xg90'],1)
+  for field,value in [('TeamId',21),('MinutesPlayed',181),('StatValue',None),('StatValue',float('nan'))]:
+   bad=copy.deepcopy(payload);bad['expected_goals']['TopLists'][0]['StatList'][0][field]=value
+   self.assertEqual(scout.combine_stats(bad),{})
+  missing=copy.deepcopy(payload);missing['expected_assists']['TopLists'][0]['StatList']=[]
+  self.assertEqual(scout.combine_stats(missing),{})
+  zero=copy.deepcopy(payload);zero['expected_assists']['TopLists'][0]['StatList'][0]['StatValue']=0
+  self.assertEqual(scout.combine_stats(zero)[('10','20')]['xa90'],0)
+ def test_duplicate_stat_rejected(self):
+  r={'ParticiantId':1,'TeamId':2}
+  with self.assertRaises(ValueError):scout.stat_rows({'TopLists':[{'StatName':'x','StatList':[r,r]}]},'x')
  def test_table_envelopes(self):
   teams=[{'id':i,'name':f'Team {i}'} for i in range(1,19)]
   for shape in [{'all':teams},{'data':{'table':{'all':teams}}},[{'data':{'table':{'all':teams,'home':teams,'away':teams}}}]]:
