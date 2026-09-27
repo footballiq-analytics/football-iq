@@ -1,4 +1,4 @@
-import json, re, sys, time, os, unicodedata
+import json, re, sys, time, os, unicodedata, pathlib
 from datetime import datetime, timezone
 import requests
 from bs4 import BeautifulSoup
@@ -10,12 +10,12 @@ HEADERS={
  "Referer":"https://www.fotmob.com/",
 }
 FOTMOB_LEAGUE_URLS=[
- "https://www.fotmob.com/api/leagues?id=71&ccode3=TUR",
  "https://www.fotmob.com/api/data/leagues?id=71&ccode3=TUR",
+ "https://www.fotmob.com/api/leagues?id=71&ccode3=TUR",
 ]
 FOTMOB_TEAM_URLS=[
- "https://www.fotmob.com/api/teams?id={id}&tab=squad&type=team",
  "https://www.fotmob.com/api/data/teams?id={id}",
+ "https://www.fotmob.com/api/teams?id={id}&tab=squad&type=team",
 ]
 FBREF_URLS=[
  "https://fbref.com/en/comps/26/stats/Super-Lig-Stats",
@@ -25,7 +25,7 @@ FBREF_URLS=[
 TEAM_CANON={
  "İstanbul Başakşehir":"İstanbul Başakşehir","Istanbul Basaksehir":"İstanbul Başakşehir","Başakşehir":"İstanbul Başakşehir",
  "Çaykur Rizespor":"Çaykur Rizespor","Rizespor":"Çaykur Rizespor",
- "Amedspor":"Amed SK","Amed Sportif Faaliyetler":"Amed SK","Amed SK":"Amed SK",
+ "Amedspor":"Amed SK","Amed Sportif":"Amed SK","Amed Sportif Faaliyetler":"Amed SK","Amed SK":"Amed SK",
  "Erzurumspor FK":"Erzurumspor","Erzurumspor":"Erzurumspor",
  "Çorum FK":"Çorum FK","Corum FK":"Çorum FK",
  "Gaziantep FK":"Gaziantep","Gaziantep":"Gaziantep",
@@ -35,7 +35,7 @@ def canon_team(v):
     return TEAM_CANON.get(str(v or "").strip(),str(v or "").strip())
 
 def key(v):
-    s=unicodedata.normalize("NFKD",str(v or "")).encode("ascii","ignore").decode().lower()
+    s=unicodedata.normalize("NFKD",str(v or "").lower().replace('ı','i')).encode("ascii","ignore").decode()
     return re.sub(r"[^a-z0-9]+","",s)
 
 def n(v):
@@ -50,6 +50,7 @@ def get_json(url,retries=3):
             if r.ok:
                 return r.json()
             err=RuntimeError(f"HTTP {r.status_code}: {url}")
+            if r.status_code in (400,401,403,404):break
         except Exception as e: err=e
         time.sleep(1.2*(i+1))
     raise err or RuntimeError(url)
@@ -78,15 +79,46 @@ def load_previous():
     if not os.path.exists(OUT):return {}
     try:
         d=json.load(open(OUT,encoding="utf-8"))
-        return {(key(p.get("player")),key(canon_team(p.get("team")))):p for p in d.get("players",[])}
+        return {(key(p.get("player")),key(canon_team(p.get("team")))):{**p, "statsUpdatedAt":p.get("statsUpdatedAt",d.get("statsUpdatedAt",d.get("updatedAt")))} for p in d.get("players",[])}
     except:return {}
+
+def league_teams(league):
+    """Support single-table and grouped-table envelopes, never home/away duplicates."""
+    found={}
+    def visit(node):
+        if isinstance(node,list):
+            for item in node:visit(item)
+        elif isinstance(node,dict):
+            if isinstance(node.get('all'),list):
+                for team in node['all']:
+                    if not isinstance(team,dict) or not team.get('id') or not team.get('name'):continue
+                    tid=str(team['id'])
+                    if tid in found and key(found[tid]['name'])!=key(team['name']):raise ValueError('Conflicting team IDs')
+                    found[tid]=team
+            for field in ('data','table','tables'):
+                if field in node:visit(node[field])
+    visit(league.get('table'))
+    return list(found.values())
+
+def squad_sections(data):
+    squad=data.get('squad')
+    if isinstance(squad,dict):squad=squad.get('squad',[])
+    return squad if isinstance(squad,list) else []
+
+def injury_fields(member,team_id,checked_at):
+    # A listed problem is a reason to exclude. No problem listed is NOT proof of fitness.
+    injury=member.get('injury')
+    risk=member.get('injured') is True or (isinstance(injury,dict) and bool(injury))
+    return dict(unavailable=risk,doubtful=False,suspended=False,injuryRisk=1.0 if risk else 0.0,
+                availability='unavailable' if risk else 'unknown',
+                injuryNote='Kaynakta sakatlık / oynayamama kaydı var; kesin dönüş tarihi doğrulanmadı.' if risk else '',
+                injuryUpdatedAt=checked_at,injurySource=f'https://www.fotmob.com/teams/{team_id}/overview')
 
 def fetch_full_rosters():
     league,league_url=first_json(FOTMOB_LEAGUE_URLS)
-    table=league.get("table") or {}
-    teams=table.get("all") or []
-    if not teams and isinstance(table.get("data"),dict):
-        teams=(table["data"].get("table") or {}).get("all") or []
+    teams=league_teams(league)
+    expected_season=json.loads(pathlib.Path("public/data/analysis-context.json").read_text())["season"]
+    if str((league.get("details") or {}).get("selectedSeason", "")).replace("/","-")!=expected_season:raise ValueError("Provider season mismatch")
     if not isinstance(teams,list) or len(teams)<18:
         raise RuntimeError(f"FotMob league table incomplete: {len(teams) if isinstance(teams,list) else 0} teams")
 
@@ -101,8 +133,9 @@ def fetch_full_rosters():
             except Exception:pass
         if not data:
             print(f"WARN no squad: {team}",file=sys.stderr);continue
-        sections=((data.get("squad") or {}).get("squad") or [])
-        if not sections and isinstance(data.get("squad"),list):sections=data["squad"]
+        if str((data.get('details') or {}).get('id'))!=str(tid):raise ValueError('Wrong team response')
+        checked_at=datetime.now(timezone.utc).isoformat()
+        sections=squad_sections(data)
         count_before=len(out)
         for sec in sections:
             if str(sec.get("title","")).lower()=="coach":continue
@@ -130,6 +163,7 @@ def fetch_full_rosters():
                     "penalty":False,"corner":False,"form4":False,
                     "unavailable":False,"doubtful":False,"suspended":False,"injuryRisk":0.0,
                     "startProb":0.25,
+                    **injury_fields(m,tid,checked_at),
                 })
         print(f"{team}: {len(out)-count_before} players")
         time.sleep(0.25)
@@ -160,12 +194,16 @@ def fetch_fbref_stats():
         except Exception:pass
     if not html:return {},None
     soup=BeautifulSoup(html,"lxml")
+    expected_season=json.loads(pathlib.Path("public/data/analysis-context.json").read_text())["season"]
+    heading=" ".join(x.get_text(" ",strip=True) for x in soup.select("title,h1"))
+    if expected_season not in heading.replace("–","-"):return {},used
     table=soup.select_one("table#stats_standard")
     if not table:return {},used
     out={}
     for row in table.select("tbody tr"):
         name=txt(row,"player");team=canon_team(txt(row,"team") or txt(row,"squad"));pos=pos_norm(txt(row,"position"))
         if not name or not team or not pos:continue
+        if not all(txt(row,k) for k in ("games","minutes","xg","xg_assist","xg_per90","xg_assist_per90")):continue
         mp=n(txt(row,"games"));minutes=n(txt(row,"minutes"))
         out[(key(name),key(team))]={
             "mp":mp,"min":minutes,"gls":n(txt(row,"goals")),"ast":n(txt(row,"assists")),
@@ -187,7 +225,12 @@ def main():
     for p in players:
         k=(key(p["player"]),key(canon_team(p["team"])))
         prev=previous.get(k,{})
-        if k in stats:p.update(stats[k])
+        if k in stats:
+            p.update(stats[k]);p['statsUpdatedAt']=datetime.now(timezone.utc).isoformat();p['statsSourceUrl']=fbref_url
+        elif prev.get('rosterOnly') is False:
+            # Keep the actual age of retained statistics; refreshing a roster is not refreshing xG.
+            for fld in ['mp','min','starts','startRate','minutesPerMatch','gls','ast','xg','xa','xg90','xa90','yellow','red','pk','pkAtt','startProb','rosterOnly','statsUpdatedAt','statsSourceUrl']:
+                if fld in prev:p[fld]=prev[fld]
         for fld in ["price","priceVerified","priceSource","ownership","ownershipVerified","ownershipSource","corner","opponent","home"]:
             if fld in prev:p[fld]=prev[fld]
         p["penalty"]=bool(prev.get("penalty",False) or p.get("pkAtt",0)>0)
@@ -197,20 +240,29 @@ def main():
     if len(teams)<18 or len(players)<350:
         raise SystemExit(f"REFUSING TO PUBLISH incomplete data: {len(players)} players / {len(teams)} teams")
 
+    context=json.loads(pathlib.Path('public/data/analysis-context.json').read_text())
+    expected={key(canon_team(m[side])) for m in context['matches'] for side in ('home','away')}
+    actual={key(canon_team(t)) for t in teams}
+    # Alias suffixes are canonicalized before comparison, not guessed player matches.
+    normalize=lambda k:{'istanbulbasaksehirfk':'istanbulbasaksehir','gaziantepfk':'gaziantep','erzurumsporfk':'erzurumspor'}.get(k,k)
+    if {normalize(k) for k in expected}!={normalize(k) for k in actual}:raise ValueError('Roster clubs do not match the TFF season')
     out={
         "source":"FotMob full squads + optional FBref stats",
         "sourceUrl":league_url,
         "statsSourceUrl":fbref_url,
         "updatedAt":datetime.now(timezone.utc).isoformat(),
-        "season":"2026-2027",
+        "season":context['season'],
+        "statsUpdatedAt":datetime.now(timezone.utc).isoformat() if stats else None,
+        "statsCount":len(stats),
         "count":len(players),
         "teamCount":len(teams),
         "teams":teams,
         "players":players,
     }
     os.makedirs(os.path.dirname(OUT),exist_ok=True)
-    with open(OUT,"w",encoding="utf-8") as fh:
+    with open(OUT+'.tmp',"w",encoding="utf-8") as fh:
         json.dump(out,fh,ensure_ascii=False,separators=(",",":"))
+    os.replace(OUT+'.tmp',OUT)
     print(f"OK {len(players)} players / {len(teams)} teams -> {OUT}")
 
 if __name__=="__main__":

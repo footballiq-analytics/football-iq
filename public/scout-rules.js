@@ -59,5 +59,16 @@
   if(e&&(e.riskFlags?.length||e.rotationRisk>0||e.injuryRisk>0||(e.availability&&e.availability!=='available')||(Number.isFinite(e.startProbability)&&e.startProbability<.8)))return false;
   return !workload(e,now).highRisk;
  }
- return {weeks,eligibility,workload,weeklyBest,fresh,draftAllowed};
+ function statsInput(raw,sourceTimestamp,now=Date.now()){
+  const p={...raw},stamp=p.statsUpdatedAt??sourceTimestamp;
+  p.statsCurrent=p.rosterOnly===false&&!!(p.statsSourceUrl||p.statsSource)&&fresh(stamp,now);
+  p.statsUpdatedAt=stamp||null;
+  if(!p.statsCurrent){
+   for(const k of ['mp','min','starts','startRate','minutesPerMatch','gls','ast','xg','xa','xg90','xa90','yellow','red','pk','pkAtt'])p[k]=0;
+   p.rosterOnly=true;p.startProb=.25;p.baseStartProb=.25;p.recent=[];
+   p.penalty=false;p.corner=false;p.form4=false;
+  }
+  return p;
+ }
+ return {weeks,eligibility,workload,weeklyBest,fresh,draftAllowed,statsInput};
 });

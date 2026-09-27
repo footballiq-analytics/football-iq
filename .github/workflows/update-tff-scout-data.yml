@@ -19,6 +19,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install --disable-pip-version-check requests beautifulsoup4 lxml
+      - name: Test source parsing and injury handling
+        run: python scripts/test_scout_refresh.py
       - run: mkdir -p public/data && python scripts/update_tff_scout.py
       - name: Commit refreshed data
         run: |
@@ -31,3 +33,4 @@ jobs:
             git commit -m "Refresh TFF scout data"
             git push
           fi
+

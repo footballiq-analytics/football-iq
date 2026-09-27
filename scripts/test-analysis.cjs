@@ -88,3 +88,17 @@ assert.deepEqual(E.backtest(futureData).records.filter(r=>r.week<=34),report.rec
 const dupLoad={...tired,recentAppearances:[...tired.recentAppearances,...tired.recentAppearances]};assert.equal(R.workload(dupLoad,now).minutes7,90);assert.equal(R.workload(dupLoad,now).minutes14,90);
 const verified=E.project({...sample,verifiedStartProbability:.91},ctx);assert.equal(verified.startProb,.91);assert.equal(E.project(verified,ctx).xp,verified.xp);
 console.log('PASS: V12 opponent model, invalid/duplicate/live/future exclusions, xG provenance time, probability tails, retrospective metrics, workload deduplication');
+
+// Fresh roster data must not rejuvenate stale or unsourced performance statistics.
+{
+ const rules=require('../public/scout-rules.js');
+ const now=Date.parse('2026-09-27T12:00:00Z');
+ const p={rosterOnly:false,min:500,xg90:1.2,statsSourceUrl:'https://example.test/stats',statsUpdatedAt:'2026-09-20T12:00:00Z',unavailable:true};
+ const old=rules.statsInput(p,'2026-09-27T12:00:00Z',now);
+ assert.equal(old.statsCurrent,false);assert.equal(old.xg90,0);assert.equal(old.unavailable,true);assert.equal(p.xg90,1.2);
+ const recent=rules.statsInput({...p,statsUpdatedAt:'2026-09-27T10:00:00Z'},null,now);
+ assert.equal(recent.statsCurrent,true);assert.equal(recent.xg90,1.2);
+ assert.equal(rules.statsInput({...recent,statsSourceUrl:null},null,now).statsCurrent,false);
+ assert.equal(rules.statsInput({...recent,statsUpdatedAt:'2026-09-28T10:00:00Z'},null,now).statsCurrent,false);
+ console.log('PASS: stale/unsourced/future statistics excluded; injury flags retained; source data not mutated');
+}

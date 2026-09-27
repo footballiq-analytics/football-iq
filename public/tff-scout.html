@@ -183,7 +183,7 @@ tbody tr:hover{background:#ffffff05}
       <div>
         <div class="brand-title">FUTBOL <span style="color:var(--gold)">IQ</span></div>
         <div class="brand-sub">Haftalık kadro ve maç analizi</div>
-        <!-- PRO UI V10.4 · IMPORT GUARANTEE --><span class="version-badge">Haftalık analiz · V12</span>
+        <!-- PRO UI V10.4 · IMPORT GUARANTEE --><span class="version-badge">Haftalık analiz · V12.1</span>
       </div>
     </div>
     <nav class="scout-page-nav" aria-label="Site menüsü"><a id="backToFantasy" class="back-home" href="./index.html">← Ana sayfa</a><a class="back-home to-squad" href="./team/">Kadrom →</a></nav>
@@ -212,6 +212,7 @@ tbody tr:hover{background:#ffffff05}
   <section class="analysis-panel" aria-label="Haftalık analiz">
  <div class="analysis-heading"><div><h1>Haftanı analiz et</h1><p>Rakip, beklenen dakika ve puan katkısına göre 11 + 4 öneri.</p></div><label>Maç haftası <select id="analysisWeek" aria-label="Analiz haftası"></select></label></div>
  <p id="analysisSummary" role="status">Veriler hazırlanıyor…</p>
+ <details id="dataQualityDetails"><summary>Veriler ne kadar güncel?</summary><div id="dataQualitySummary">Veri kaynakları kontrol ediliyor…</div></details>
  <details><summary>Hesapta neler var?</summary><p>Oynama ve 60 dakika ihtimali; dakika başına xG/xA; varsa son 5 maç; rakibin hücum/savunma formu; ev/deplasman; gol yememe; sakatlık, ceza ve varsa rotasyon/dinlenme bilgisi. Penaltı ve korner rolleri açıklanır, xG/xA içine zaten yansıdığı için ikinci kez puan eklenmez.</p><p>Beklenen puan: oynama + mevkiye göre gol + asist + gol yememe + varsa kurtarış − yenilen gol/kart. Az maçlı istatistikler ortalamaya yaklaştırılır. Güncel maç uygunluğu doğrulanmayan, başlama ihtimali %80 altındaki veya risk işareti taşıyan oyuncular önerilmez. Güvenli havuz yetersizse bilinen riskler dışlanarak doğrulanmamış taslak oluşturulur; taslak güvenli öneri değildir. Bu model henüz geçmiş haftalarda kalibre edilmedi; kesin sonuç veya matematiksel olarak en iyi kadro garantisi vermez.</p><p>15 kişilik öneri: 100M sınırı, kulüp başına en fazla 3, seçilen diziliş ve her mevkiden 1 yedek. Arama ilk 11’i, kaptanın ×2 katkısını ve yedekleri birlikte değerlendirir.</p></details>
  
 
@@ -324,6 +325,7 @@ const teamCanon=t=>TEAM_CANON[String(t||'').trim()]||String(t||'').trim();
 const TEAM_STRENGTH={'Galatasaray':5,'Fenerbahçe':4.8,'Beşiktaş':4.2,'Trabzonspor':4.2,'İstanbul Başakşehir':3.7,'Göztepe':3.4,'Samsunspor':3.3,'Çaykur Rizespor':3.0,'Kasımpaşa':3.0,'Amed SK':2.9,'Alanyaspor':2.8,'Eyüpspor':2.6,'Gençlerbirliği':2.4,'Erzurumspor':2.3,'Çorum FK':2.3,'Konyaspor':2.8};
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function calc(p){
+ if(p.statsCurrent&&!ScoutRules.fresh(p.statsUpdatedAt,Date.now()))p=ScoutRules.statsInput(p,null);
  const check=ScoutRules.eligibility(p,analysisEvidence,selectedWeek);
  const e=check.evidence;
  const fresh=!!(e?.week===selectedWeek&&e?.source&&ScoutRules.fresh(e.verifiedAt,Date.now()));
@@ -596,14 +598,17 @@ async function fetchData(force=false){
    analysisData.matchStats=analysisEvidence?.matchStats||{};evaluationCache=ScoutEngine.backtest(analysisData);
    analysisContext=ScoutEngine.prepare(analysisData,selectedWeek);
    el('analysisWeek').innerHTML='<option>'+ (selectedWeek?selectedWeek+'. hafta · otomatik':'Sezon tamamlandı')+'</option>';el('analysisWeek').disabled=true;
-   const keyed=new Map(data.players.map(p=>[ScoutEngine.club(p.team)+'|'+ScoutEngine.key(p.player),p]));
-   data.players=catalog.players.map(p=>{const found=keyed.get(ScoutEngine.club(p.club)+'|'+ScoutEngine.key(p.name));return {...(found||{rosterOnly:true}),id:String(p.id),player:p.name,team:p.club,pos:({DEF:'DF',MID:'MF',FWD:'FW'})[p.position]||p.position,price:p.price,priceVerified:true,priceSource:'Kadro Kur oyun fiyatı'};});
+   const keyed=new Map(),ambiguous=new Set();for(const p of data.players){const k=ScoutEngine.club(p.team)+'|'+ScoutEngine.key(p.player);if(keyed.has(k))ambiguous.add(k);else keyed.set(k,p)}for(const k of ambiguous)keyed.delete(k);
+   data.players=catalog.players.map(p=>{const found=keyed.get(ScoutEngine.club(p.club)+'|'+ScoutEngine.key(p.name));return {...(found?ScoutRules.statsInput({...found,statsSourceUrl:found.statsSourceUrl||data.statsSourceUrl},data.updatedAt):{rosterOnly:true,statsCurrent:false}),id:String(p.id),player:p.name,team:p.club,pos:({DEF:'DF',MID:'MF',FWD:'FW'})[p.position]||p.position,price:p.price,priceVerified:true,priceSource:'Kadro Kur oyun fiyatı'};});
 
    const teamCount=data.teamCount||new Set((data.players||[]).map(p=>teamCanon(p.team)).filter(Boolean)).size;
    if(!Array.isArray(data.players)||data.players.length<350||teamCount<18){
      throw new Error('Eksik yayın verisi: '+(data.players?.length||0)+' oyuncu / '+teamCount+' takım');
    }
    players=data.players.map(norm);
+   const verifiedStats=players.filter(p=>p.statsCurrent).length;
+   const dateLabel=x=>Number.isFinite(Date.parse(x))?new Date(x).toLocaleString('tr-TR'):'Doğrulanmadı';
+   el('dataQualitySummary').innerHTML='<p>Oyuncu listesi: '+esc(dateLabel(data.updatedAt))+' · '+(ScoutRules.fresh(data.updatedAt,Date.now())?'Güncel':'72 saatten eski')+'</p><p>Kaynağı ve güncelliği doğrulanmış oyuncu istatistiği: <b>'+verifiedStats+'/'+players.length+'</b>. Diğer oyuncularda eski veya kaynaksız istatistik kullanılmaz; xP mevki ortalamasından taslak olarak hesaplanır.</p><p>Fikstür kontrolü: '+esc(dateLabel(analysisData.updatedAt))+'</p><p>Oynama / maç yükü verisi: '+esc(dateLabel(analysisEvidence?.updatedAt))+' · '+players.filter(p=>p.safety?.eligible).length+' güvenli oyuncu.</p><p>Veriyi Yenile yayımlanan son dosyaları alır; dış kaynağın eksik verisini tamamlamaz.</p>';
    save();renderAll();
    setStatus(players.length+' oyuncu · ortak kadro havuzu · '+selectedWeek+'. hafta hazır.');renderMatchForecasts();renderAnalysisSummary();
  }catch(err){
@@ -614,12 +619,13 @@ async function fetchData(force=false){
 }
 function renderAll(){players=players.map(norm);el('playerCount').textContent=players.length;const tc=new Set(players.map(p=>teamCanon(p.team)).filter(Boolean)).size;el('coverageText').textContent=players.length+' oyuncu · '+tc+'/18 takım';refreshTeams();renderTable();renderDashboardInsights();if(players.length)renderSideProfile(players[0]);if(squad.length)buildSquad()}
 function refreshTeams(){const cur=el('teamFilter').value;const teams=[...new Set(players.map(p=>p.team).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));el('teamFilter').innerHTML='<option value="">Tüm takımlar</option>'+teams.map(t=>'<option>'+esc(t)+'</option>').join('');el('teamFilter').value=teams.includes(cur)?cur:''}
+function statText(p,k){return p.statsCurrent===false?'—':Number(p[k]||0).toFixed(2)}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function renderTable(){
  const pos=el('posFilter').value,team=el('teamFilter').value,avail=el('availabilityFilter').value,q=el('search').value.toLocaleLowerCase('tr'),sort=el('sortBy').value;
  const key={xp:'xp',score:'score',eff:'eff',xg90:'xg90',xa90:'xa90'}[sort]||'xp';
  const arr=players.filter(p=>(!pos||p.pos===pos)&&(!team||p.team===team)&&(!q||p.player.toLocaleLowerCase('tr').includes(q))&&(!avail||(avail==='available'&&!p.excluded&&!p.unavailable&&!p.doubtful&&!p.suspended)||(avail==='doubtful'&&p.doubtful)||(avail==='out'&&(p.unavailable||p.suspended)))).sort((a,b)=>b[key]-a[key]);
- el('playersBody').innerHTML=arr.map((p,i)=>'<tr class="border-t border-white/5 hover:bg-white/[.03]"><td class="p-2 text-slate-500">'+(i+1)+'</td><td class="p-2 font-bold"><div class="flex items-center gap-2"><div class="shrink-0">'+(p.photo?'<img src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.15)" onerror="this.style.display=\'none\'">':'')+'</div><button data-profile="'+esc(p.id)+'" class="text-left hover:text-amber-200">'+esc(p.player)+'</button></div></td><td class="p-2 text-slate-400">'+esc(p.team)+'</td><td class="p-2 text-center">'+esc(p.opponent)+'</td><td class="p-2 text-center">'+(p.home===true?'EV':p.home===false?'D':'—')+'</td><td class="p-2 text-center">'+p.pos+'</td><td class="p-2 text-center">'+p.xg90.toFixed(2)+'</td><td class="p-2 text-center">'+p.xa90.toFixed(2)+'</td><td class="p-2 text-center font-black text-iq">'+p.xp.toFixed(2)+'</td><td class="p-2 text-center">'+Math.round(p.startProb*100)+'%</td><td class="p-2 text-center">'+Math.round(p.cleanSheetProb*100)+'%</td><td class="p-2"><input data-id="'+p.id+'" data-k="price" type="number" min="1" step=".1" value="'+p.price.toFixed(1)+'" class="w-16 rounded border px-1 py-1 text-center"/></td><td class="p-2 text-center">'+(p.ownershipVerified&&p.ownership!=null?'<span class="text-sky-300">%'+p.ownership.toFixed(1)+'</span>':'<span class="text-slate-500">—</span>')+'</td><td class="p-2 text-center">'+(p.priceVerified?'<span class="text-emerald-300">Doğrulandı</span>':'<span class="text-amber-300">Manuel</span>')+'</td><td class="p-2 text-center">'+(p.suspended?'<span class="text-red-300">Cezalı</span>':p.unavailable?'<span class="text-red-300">Sakat</span>':p.doubtful?'<span class="text-amber-300">Şüpheli</span>':'<span>'+esc(availabilityLabel(p))+'</span>')+'</td></tr>').join('');
+ el('playersBody').innerHTML=arr.map((p,i)=>'<tr class="border-t border-white/5 hover:bg-white/[.03]"><td class="p-2 text-slate-500">'+(i+1)+'</td><td class="p-2 font-bold"><div class="flex items-center gap-2"><div class="shrink-0">'+(p.photo?'<img src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.15)" onerror="this.style.display=\'none\'">':'')+'</div><button data-profile="'+esc(p.id)+'" class="text-left hover:text-amber-200">'+esc(p.player)+'</button></div></td><td class="p-2 text-slate-400">'+esc(p.team)+'</td><td class="p-2 text-center">'+esc(p.opponent)+'</td><td class="p-2 text-center">'+(p.home===true?'EV':p.home===false?'D':'—')+'</td><td class="p-2 text-center">'+p.pos+'</td><td class="p-2 text-center">'+statText(p,'xg90')+'</td><td class="p-2 text-center">'+statText(p,'xa90')+'</td><td class="p-2 text-center font-black text-iq">'+p.xp.toFixed(2)+'</td><td class="p-2 text-center">'+Math.round(p.startProb*100)+'%</td><td class="p-2 text-center">'+Math.round(p.cleanSheetProb*100)+'%</td><td class="p-2"><input data-id="'+p.id+'" data-k="price" type="number" min="1" step=".1" value="'+p.price.toFixed(1)+'" class="w-16 rounded border px-1 py-1 text-center"/></td><td class="p-2 text-center">'+(p.ownershipVerified&&p.ownership!=null?'<span class="text-sky-300">%'+p.ownership.toFixed(1)+'</span>':'<span class="text-slate-500">—</span>')+'</td><td class="p-2 text-center">'+(p.priceVerified?'<span class="text-emerald-300">Doğrulandı</span>':'<span class="text-amber-300">Manuel</span>')+'</td><td class="p-2 text-center">'+(p.suspended?'<span class="text-red-300">Cezalı</span>':p.unavailable?'<span class="text-red-300">Sakat</span>':p.doubtful?'<span class="text-amber-300">Şüpheli</span>':'<span>'+esc(availabilityLabel(p))+'</span>')+'</td></tr>').join('');
  renderMobilePlayers(arr);
 }
 function quotas(){return FORMATIONS[el('formation').value]||FORMATIONS[433]}
@@ -783,7 +789,8 @@ function explainPlayer(p){
  if(p.corner)reasons.push('duran top/korner rolü');
  if(p.ownershipVerified&&p.ownership!=null&&p.ownership<=10)reasons.push('diferansiyel: %'+p.ownership.toFixed(1)+' sahiplik');
  if(p.eff>=.8)reasons.push('fiyat/xP verimi yüksek');
- if(p.rosterOnly)reasons.push('kadroda kayıtlı; henüz güçlü maç istatistiği yok');
+ if(p.rosterOnly)reasons.push('güncel ve kaynaklı oyuncu istatistiği yok; mevki ortalamasıyla taslak');
+ if(p.injuryNote)reasons.push(p.injuryNote);
  if(p.home===true)reasons.push('iç saha avantajı');
  if(p.doubtful)reasons.push('risk: şüpheli');
  if(!reasons.length)reasons.push('mevki kotası + bütçe + kulüp limiti içinde en iyi kombinasyon');
@@ -814,8 +821,8 @@ function showPlayerProfile(p){
  '<div><div class="text-sm text-slate-400">'+esc(p.team)+' · '+p.pos+'</div><div class="text-2xl font-extrabold mt-1">'+p.price.toFixed(1)+'M</div><div class="flex flex-wrap gap-1 mt-2"><span class="px-2 py-1 rounded-full border border-white/10 text-[10px]">'+availabilityLabel(p)+'</span><span class="px-2 py-1 rounded-full border border-white/10 text-[10px]">'+formLabel(p)+'</span><span class="px-2 py-1 rounded-full border border-white/10 text-[10px]">'+venue+' · '+esc(p.opponent)+'</span></div></div></div>'+
  '<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">'+
  '<div class="metric-card"><small>xP</small><b>'+p.xp.toFixed(2)+'</b></div>'+
- '<div class="metric-card"><small>xG90</small><b>'+p.xg90.toFixed(2)+'</b></div>'+
- '<div class="metric-card"><small>xA90</small><b>'+p.xa90.toFixed(2)+'</b></div>'+
+ '<div class="metric-card"><small>xG90</small><b>'+statText(p,'xg90')+'</b></div>'+
+ '<div class="metric-card"><small>xA90</small><b>'+statText(p,'xa90')+'</b></div>'+
  '<div class="metric-card"><small>Başlama</small><b>%'+Math.round(p.startProb*100)+'</b></div>'+
  '<div class="metric-card"><small>CS ihtimali</small><b>%'+Math.round(p.cleanSheetProb*100)+'</b></div>'+
  '<div class="metric-card"><small>Sahiplik</small><b>'+own+'</b></div>'+
@@ -835,7 +842,7 @@ function renderSideProfile(p){
  const face=p.photo?'<img class="side-avatar" src="'+esc(p.photo)+'" alt="" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="side-avatar-fallback" style="display:none">'+initials+'</div>':'<div class="side-avatar-fallback">'+initials+'</div>';
  const reasons=explainPlayer(p);
  el('sideProfile').innerHTML='<div class="side-profile-head">'+face+'<div><div class="side-name">'+esc(p.player)+'</div><div class="side-team">'+esc(p.team)+' · '+p.pos+'</div><div class="side-tags"><span class="tag">'+availabilityLabel(p)+'</span><span class="tag">'+(p.home===true?'EV':p.home===false?'D':'—')+' · '+esc(p.opponent)+'</span></div></div></div>'+
- '<div class="side-metrics"><div class="side-metric"><small>Fiyat</small><b>'+p.price.toFixed(1)+'M</b></div><div class="side-metric"><small>xP</small><b>'+p.xp.toFixed(2)+'</b></div><div class="side-metric"><small>xG90</small><b>'+p.xg90.toFixed(2)+'</b></div><div class="side-metric"><small>xA90</small><b>'+p.xa90.toFixed(2)+'</b></div><div class="side-metric"><small>Başlama</small><b>%'+Math.round(p.startProb*100)+'</b></div><div class="side-metric"><small>CS</small><b>%'+Math.round(p.cleanSheetProb*100)+'</b></div><div class="side-metric"><small>Sahiplik</small><b>'+own+'</b></div><div class="side-metric"><small>Dakika</small><b>'+Math.round(p.min)+'</b></div></div>'+
+ '<div class="side-metrics"><div class="side-metric"><small>Fiyat</small><b>'+p.price.toFixed(1)+'M</b></div><div class="side-metric"><small>xP</small><b>'+p.xp.toFixed(2)+'</b></div><div class="side-metric"><small>xG90</small><b>'+statText(p,'xg90')+'</b></div><div class="side-metric"><small>xA90</small><b>'+statText(p,'xa90')+'</b></div><div class="side-metric"><small>Başlama</small><b>%'+Math.round(p.startProb*100)+'</b></div><div class="side-metric"><small>CS</small><b>%'+Math.round(p.cleanSheetProb*100)+'</b></div><div class="side-metric"><small>Sahiplik</small><b>'+own+'</b></div><div class="side-metric"><small>Dakika</small><b>'+Math.round(p.min)+'</b></div></div>'+
  '<div class="ai-box"><b>FUTBOL IQ yorumu</b><p>'+reasons.map(esc).join(' · ')+'</p></div>'+
  '<div class="side-actions"><button data-detail="'+esc(p.id)+'">Detaylı analiz</button></div>';
 }
@@ -1024,7 +1031,7 @@ function cardHtml(p){
  const kit=teamKit(p.team),initials=esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''));
  const availability=p.suspended?['CEZALI','bad']:p.unavailable?['SAKAT','bad']:p.doubtful?['ŞÜPHELİ','risk']:p.provisional?['TASLAK','risk']:['UYGUN','ok'];
  const photo=p.photo?'<img class="fantasy-photo" src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="fantasy-fallback" style="display:none">'+initials+'</div>':'<div class="fantasy-fallback">'+initials+'</div>';
- return '<div class="fantasy-card" style="--kit1:'+kit[0]+';--kit2:'+kit[1]+'">'+photo+'<div class="fantasy-shade"></div><div class="fantasy-top"><span class="fantasy-pos">'+p.pos+'</span><span class="fantasy-badge">'+badge+'</span></div><div class="fantasy-meta"><div class="fantasy-name">'+esc(p.player)+'</div><div class="fantasy-team">'+esc(p.team)+' · '+(p.home===true?'EV':p.home===false?'D':'—')+' '+esc(p.opponent)+'</div><div class="fantasy-stats"><div class="fantasy-stat"><span>xP</span><b>'+p.xp.toFixed(1)+'</b></div><div class="fantasy-stat"><span>Fiyat</span><b>'+p.price.toFixed(1)+'M</b></div><div class="fantasy-stat"><span>Başlama</span><b>%'+Math.round(p.startProb*100)+'</b></div><div class="fantasy-stat"><span>xG+xA</span><b>'+(p.xg90+p.xa90).toFixed(2)+'</b></div></div><div class="fantasy-foot"><span class="'+availability[1]+'">'+availability[0]+'</span><span>CS %'+Math.round(p.cleanSheetProb*100)+'</span></div></div><button data-profile="'+esc(p.id)+'" aria-label="'+esc(p.player)+' oyuncu detayını aç"></button></div>';
+ return '<div class="fantasy-card" style="--kit1:'+kit[0]+';--kit2:'+kit[1]+'">'+photo+'<div class="fantasy-shade"></div><div class="fantasy-top"><span class="fantasy-pos">'+p.pos+'</span><span class="fantasy-badge">'+badge+'</span></div><div class="fantasy-meta"><div class="fantasy-name">'+esc(p.player)+'</div><div class="fantasy-team">'+esc(p.team)+' · '+(p.home===true?'EV':p.home===false?'D':'—')+' '+esc(p.opponent)+'</div><div class="fantasy-stats"><div class="fantasy-stat"><span>xP</span><b>'+p.xp.toFixed(1)+'</b></div><div class="fantasy-stat"><span>Fiyat</span><b>'+p.price.toFixed(1)+'M</b></div><div class="fantasy-stat"><span>Başlama</span><b>%'+Math.round(p.startProb*100)+'</b></div><div class="fantasy-stat"><span>xG+xA</span><b>'+(p.statsCurrent===false?'—':(p.xg90+p.xa90).toFixed(2))+'</b></div></div><div class="fantasy-foot"><span class="'+availability[1]+'">'+availability[0]+'</span><span>CS %'+Math.round(p.cleanSheetProb*100)+'</span></div></div><button data-profile="'+esc(p.id)+'" aria-label="'+esc(p.player)+' oyuncu detayını aç"></button></div>';
 }
 function renderPitch(){
  const pitch=el('pitch');[...pitch.querySelectorAll('.player-card')].forEach(n=>n.remove());el('emptyPitch').classList.toggle('hidden',starters.length>0);
