@@ -46,4 +46,23 @@ class RefreshTests(unittest.TestCase):
    get.return_value.ok=False;get.return_value.status_code=404
    with self.assertRaises(RuntimeError):scout.get_json('https://example.test')
    self.assertEqual(get.call_count,1);sleep.assert_not_called()
+class TeamContextTests(unittest.TestCase):
+ def fixture(self,mid=1,**status):
+  return {'id':mid,'home':{'id':20,'name':'A'},'away':{'id':21,'name':'B'},'tournament':{'name':'Cup'},'status':{'utcTime':'2026-09-28T12:00:00Z','finished':True,**status}}
+ def context(self,rows,lineup=None):
+  return scout.extract_team_context({'fixtures':{'allFixtures':{'fixtures':rows}},'overview':{'lastMatch':{'id':1},'lastLineupStats':lineup}},20,'2026-09-30T12:00:00Z')
+ def test_calendar_filters(self):
+  other=self.fixture(8);other['home']['id']=99
+  rows=[self.fixture(),self.fixture(),self.fixture(2,cancelled=True),self.fixture(3,awarded=True),self.fixture(4,utcTime='bad'),self.fixture(5,utcTime='2026-10-01T12:00:00Z'),self.fixture(6,utcTime='2026-08-01T12:00:00Z'),other,self.fixture(9,finished=False,utcTime='2026-10-01T12:00:00Z')]
+  result=self.context(rows)
+  self.assertEqual([r['id'] for r in result['fixtures']],['1','9'])
+  self.assertEqual(result['coverage'],'club-calendar-only')
+  self.assertIsNone(result['lastLineup'])
+ def test_historical_lineup_identity(self):
+  lineup={'id':20,'lastMatch':{'matchId':1},'starters':[{'id':i} for i in range(11)],'subs':[{'id':11}]}
+  self.assertEqual(len(self.context([self.fixture()],lineup)['lastLineup']['starters']),11)
+  for field,value in [('id',21),('lastMatch',{'matchId':2}),('subs',[{'id':1}]),('starters',[{'id':1}])]:
+   bad=copy.deepcopy(lineup);bad[field]=value
+   self.assertIsNone(self.context([self.fixture()],bad)['lastLineup'])
+  self.assertIsNone(self.context([self.fixture(finished=False)],lineup)['lastLineup'])
 if __name__=='__main__':unittest.main()

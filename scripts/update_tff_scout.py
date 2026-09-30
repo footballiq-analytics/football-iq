@@ -2,6 +2,7 @@ import json, re, sys, time, os, unicodedata, pathlib, math
 from datetime import datetime, timezone
 import requests
 from bs4 import BeautifulSoup
+from team_match_context import extract_team_context
 
 OUT="public/data/tff-scout.json"
 HEADERS={
@@ -122,7 +123,7 @@ def fetch_full_rosters():
     if not isinstance(teams,list) or len(teams)<18:
         raise RuntimeError(f"FotMob league table incomplete: {len(teams) if isinstance(teams,list) else 0} teams")
 
-    out=[];seen=set();team_names=set()
+    out=[];seen=set();team_names=set();team_context={}
     for t in teams:
         tid=t.get("id"); team=canon_team(t.get("name") or t.get("shortName") or "")
         if not tid or not team:continue
@@ -135,6 +136,7 @@ def fetch_full_rosters():
             print(f"WARN no squad: {team}",file=sys.stderr);continue
         if str((data.get('details') or {}).get('id'))!=str(tid):raise ValueError('Wrong team response')
         checked_at=datetime.now(timezone.utc).isoformat()
+        team_context[team]=extract_team_context(data,tid,checked_at)
         sections=squad_sections(data)
         count_before=len(out)
         for sec in sections:
@@ -170,7 +172,7 @@ def fetch_full_rosters():
 
     if len(team_names)<18 or len(out)<350:
         raise RuntimeError(f"Full roster validation failed: {len(out)} players / {len(team_names)} teams")
-    return out,league_url,league
+    return out,league_url,league,team_context
 
 def txt(row,name):
     el=row.select_one(f'[data-stat="{name}"]')
@@ -262,7 +264,7 @@ def fetch_fotmob_stats(league):
 
 def main():
     previous=load_previous()
-    players,league_url,league=fetch_full_rosters()
+    players,league_url,league,team_context=fetch_full_rosters()
     stats,stats_url=fetch_fotmob_stats(league)
     stats_by_id=bool(stats)
     if not stats:stats,stats_url=fetch_fbref_stats()
@@ -303,6 +305,7 @@ def main():
         "count":len(players),
         "teamCount":len(teams),
         "teams":teams,
+        "teamContext":team_context,
         "players":players,
     }
     os.makedirs(os.path.dirname(OUT),exist_ok=True)

@@ -9,6 +9,7 @@ on:
     paths:
       - scripts/update_tff_scout.py
       - scripts/test_scout_refresh.py
+      - scripts/team_match_context.py
       - .github/workflows/update-tff-scout-data.yml
 
 permissions:

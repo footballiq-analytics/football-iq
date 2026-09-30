@@ -70,5 +70,14 @@
   }
   return p;
  }
- return {weeks,eligibility,workload,weeklyBest,fresh,draftAllowed,statsInput};
+ function teamWorkload(schedule,nextKickoff,now=Date.now()){
+  const end=time(nextKickoff);
+  if(!schedule?.source||!fresh(schedule.checkedAt,now)||!Number.isFinite(end)||end<=now)return null;
+  const seen=new Set(),rows=(schedule.fixtures||[]).filter(m=>{const t=time(m.kickoff);if(!m.id||seen.has(m.id)||!Number.isFinite(t)||t>=end||end-t>14*86400000)return false;seen.add(m.id);return true;});
+  const played=rows.filter(m=>m.finished===true&&time(m.kickoff)<=now).sort((a,b)=>time(b.kickoff)-time(a.kickoff));
+  const planned=rows.filter(m=>m.finished!==true&&time(m.kickoff)>now);
+  const latest=played[0];
+  return {played14:played.length,played7:played.filter(m=>end-time(m.kickoff)<=7*86400000).length,planned:planned.length,kickoffGapHours:latest?(end-time(latest.kickoff))/3600000:null,fixtures:played,coverage:'club-calendar-only'};
+ }
+ return {weeks,eligibility,workload,weeklyBest,fresh,draftAllowed,statsInput,teamWorkload};
 });

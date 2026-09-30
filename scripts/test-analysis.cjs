@@ -102,3 +102,22 @@ console.log('PASS: V12 opponent model, invalid/duplicate/live/future exclusions,
  assert.equal(rules.statsInput({...recent,statsUpdatedAt:'2026-09-28T10:00:00Z'},null,now).statsCurrent,false);
  console.log('PASS: stale/unsourced/future statistics excluded; injury flags retained; source data not mutated');
 }
+
+{
+ const now=Date.parse('2026-09-30T12:00:00Z'),target='2026-10-02T12:00:00Z';
+ const schedule={source:'test',checkedAt:'2026-09-30T12:00:00Z',fixtures:[
+  {id:'1',kickoff:'2026-09-28T12:00:00Z',finished:true},
+  {id:'1',kickoff:'2026-09-28T12:00:00Z',finished:true},
+  {id:'2',kickoff:'2026-09-20T12:00:00Z',finished:true},
+  {id:'3',kickoff:'2026-10-01T12:00:00Z',finished:false},
+  {id:'4',kickoff:target,finished:false},
+  {id:'5',kickoff:'2026-09-30T10:00:00Z',finished:false}
+ ]};
+ const w=R.teamWorkload(schedule,target,now);
+ assert.equal(w.played7,1);assert.equal(w.played14,2);assert.equal(w.planned,1);assert.equal(w.kickoffGapHours,96);
+ assert.equal(w.coverage,'club-calendar-only');
+ for(const change of [{source:null},{checkedAt:'2026-09-20T12:00:00Z'},{checkedAt:'2026-10-01T12:00:00Z'}])assert.equal(R.teamWorkload({...schedule,...change},target,now),null);
+ assert.equal(R.teamWorkload(schedule,null,now),null);
+ assert.equal(R.teamWorkload({...schedule,fixtures:[]},target,now).kickoffGapHours,null);
+ console.log('PASS: club calendar windows, deduplication, future/planned separation and missing-data handling');
+}
