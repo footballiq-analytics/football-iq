@@ -184,7 +184,7 @@ tbody tr:hover{background:#ffffff05}
       <div>
         <div class="brand-title">FUTBOL <span style="color:var(--gold)">IQ</span></div>
         <div class="brand-sub">Haftalık kadro ve maç analizi</div>
-        <!-- PRO UI V10.4 · IMPORT GUARANTEE --><span class="version-badge">Haftalık analiz · V12.3</span>
+        <!-- PRO UI V10.4 · IMPORT GUARANTEE --><span class="version-badge">Haftalık analiz · V12.4</span>
       </div>
     </div>
     <nav class="scout-page-nav" aria-label="Site menüsü"><a id="backToFantasy" class="back-home" href="./index.html">← Ana sayfa</a><a class="back-home to-squad" href="./team/">Kadrom →</a></nav>
@@ -308,7 +308,7 @@ const WIKI_SQUADS={
 const LS_DATA='fiq_tff_scout_data_v14',LS_TIME='fiq_tff_scout_time_v14';
 let players=[],squad=[],starters=[],bench=[],captain=null,viceCaptain=null;
 let SQUAD_QUOTAS={GK:2,DF:5,MF:4,FW:4};
-let teamSchedules={};
+let teamSchedules={},matchEnrichment=null;
 let analysisData=null,analysisContext=null,selectedWeek=null,sourceUpdatedAt=null,analysisEvidence=null,weekPolicy=null,recommendationMode='verified';
 let evaluationCache=null;
 const FORMATIONS={433:{GK:1,DF:4,MF:3,FW:3},442:{GK:1,DF:4,MF:4,FW:2},343:{GK:1,DF:3,MF:4,FW:3},352:{GK:1,DF:3,MF:5,FW:2},532:{GK:1,DF:5,MF:3,FW:2}};
@@ -593,10 +593,17 @@ async function fetchData(force=false){
    if(!local.ok)throw new Error('Yerel tam kadro dosyası HTTP '+local.status);
    const data=await local.json();
    teamSchedules=Object.fromEntries(Object.entries(data.teamContext||{}).map(([team,value])=>[ScoutEngine.club(team),value]));
-   const [catalogResponse,contextResponse,evidenceResponse]=await Promise.all([fetch('./analysis-catalog.json'),fetch('./data/analysis-context.json?v='+Date.now(),{cache:'no-store'}),fetch('./data/analysis-evidence.json?v='+Date.now(),{cache:'no-store'})]);
+   const [catalogResponse,contextResponse,evidenceResponse,enrichmentResponse]=await Promise.all([fetch('./analysis-catalog.json'),fetch('./data/analysis-context.json?v='+Date.now(),{cache:'no-store'}),fetch('./data/analysis-evidence.json?v='+Date.now(),{cache:'no-store'}),fetch('./data/match-enrichment.json?v='+Date.now(),{cache:'no-store'}).catch(()=>null)]);
    if(!catalogResponse.ok||!contextResponse.ok)throw new Error('Ortak kadro havuzu veya haftalık fikstür alınamadı');
    const catalog=await catalogResponse.json();analysisData=await contextResponse.json();analysisEvidence=evidenceResponse.ok?await evidenceResponse.json():null;if(analysisEvidence?.season!==data.season)analysisEvidence=null;sourceUpdatedAt=data.updatedAt;
    if(!analysisData.matches?.length||analysisData.season!==data.season)throw new Error('Fikstür sezonu oyuncu sezonuyla eşleşmiyor');
+   matchEnrichment=enrichmentResponse?.ok?await enrichmentResponse.json():null;
+   if(matchEnrichment?.season!==analysisData.season||!ScoutRules.fresh(matchEnrichment?.updatedAt,Date.now()))matchEnrichment=null;
+   if(matchEnrichment){
+    for(const m of analysisData.matches){const detail=matchEnrichment.matchDetails?.[m.id];if(!m.kickoff&&detail?.kickoff)m.kickoff=detail.kickoff;}
+    const external=analysisEvidence||{};
+    analysisEvidence={...matchEnrichment,...external,players:{...external.players,...matchEnrichment.players},matchStats:{...matchEnrichment.matchStats,...external.matchStats},fixtures:{...matchEnrichment.fixtures,...external.fixtures}};
+   }
    weekPolicy=ScoutRules.weeks(analysisData);selectedWeek=weekPolicy.recommendation;
    analysisData.matchStats=analysisEvidence?.matchStats||{};evaluationCache=ScoutEngine.backtest(analysisData);
    analysisContext=ScoutEngine.prepare(analysisData,selectedWeek);
@@ -928,7 +935,7 @@ function renderHealth(){
  el('healthSummary').innerHTML=[['Güvenli havuz',safe.length],['Önerilmeyen',players.length-safe.length],['Oynama verisi yok',unknown.length],['Öneri haftası',selectedWeek||'—']].map(([k,v])=>'<div class="metric-card"><small>'+k+'</small><b>'+v+'</b></div>').join('');
  el('healthIssues').innerHTML=renderTeamSchedules()+'<h3>Oyuncuların uygunluğu</h3><p>En az %80 başlama ihtimali ve son 72 saatte doğrulanmış maç uygunluğu gerekir. Yorgunluk için tüm organizasyonlardaki gerçek oyuncu dakikaları kullanılır. Motivasyon, doğrulanmış açıklama olmadan puanlaştırılmaz.</p><div class="health-list">'+players.map(p=>{
  const h=p.safety.health;
- return '<details><summary>'+esc(p.player)+' · '+esc(p.team)+' · '+(p.safety.eligible?'Uygun':'Doğrulanmadı / önerilmiyor')+'</summary><p>'+p.safety.reasons.map(esc).join(' · ')+'</p><p>Dinlenme: '+(h.restHours==null?'Bilinmiyor':Math.round(h.restHours)+' saat')+' · Son 7 gün: '+(h.minutes7==null?'Dakika verisi eksik':h.minutes7+' dk')+' · Son 14 gün: '+(h.minutes14==null?'Eksik':h.minutes14+' dk')+' · '+(p.home===true?'Ev':p.home===false?'Deplasman':'Saha bilgisi yok')+' · '+esc(p.opponent)+'</p><p>Yol: '+(h.travelKm==null?'Uzaklık doğrulanmadı':Math.round(h.travelKm)+' km')+' · '+(h.complete?'Tüm organizasyonlar kontrol edildi':'Avrupa/kupa dâhil maç yükü eksik')+'</p><p>'+esc(h.motivation)+'</p><p>'+esc(historicalLineup(p))+'</p></details>';
+ return '<details><summary>'+esc(p.player)+' · '+esc(p.team)+' · '+(p.safety.eligible?'Uygun':'Doğrulanmadı / önerilmiyor')+'</summary><p>'+p.safety.reasons.map(esc).join(' · ')+'</p><p>Dinlenme: '+(h.restHours==null?'Bilinmiyor':Math.round(h.restHours)+' saat')+' · Son 7 gün: '+(h.minutes7==null?'Dakika verisi eksik':h.minutes7+' dk')+' · Son 14 gün: '+(h.minutes14==null?'Eksik':h.minutes14+' dk')+' · '+(p.home===true?'Ev':p.home===false?'Deplasman':'Saha bilgisi yok')+' · '+esc(p.opponent)+'</p><p>Yol: '+(h.travelKm==null?'Uzaklık doğrulanmadı':Math.round(h.travelKm)+' km')+' · '+(h.complete?'Tüm organizasyonlar kontrol edildi':'Avrupa/kupa dâhil maç yükü eksik')+'</p><p>'+esc(h.motivation)+'</p><p>'+esc(historicalLineup(p))+'</p>'+playerMinuteHistory(p)+'</details>';
  }).join('')+'</div>';
  el('healthPanel').classList.remove('hidden');
 }
@@ -1110,6 +1117,27 @@ el('formation').onchange=()=>runAction('Diziliş güncelleme',()=>{if(squad.leng
 if(el('healthMiniOpen'))el('healthMiniOpen').onclick=()=>runAction('Kadro sağlığı',()=>renderHealth());if(el('radarMiniOpen'))el('radarMiniOpen').onclick=()=>runAction('Fikstür radarı',()=>renderRadar());if(el('mobileMenuBtn'))el('mobileMenuBtn').onclick=()=>el('mobileMenu').classList.toggle('open');if(el('mobileMore'))el('mobileMore').onclick=()=>el('mobileMenu').classList.toggle('open');
 el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
 
+function recentMatchInputs(m){
+ if(!matchEnrichment)return '';
+ const rows=[];
+ for(const team of [m.home,m.away]){
+  const recent=analysisData.matches.filter(x=>x.status==='finished'&&x.week<m.week&&(ScoutEngine.club(x.home)===ScoutEngine.club(team)||ScoutEngine.club(x.away)===ScoutEngine.club(team))&&matchEnrichment.matchDetails?.[x.id]).sort((a,b)=>b.week-a.week).slice(0,3);
+  for(const x of recent){const d=matchEnrichment.matchDetails[x.id],v=d.metrics||{},pair=k=>v[k]?v[k].map(n=>Number(n).toFixed(k==='xg'?2:0)).join(' / '):'Eksik';
+   rows.push('<tr><td>'+esc(x.home+' – '+x.away)+'</td><td>'+pair('xg')+'</td><td>'+pair('shots')+'</td><td>'+pair('shotsOnTarget')+'</td><td><a href="'+esc(d.source)+'" target="_blank" rel="noopener">Kaynak</a></td></tr>');
+  }
+ }
+ return rows.length?'<div class="glossary-scroll"><table><caption>Takımların son 3 lig maçı · değerler ev / deplasman sırasındadır</caption><thead><tr><th>Maç</th><th>xG</th><th>Şut</th><th>İsabetli şut</th><th>Kontrol</th></tr></thead><tbody>'+rows.join('')+'</tbody></table></div>':'';
+}
+function renderConnectionStatus(){
+ const r=matchEnrichment?.report;
+ if(!r)return '<p>Ek maç veri bağlantısı alınamadı veya 72 saatten eski. Ek alanlar doğrulanmış sayılmaz.</p>';
+ return '<details open><summary>Maç verisi bağlantı kontrolü</summary><p>'+r.fetched+'/'+r.attempted+' maç kaydı doğrulandı · '+r.xgMatches+' maçta xG · '+r.weatherMatches+' maçta hava tahmini · '+r.playerMinuteRecords+' oyuncu dakika kaydı · '+r.matchSpecificAbsences+' maça özel eksik oyuncu.</p><p>Skor hesabında: geçmiş sonuçlar, rakip gücü, ev/deplasman ve kaynaklı maç xG verisi. Şut, kadro, hava ve zemin bilgisi gerekçe ekranındadır; etkileri henüz ölçülmediği için keyfî puan eklenmez.</p><p>Eksikler: '+(r.missing||[]).map(esc).join(' · ')+'</p>'+(r.failures?.length?'<p>'+r.failures.length+' maç verisi alınamadı/eşleşmedi ve kullanılmadı.</p>':'')+'<p>Kontrol: '+esc(new Date(matchEnrichment.updatedAt).toLocaleString('tr-TR'))+'</p></details>';
+}
+function playerMinuteHistory(p){
+ const rows=matchEnrichment?.playerMatches?.[p.id];
+ if(!rows?.length)return '';
+ return '<details><summary>Doğrulanan maç dakikaları ('+rows.length+' lig maçı)</summary><ul>'+[...rows].sort((a,b)=>Date.parse(b.kickoff)-Date.parse(a.kickoff)).slice(0,6).map(m=>'<li>'+esc(new Date(m.kickoff).toLocaleDateString('tr-TR'))+' · '+m.minutes+' dk · <a href="'+esc(m.source)+'" target="_blank" rel="noopener">Maç kaynağı</a></li>').join('')+'</ul><p>Lig dışı ve millî takım dakikaları eksik; toplam yorgunluk doğrulanmış değildir.</p></details>';
+}
 let forecastMarkupCache=null;
 function renderMatchForecasts(){
  if(!analysisData||!weekPolicy)return;
@@ -1117,12 +1145,12 @@ function renderMatchForecasts(){
  const fresh=ScoutRules.fresh(analysisData.updatedAt,Date.now(),72);
  el('fixtureSource').innerHTML='Skor ekranı: '+(forecastWeek||'Sezon tamamlandı')+' · Kadro önerisi: '+(selectedWeek||'—')+'. hafta.<br>'+(weekPolicy.locked?'Devam eden haftanın maçları tamamlanmadan gelecek haftanın skor tahminleri açılmaz. ':'')+'<a href="https://www.tff.org/default.aspx?pageID=198" target="_blank" rel="noopener">TFF fikstürü</a> · Son kontrol: '+esc(new Date(analysisData.updatedAt).toLocaleString('tr-TR'));
  const eligible=players.filter(p=>p.safety?.eligible).length;
- el('modelQuality').innerHTML='<strong>Veri kapsamı ve sınırlar</strong><p>'+context.r.historyCount+' geçmiş sonuç · '+context.r.xgCount+' kaynaklı xG kaydı · '+eligible+'/'+players.length+' güvenli oyuncu</p><p>'+(fresh?'Fikstür güncel.':'Fikstür 72 saatten eski veya tarih geçersiz; tahminler gizlendi.')+' Kadro, seyahat, hava ve taktik eksikleri güveni sınırlar. Bu olasılıklar henüz kalibre edilmiş değildir.</p>';
+ el('modelQuality').innerHTML='<strong>Veri kapsamı ve sınırlar</strong><p>'+context.r.historyCount+' geçmiş sonuç · '+context.r.xgCount+' kaynaklı xG kaydı · '+eligible+'/'+players.length+' güvenli oyuncu</p><p>'+(fresh?'Fikstür güncel.':'Fikstür 72 saatten eski veya tarih geçersiz; tahminler gizlendi.')+' Bu olasılıklar henüz kalibre edilmiş değildir.</p>'+renderConnectionStatus();
  const forecastMarkup=context.fixtures.map(m=>{
   const done=m.status==='finished',begun=m.status==='live'||(m.kickoff&&Date.parse(m.kickoff)<=Date.now()),top=m.top[0];
   const extra=analysisEvidence?.fixtures?.[m.id],valid=extra?.source&&ScoutRules.fresh(extra.verifiedAt,Date.now())&&Date.parse(extra.verifiedAt)<=Math.min(Date.now(),Date.parse(m.kickoff)||Date.now());
   const notes=valid?['lineup','absences','workload','travel','weather','pitch','tactics','coachChange','motivation'].map(k=>[({lineup:'İlk 11',absences:'Eksikler',workload:'Maç yükü',travel:'Seyahat',weather:'Hava',pitch:'Zemin',tactics:'Taktik',coachChange:'Teknik direktör',motivation:'Motivasyon'})[k],typeof extra[k]==='string'?extra[k]:'Veri eksik']):[];
-  const details='<details class="forecast-explanation"><summary>Gerekçe ve veri durumu</summary><ul>'+m.reasons.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p>Model gol beklentisi: '+m.homeLambda.toFixed(2)+' / '+m.awayLambda.toFixed(2)+' (ölçülmüş xG değildir).</p><p>'+m.missing.map(esc).join(' · ')+'</p>'+(notes.length?'<dl>'+notes.map(([k,v])=>'<dt>'+k+'</dt><dd>'+esc(v)+'</dd>').join('')+'</dl><p>Bağlam kaynağı: '+esc(extra.source)+' · Bu notlar sayısal puan artışı olarak uygulanmaz.</p>':'<p>Güncel ilk 11, eksikler, maç yükü, seyahat, hava, zemin, taktik ve motivasyon verisi bağlı değil.</p>')+'</details>';
+  const details='<details class="forecast-explanation"><summary>Gerekçe ve veri durumu</summary><ul>'+m.reasons.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p>Model gol beklentisi: '+m.homeLambda.toFixed(2)+' / '+m.awayLambda.toFixed(2)+' (ölçülmüş xG değildir).</p><p>'+m.missing.map(esc).join(' · ')+'</p>'+recentMatchInputs(m)+(notes.length?'<dl>'+notes.map(([k,v])=>'<dt>'+k+'</dt><dd>'+esc(v)+'</dd>').join('')+'</dl><p>Bağlam kaynağı: '+esc(extra.source)+' · Bu notlar sayısal puan artışı olarak uygulanmaz.</p>':'<p>Güncel ilk 11, eksikler, maç yükü, seyahat, hava, zemin, taktik ve motivasyon verisi bağlı değil.</p>')+'</details>';
   return '<article class="forecast"><div class="match-clubs">'+esc(m.home)+' <span>—</span> '+esc(m.away)+'</div><div class="match-score">'+(done?m.homeGoals+' – '+m.awayGoals:begun||!fresh?'—':top.home+' – '+top.away)+'</div><small>'+(done?'Maç sonucu':begun?'Maç başladı · sonuç bekleniyor':!fresh?'Güncel veri bekleniyor':'En olası skor · '+pct(top.prob)+' · güven düşük')+'</small>'+((done||begun||!fresh)?'':'<div class="score-alternatives">'+m.top.map(s=>'<span>'+s.home+'–'+s.away+' <b>'+pct(s.prob)+'</b></span>').join('')+'</div><div class="match-odds"><span>Ev '+pct(m.homeWin)+'</span><span>Ber. '+pct(m.draw)+'</span><span>Dep. '+pct(m.awayWin)+'</span></div><div class="forecast-secondary"><span>2,5 üst '+pct(m.over25)+'</span><span>İki takım gol '+pct(m.btts)+'</span><span>Ev gol yemez '+pct(m.homeCleanSheet)+'</span><span>Dep. gol yemez '+pct(m.awayCleanSheet)+'</span></div>'+details)+'</article>';
  }).join('');
  if(forecastMarkup!==forecastMarkupCache){el('matchForecasts').innerHTML=forecastMarkup;forecastMarkupCache=forecastMarkup;}
