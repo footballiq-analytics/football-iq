@@ -1,4 +1,5 @@
 "use client";
+import InjuryBadge from "./InjuryBadge";
 import PlayerPortrait from "./PlayerPortrait";
 import { formatFantasyPrice } from "@/lib/fantasy-price";
 
@@ -99,6 +100,7 @@ export default function PlayerCard({ player, tier = "gold", captain = false, vic
         </div>
       </div>
 
+      <InjuryBadge name={player.name} club={player.club} onCard />
       {invalidPosition ? <span className="absolute -left-1.5 -top-1.5 z-[80] rounded-full border border-rose-200/70 bg-rose-600 px-1.5 py-0.5 text-[6px] font-black text-white shadow-[0_0_16px_rgba(244,63,94,.55)]">MEVKİ HATASI</span> : null}
       {badge ? (
         <span data-leadership={viceCaptain && !captain && !tripleCaptain ? "vice" : "captain"} className={[

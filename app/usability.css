@@ -24,3 +24,27 @@ html body .fiq-manual-share{background:#fff!important;color:#253e4d!important;bo
 html body .fiq-manual-share :is(p,textarea){color:#344f5e!important;background:#f4f8fa!important;font-size:14px!important}
 html body .fiq-team-page .fiq-transfer-panel-v28 .fiq-coach-row{cursor:default!important}
 html body .fiq-team-page .fiq-transfer-panel-v28 .fiq-coach-row .fiq-transfer-avatar{cursor:default!important}
+
+/* Legible text on the light homepage, including small-screen navigation. */
+html body .fiq-header nav.fiq-desktop-nav a[href]{font-size:14px!important;font-weight:700!important;line-height:1.4!important;color:#263e4d!important;text-shadow:none!important;opacity:1!important}
+html body .fiq-header nav.fiq-desktop-nav a[aria-current="page"]{color:#174d42!important;background:#e7f1ed!important;border-bottom-color:#397b68!important}
+html body .fiq-home :is(h1,h2,h3,.home-eyebrow,.home-actions a,.home-rule-chips p){text-shadow:none!important;filter:none!important;opacity:1!important}
+html body .fiq-home .home-hero h1{color:#163348!important;letter-spacing:-.025em!important;line-height:1.12!important}
+html body .fiq-home .home-eyebrow{color:#66501c!important;font-size:11px!important;letter-spacing:.12em!important}
+html body .fiq-home .home-panel-title h2{color:#163348!important;font-size:18px!important;font-weight:750!important}
+html body .fiq-home .home-panel-title>a{color:#315565!important;font-size:13px!important}
+html body .fiq-home .home-intro{color:#405666!important;font-size:16px!important}
+html body .fiq-home .home-actions a{font-size:14px!important}
+html body .fiq-home .home-actions a>span:not(.home-action-emoji){font-size:14px!important;font-weight:750!important}
+html body .fiq-home .home-rule-chips :is(p,b){color:#304b59!important;font-size:12px!important}
+html body .fiq-home .home-position-card :is(h3,p){text-shadow:none!important}
+@media(max-width:600px){html body .fiq-header nav.fiq-desktop-nav a[href]{font-size:13px!important;padding-inline:9px!important}html body .fiq-home .home-hero h1{font-size:clamp(27px,7.2vw,38px)!important}html body .fiq-home .home-panel-title h2{font-size:16px!important}}
+/* Warning stays above the portrait without covering captain/remove controls. */
+html body .fiq-injury-badge{display:inline-flex!important;align-items:center;gap:4px;width:max-content;max-width:100%;padding:3px 6px;border:1px solid #dc8994;border-radius:5px;background:#fff0f1!important;color:#a31630!important;font-size:11px!important;font-weight:750!important;line-height:1.2!important;text-shadow:none!important;filter:none!important;vertical-align:middle}
+html body .fiq-injury-badge svg{width:14px!important;height:14px!important;flex:none;color:inherit!important}
+html body .fiq-injury-badge>span{color:inherit!important;font-size:inherit!important;white-space:normal!important}
+html body .fiq-injury-badge[data-stale="true"]{background:#fff7e6!important;color:#765000!important;border-color:#d1b064}
+html body .fiq-player-card>.fiq-injury-on-card{position:absolute;top:30px;left:-5px;z-index:110;max-width:calc(100% + 5px);font-size:10px!important;pointer-events:none}
+html body .fiq-transfer-player-info .fiq-injury-badge{margin-top:3px}
+
+html body .fiq-header .fiq-logo b{color:#256453!important;text-shadow:none!important}

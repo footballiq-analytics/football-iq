@@ -1,4 +1,5 @@
 "use client";
+import InjuryBadge from "./InjuryBadge";
 import PlayerPortrait from "./PlayerPortrait";
 import { resolveFantasyMedia } from "@/lib/fantasy-media";
 import { getClubFixture } from "@/data/weekly-fixtures";
@@ -135,7 +136,7 @@ function TransferDraggable({player,selected,assessment,onQuickAdd,onRemovePlayer
     <PlayerPortrait key={`${player.id}:${photo??""}`} name={player.name} club={player.club} src={photo}/>
    </button>
    <button type="button" onClick={()=>selected?onRemovePlayer(player):onPlayerClick?.(player)} aria-label={`${player.name} ${selected?"kadrodan çıkar":"oyuncu bilgileri"}`} className="fiq-transfer-player-info">
-    <strong title={player.name}>{player.name}</strong><small>{player.club} · {tabLabel[player.position]}</small>
+    <strong title={player.name}>{player.name}</strong><InjuryBadge name={player.name} club={player.club} /><small>{player.club} · {tabLabel[player.position]}</small>
    </button>
    <b className="fiq-transfer-price">{formatFantasyPrice(player.price)}M</b>
    {selected?<button type="button" className="fiq-transfer-owned" aria-label={`${player.name} kadrodan çıkar`} title="Tek tıkla kadrodan çıkar" onMouseDown={e=>e.stopPropagation()} onTouchStart={e=>e.stopPropagation()} onPointerDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();onRemovePlayer(player)}}>Kadroda</button>:<button type="button" className="fiq-transfer-add" disabled={!assessment.eligible} aria-label={`${player.name} kadroya ekle`} title={assessment.reason??"Kadroya ekle"} onMouseDown={e=>e.stopPropagation()} onTouchStart={e=>e.stopPropagation()} onPointerDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();onQuickAdd(player)}}>+</button>}

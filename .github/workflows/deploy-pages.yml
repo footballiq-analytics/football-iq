@@ -74,6 +74,9 @@ jobs:
       - name: Verify analysis model and squad rules
         run: node scripts/test-analysis.cjs
 
+      - name: Verify injury warning data
+        run: node scripts/test-player-injury.cjs
+
       - name: Verify exported scout page
         run: |
           test -f out/tff-scout.html

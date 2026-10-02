@@ -172,6 +172,7 @@ tbody tr:hover{background:#ffffff05}
 @media(max-width:560px){
   .metric-inline{display:none}.pitch{min-height:470px}.bench-grid{gap:3px}.bench-card{padding:3px}.rules{grid-template-columns:repeat(2,1fr)}
 }
+.injury-warning{display:inline-flex;align-items:center;gap:4px;margin:3px 4px;padding:3px 6px;border-radius:5px;background:#fff0f1!important;color:#a31630!important;border:1px solid #dc8994;font-size:11px;font-weight:750;white-space:nowrap}.injury-warning[data-stale="true"]{background:#fff7e6!important;color:#765000!important;border-color:#d1b064}
 </style>
 <link rel="stylesheet" href="./scout-light.css"/>
 </head>
@@ -183,7 +184,7 @@ tbody tr:hover{background:#ffffff05}
       <div>
         <div class="brand-title">FUTBOL <span style="color:var(--gold)">IQ</span></div>
         <div class="brand-sub">Haftalık kadro ve maç analizi</div>
-        <!-- PRO UI V10.4 · IMPORT GUARANTEE --><span class="version-badge">Haftalık analiz · V12.2</span>
+        <!-- PRO UI V10.4 · IMPORT GUARANTEE --><span class="version-badge">Haftalık analiz · V12.3</span>
       </div>
     </div>
     <nav class="scout-page-nav" aria-label="Site menüsü"><a id="backToFantasy" class="back-home" href="./index.html">← Ana sayfa</a><a class="back-home to-squad" href="./team/">Kadrom →</a></nav>
@@ -623,11 +624,17 @@ function renderAll(){players=players.map(norm);el('playerCount').textContent=pla
 function refreshTeams(){const cur=el('teamFilter').value;const teams=[...new Set(players.map(p=>p.team).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));el('teamFilter').innerHTML='<option value="">Tüm takımlar</option>'+teams.map(t=>'<option>'+esc(t)+'</option>').join('');el('teamFilter').value=teams.includes(cur)?cur:''}
 function statText(p,k){return p.statsCurrent===false?'—':Number(p[k]||0).toFixed(2)}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function injuryBadge(p){
+ if(!p.unavailable||!p.injurySource?.startsWith('https://')||!Number.isFinite(Date.parse(p.injuryUpdatedAt))||Date.parse(p.injuryUpdatedAt)>Date.now())return '';
+ const fresh=ScoutRules.fresh(p.injuryUpdatedAt,Date.now()),label=fresh?'Sakatlık kaydı':'Eski sakatlık kaydı · kontrol gerekli';
+ const detail=label+' · Son kontrol: '+new Date(p.injuryUpdatedAt).toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+' · '+p.injurySource;
+ return '<span class="injury-warning" data-stale="'+!fresh+'" role="img" aria-label="'+esc(p.player+': '+detail)+'" title="'+esc(detail)+'"><span aria-hidden="true">⚠</span> '+(fresh?'Sakat':'Kontrol gerekli')+'</span>';
+}
 function renderTable(){
  const pos=el('posFilter').value,team=el('teamFilter').value,avail=el('availabilityFilter').value,q=el('search').value.toLocaleLowerCase('tr'),sort=el('sortBy').value;
  const key={xp:'xp',score:'score',eff:'eff',xg90:'xg90',xa90:'xa90'}[sort]||'xp';
  const arr=players.filter(p=>(!pos||p.pos===pos)&&(!team||p.team===team)&&(!q||p.player.toLocaleLowerCase('tr').includes(q))&&(!avail||(avail==='available'&&!p.excluded&&!p.unavailable&&!p.doubtful&&!p.suspended)||(avail==='doubtful'&&p.doubtful)||(avail==='out'&&(p.unavailable||p.suspended)))).sort((a,b)=>b[key]-a[key]);
- el('playersBody').innerHTML=arr.map((p,i)=>'<tr class="border-t border-white/5 hover:bg-white/[.03]"><td class="p-2 text-slate-500">'+(i+1)+'</td><td class="p-2 font-bold"><div class="flex items-center gap-2"><div class="shrink-0">'+(p.photo?'<img src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.15)" onerror="this.style.display=\'none\'">':'')+'</div><button data-profile="'+esc(p.id)+'" class="text-left hover:text-amber-200">'+esc(p.player)+'</button></div></td><td class="p-2 text-slate-400">'+esc(p.team)+'</td><td class="p-2 text-center">'+esc(p.opponent)+'</td><td class="p-2 text-center">'+(p.home===true?'EV':p.home===false?'D':'—')+'</td><td class="p-2 text-center">'+p.pos+'</td><td class="p-2 text-center">'+statText(p,'xg90')+'</td><td class="p-2 text-center">'+statText(p,'xa90')+'</td><td class="p-2 text-center font-black text-iq">'+p.xp.toFixed(2)+'</td><td class="p-2 text-center">'+Math.round(p.startProb*100)+'%</td><td class="p-2 text-center">'+Math.round(p.cleanSheetProb*100)+'%</td><td class="p-2"><input data-id="'+p.id+'" data-k="price" type="number" min="1" step=".1" value="'+p.price.toFixed(1)+'" class="w-16 rounded border px-1 py-1 text-center"/></td><td class="p-2 text-center">'+(p.ownershipVerified&&p.ownership!=null?'<span class="text-sky-300">%'+p.ownership.toFixed(1)+'</span>':'<span class="text-slate-500">—</span>')+'</td><td class="p-2 text-center">'+(p.priceVerified?'<span class="text-emerald-300">Doğrulandı</span>':'<span class="text-amber-300">Manuel</span>')+'</td><td class="p-2 text-center">'+(p.suspended?'<span class="text-red-300">Cezalı</span>':p.unavailable?'<span class="text-red-300">Sakat</span>':p.doubtful?'<span class="text-amber-300">Şüpheli</span>':'<span>'+esc(availabilityLabel(p))+'</span>')+'</td></tr>').join('');
+ el('playersBody').innerHTML=arr.map((p,i)=>'<tr class="border-t border-white/5 hover:bg-white/[.03]"><td class="p-2 text-slate-500">'+(i+1)+'</td><td class="p-2 font-bold"><div class="flex items-center gap-2"><div class="shrink-0">'+(p.photo?'<img src="'+esc(p.photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.15)" onerror="this.style.display=\'none\'">':'')+'</div><button data-profile="'+esc(p.id)+'" class="text-left hover:text-amber-200">'+esc(p.player)+'</button>'+injuryBadge(p)+'</div></td><td class="p-2 text-slate-400">'+esc(p.team)+'</td><td class="p-2 text-center">'+esc(p.opponent)+'</td><td class="p-2 text-center">'+(p.home===true?'EV':p.home===false?'D':'—')+'</td><td class="p-2 text-center">'+p.pos+'</td><td class="p-2 text-center">'+statText(p,'xg90')+'</td><td class="p-2 text-center">'+statText(p,'xa90')+'</td><td class="p-2 text-center font-black text-iq">'+p.xp.toFixed(2)+'</td><td class="p-2 text-center">'+Math.round(p.startProb*100)+'%</td><td class="p-2 text-center">'+Math.round(p.cleanSheetProb*100)+'%</td><td class="p-2"><input data-id="'+p.id+'" data-k="price" type="number" min="1" step=".1" value="'+p.price.toFixed(1)+'" class="w-16 rounded border px-1 py-1 text-center"/></td><td class="p-2 text-center">'+(p.ownershipVerified&&p.ownership!=null?'<span class="text-sky-300">%'+p.ownership.toFixed(1)+'</span>':'<span class="text-slate-500">—</span>')+'</td><td class="p-2 text-center">'+(p.priceVerified?'<span class="text-emerald-300">Doğrulandı</span>':'<span class="text-amber-300">Manuel</span>')+'</td><td class="p-2 text-center">'+(p.suspended?'<span class="text-red-300">Cezalı</span>':p.unavailable?'<span class="text-red-300">Sakat</span>':p.doubtful?'<span class="text-amber-300">Şüpheli</span>':'<span>'+esc(availabilityLabel(p))+'</span>')+'</td></tr>').join('');
  renderMobilePlayers(arr);
 }
 function quotas(){return FORMATIONS[el('formation').value]||FORMATIONS[433]}
@@ -843,7 +850,7 @@ function renderSideProfile(p){
  const initials=esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''));
  const face=p.photo?'<img class="side-avatar" src="'+esc(p.photo)+'" alt="" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="side-avatar-fallback" style="display:none">'+initials+'</div>':'<div class="side-avatar-fallback">'+initials+'</div>';
  const reasons=explainPlayer(p);
- el('sideProfile').innerHTML='<div class="side-profile-head">'+face+'<div><div class="side-name">'+esc(p.player)+'</div><div class="side-team">'+esc(p.team)+' · '+p.pos+'</div><div class="side-tags"><span class="tag">'+availabilityLabel(p)+'</span><span class="tag">'+(p.home===true?'EV':p.home===false?'D':'—')+' · '+esc(p.opponent)+'</span></div></div></div>'+
+ el('sideProfile').innerHTML='<div class="side-profile-head">'+face+'<div><div class="side-name">'+esc(p.player)+injuryBadge(p)+'</div><div class="side-team">'+esc(p.team)+' · '+p.pos+'</div><div class="side-tags"><span class="tag">'+availabilityLabel(p)+'</span><span class="tag">'+(p.home===true?'EV':p.home===false?'D':'—')+' · '+esc(p.opponent)+'</span></div></div></div>'+
  '<div class="side-metrics"><div class="side-metric"><small>Fiyat</small><b>'+p.price.toFixed(1)+'M</b></div><div class="side-metric"><small>xP</small><b>'+p.xp.toFixed(2)+'</b></div><div class="side-metric"><small>xG90</small><b>'+statText(p,'xg90')+'</b></div><div class="side-metric"><small>xA90</small><b>'+statText(p,'xa90')+'</b></div><div class="side-metric"><small>Başlama</small><b>%'+Math.round(p.startProb*100)+'</b></div><div class="side-metric"><small>CS</small><b>%'+Math.round(p.cleanSheetProb*100)+'</b></div><div class="side-metric"><small>Sahiplik</small><b>'+own+'</b></div><div class="side-metric"><small>Dakika</small><b>'+Math.round(p.min)+'</b></div></div>'+
  '<div class="ai-box"><b>FUTBOL IQ yorumu</b><p>'+reasons.map(esc).join(' · ')+'</p></div>'+
  '<div class="side-actions"><button data-detail="'+esc(p.id)+'">Detaylı analiz</button></div>';
@@ -858,7 +865,7 @@ function renderDashboardInsights(){
 }
 function renderMobilePlayers(arr){
  if(!el('playersMobile'))return;
- el('playersMobile').innerHTML=arr.slice(0,80).map(p=>'<button data-profile="'+esc(p.id)+'" class="mobile-player text-left"><span class="avatar">'+esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''))+'</span><span><b>'+esc(p.player)+'</b><small>'+esc(p.team)+' · '+p.pos+' · '+fixtureLabel(p)+'</small></span><span class="text-right"><b class="text-amber-200">'+p.xp.toFixed(1)+'</b><small>'+p.price.toFixed(1)+'M</small></span></button>').join('');
+ el('playersMobile').innerHTML=arr.slice(0,80).map(p=>'<button data-profile="'+esc(p.id)+'" class="mobile-player text-left"><span class="avatar">'+esc(p.player.split(' ').map(x=>x[0]).slice(0,2).join(''))+'</span><span><b>'+esc(p.player)+'</b>'+injuryBadge(p)+'<small>'+esc(p.team)+' · '+p.pos+' · '+fixtureLabel(p)+'</small></span><span class="text-right"><b class="text-amber-200">'+p.xp.toFixed(1)+'</b><small>'+p.price.toFixed(1)+'M</small></span></button>').join('');
 }
 function fixtureScore(p,mode){
  let s=strategyScore(p,mode);
