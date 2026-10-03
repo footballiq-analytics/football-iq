@@ -1118,6 +1118,7 @@ if(el('healthMiniOpen'))el('healthMiniOpen').onclick=()=>runAction('Kadro sağl�
 el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
 
 function renderGoalOutlook(m){
+ const pct=x=>'%'+Math.round(x*100);
  const f=n=>n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
  const three=n=>Math.max(0,Math.min(1,1-Math.exp(-n)*(1+n+n*n/2)));
  return '<div class="goal-outlook"><div class="goal-outlook-head"><strong>Gol beklentisi</strong><span>Toplam '+f(m.homeLambda+m.awayLambda)+'</span></div><div class="goal-teams"><div><span>'+esc(m.home)+'</span><b>'+f(m.homeLambda)+'</b><small>3+ gol atma: '+pct(three(m.homeLambda))+'</small></div><div><span>'+esc(m.away)+'</span><b>'+f(m.awayLambda)+'</b><small>3+ gol atma: '+pct(three(m.awayLambda))+'</small></div></div><div class="goal-chance"><span>Maçta en az 3 gol</span><strong>'+pct(m.over25)+'</strong></div><small>Modelin ortalama gol tahmini; kesin skor veya ölçülmüş xG değildir.</small></div>';
