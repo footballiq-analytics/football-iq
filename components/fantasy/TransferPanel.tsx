@@ -6,7 +6,7 @@ import { getClubFixture } from "@/data/weekly-fixtures";
 import { formatFantasyPrice } from "@/lib/fantasy-price";
 
 
-import { assessDirectTransfer, type TransferAssessment } from "@/lib/direct-transfer";
+import { assessDirectTransfer, assessReplacementTransfer, type TransferAssessment } from "@/lib/direct-transfer";
 import { useDraggable } from "@dnd-kit/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FantasyCoach } from "@/data/superlig-coaches-2026";
@@ -15,6 +15,8 @@ import type { FantasyPlayer, PlayerPosition } from "./PlayerCard";
 export type TransferPanelProps = {
   onClose: () => void;
   coachRequest?: number;
+  replacementPlayer?: FantasyPlayer;
+  onSelectReplacement?: (id:string)=>void;
   target?: { id: string; position: PlayerPosition; label: string };
   onClearTarget?: () => void;
   players: FantasyPlayer[];
@@ -36,7 +38,7 @@ type SortMode = "POINTS" | "PRICE_ASC" | "PRICE_DESC" | "POPULAR";
 const tabLabel: Record<FilterTab, string> = { ALL:"Tümü", GK:"KL", DEF:"DEF", MID:"ORT", FWD:"FOR", COACH:"TD" };
 const BUDGET = 100;
 
-export default function TransferPanel({onClose,coachRequest,target,onClearTarget,players,coaches,clubs,selectedIds,selectedCoachId,availableSlots,onQuickAdd,onRemovePlayer,onSelectCoach,onPlayerClick}:TransferPanelProps){
+export default function TransferPanel({replacementPlayer,onSelectReplacement,onClose,coachRequest,target,onClearTarget,players,coaches,clubs,selectedIds,selectedCoachId,availableSlots,onQuickAdd,onRemovePlayer,onSelectCoach,onPlayerClick}:TransferPanelProps){
  const[query,setQuery]=useState("");
  const[debouncedQuery,setDebouncedQuery]=useState("");
  const[selectedClubs,setSelectedClubs]=useState<string[]>([]);
@@ -46,7 +48,7 @@ export default function TransferPanel({onClose,coachRequest,target,onClearTarget
  const[position,setPosition]=useState<FilterTab>("ALL");
  const[sort,setSort]=useState<SortMode>("PRICE_DESC");
  const[smartOnly,setSmartOnly]=useState(false);
- const effectivePosition=target?.position??position;
+ const effectivePosition=replacementPlayer?.position??target?.position??position;
  const showingCoaches=effectivePosition==="COACH";
  const previousSlots=useRef({position:effectivePosition,available:availableSlots,targetId:target?.id});
  useEffect(()=>{
@@ -72,9 +74,13 @@ export default function TransferPanel({onClose,coachRequest,target,onClearTarget
  const clubCounts=useMemo(()=>{const counts=new Map<string,number>();for(const p of players)counts.set(p.club,(counts.get(p.club)??0)+1);return counts},[players]);
  const clubMatch=(club:string)=>selectedClubs.length===0||selectedClubs.includes(club);
 
+ useEffect(()=>{if(replacementPlayer){setQuery("");setDebouncedQuery("");setSelectedClubs([]);setClubMenuOpen(false)}},[replacementPlayer?.id]);
  const transferAssessments=useMemo(()=>new Map(players.map(candidate=>[
   String(candidate.id),
-  assessDirectTransfer({
+  (replacementPlayer?assessReplacementTransfer:assessDirectTransfer)({
+   outgoing:replacementPlayer,
+   candidatePosition:candidate.position,
+   candidateClub:candidate.club,
    alreadySelected:selectedSet.has(String(candidate.id)),
    squadSize:selectedIds.length,
    clubCount:selectedClubCounts.get(candidate.club)??0,
@@ -82,14 +88,14 @@ export default function TransferPanel({onClose,coachRequest,target,onClearTarget
    price:candidate.price,
    remainingBudget,
   }),
- ])),[players,availableSlots,remainingBudget,selectedClubCounts,selectedIds.length,selectedSet]);
+ ])),[players,availableSlots,remainingBudget,selectedClubCounts,selectedIds.length,selectedSet,replacementPlayer]);
 
  const filteredPlayers=useMemo(()=>{
   if(showingCoaches)return[];
   const n=debouncedQuery.toLocaleLowerCase("tr");
-  const list=players.filter(p=>`${p.name} ${p.club}`.toLocaleLowerCase("tr").includes(n)&&clubMatch(p.club)&&(effectivePosition==="ALL"||p.position===effectivePosition)&&(!(smartOnly||target)||transferAssessments.get(String(p.id))?.eligible));
+  const list=players.filter(p=>`${p.name} ${p.club}`.toLocaleLowerCase("tr").includes(n)&&clubMatch(p.club)&&(effectivePosition==="ALL"||p.position===effectivePosition)&&(!(smartOnly||target||replacementPlayer)||transferAssessments.get(String(p.id))?.eligible));
   return [...list].sort((a,b)=>sort==="PRICE_ASC"?a.price-b.price:sort==="PRICE_DESC"?b.price-a.price:sort==="POPULAR"?(b.selected??0)-(a.selected??0):b.points-a.points);
- },[debouncedQuery,players,effectivePosition,target,selectedClubs,showingCoaches,smartOnly,sort,transferAssessments]);
+ },[debouncedQuery,players,effectivePosition,target,replacementPlayer,selectedClubs,showingCoaches,smartOnly,sort,transferAssessments]);
  const filteredCoaches=useMemo(()=>{if(!showingCoaches)return[];const n=debouncedQuery.toLocaleLowerCase("tr");return coaches.filter(c=>`${c.name} ${c.club} ${c.country}`.toLocaleLowerCase("tr").includes(n)&&clubMatch(c.club))},[coaches,debouncedQuery,selectedClubs,showingCoaches]);
  const resultCount=showingCoaches?filteredCoaches.length:filteredPlayers.length;
  const hasActiveFilters=selectedClubs.length>0||position!=="ALL"||query.trim().length>0||smartOnly;
@@ -103,6 +109,7 @@ export default function TransferPanel({onClose,coachRequest,target,onClearTarget
   <div className="fiq-transfer-controls">
    <div className="fiq-transfer-heading"><div><h2>{showingCoaches?"Teknik Direktörler":"Transfer Merkezi"}</h2><p>{showingCoaches?"Teknik direktörünü seç.":"Listeyi kaydır · sürüklemek için görsele basılı tut."}</p></div><button type="button" className="fiq-transfer-close" aria-label="Transfer panelini kapat" onClick={onClose}><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
 
+   {!showingCoaches&&selectedPlayers.length>0&&onSelectReplacement?<div className="fiq-replacement-picker"><label htmlFor="fiq-replacement-player">Değiştirilecek oyuncu</label><select id="fiq-replacement-player" value={replacementPlayer?String(replacementPlayer.id):""} onChange={e=>onSelectReplacement(e.target.value)}><option value="">Oyuncu seç · normal ekleme</option>{selectedPlayers.map(p=><option key={p.id} value={String(p.id)}>{p.name} · {tabLabel[p.position]} · {formatFantasyPrice(p.price)}M</option>)}</select>{replacementPlayer?<p>Kalan {formatFantasyPrice(remainingBudget)}M + {formatFantasyPrice(replacementPlayer.price)}M = <strong>{formatFantasyPrice(remainingBudget+replacementPlayer.price)}M</strong> değişim bütçesi</p>:selectedIds.length>=15?<p>Kadron dolu. Uygun alternatifler için çıkacak oyuncuyu seç.</p>:null}</div>:null}
    {target?<div className="fiq-transfer-target" role="status"><strong>HEDEF: {target.label}</strong><button type="button" onClick={onClearTarget} aria-label="Hedef seçimini kaldır">×</button></div>:null}
    <div className="fiq-player-search relative mt-2"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg font-black text-[#f3ca40]">⌕</span><input aria-label={showingCoaches?"Teknik direktör ara":"Oyuncu ara"} value={query} onChange={e=>setQuery(e.target.value)} placeholder={showingCoaches?"Teknik direktör ara...":"Oyuncu ara..."} className="h-10 w-full rounded-lg border-2 border-[#f3ca40]/65 bg-[#050a0f] pl-9 pr-9 text-[13px] font-bold text-white outline-none placeholder:text-white/45 focus:border-[#ffe778]"/>{query?<button type="button" onClick={()=>setQuery("")} aria-label="Aramayı temizle" className="absolute right-1.5 top-1/2 h-7 w-7 -translate-y-1/2 rounded-md border border-[#f3ca40]/60 bg-black text-lg font-black text-[#ffe778]">×</button>:null}</div>
    <div className="fiq-transfer-filter-pair">
@@ -114,13 +121,13 @@ export default function TransferPanel({onClose,coachRequest,target,onClearTarget
 
     <select value={sort} onChange={e=>setSort(e.target.value as SortMode)} aria-label="Sıralama"><option value="PRICE_DESC">Fiyat ↓</option><option value="PRICE_ASC">Fiyat ↑</option><option value="POINTS">Puan</option><option value="POPULAR">Popülerlik</option></select>
    </div>
-   <div className="fiq-position-tabs mt-2 grid grid-cols-6 gap-1 rounded-lg border-2 border-[#f3ca40]/55 bg-black/60 p-1">{(["ALL","GK","DEF","MID","FWD","COACH"] as const).map(item=><button type="button" key={item} aria-pressed={effectivePosition===item} disabled={!!target&&item!==target.position} onClick={()=>{setPosition(item);setQuery("")}} className={`min-h-10 rounded-md border text-[9px] font-black leading-tight ${effectivePosition===item?"border-[#ffe778] bg-[#f3ca40]/12 text-[#ffe778] shadow-[0_0_12px_rgba(243,202,64,.22)]":"border-[#f3ca40]/35 bg-black text-white/85"}`}><span>{tabLabel[item]}</span></button>)}</div>
+   <div className="fiq-position-tabs mt-2 grid grid-cols-6 gap-1 rounded-lg border-2 border-[#f3ca40]/55 bg-black/60 p-1">{(["ALL","GK","DEF","MID","FWD","COACH"] as const).map(item=><button type="button" key={item} aria-pressed={effectivePosition===item} disabled={!!replacementPlayer||!!target&&item!==target.position} onClick={()=>{setPosition(item);setQuery("")}} className={`min-h-10 rounded-md border text-[9px] font-black leading-tight ${effectivePosition===item?"border-[#ffe778] bg-[#f3ca40]/12 text-[#ffe778] shadow-[0_0_12px_rgba(243,202,64,.22)]":"border-[#f3ca40]/35 bg-black text-white/85"}`}><span>{tabLabel[item]}</span></button>)}</div>
 
-   <div className="fiq-transfer-options"><label className="fiq-transfer-eligible"><input type="checkbox" checked={smartOnly||!!target} disabled={!!target||showingCoaches} onChange={e=>setSmartOnly(e.target.checked)}/><span>Yalnızca uygun oyuncular</span></label>{hasActiveFilters?<button type="button" className="fiq-transfer-reset" onClick={clearFilters}>Filtreleri temizle</button>:null}</div>
+   <div className="fiq-transfer-options"><label className="fiq-transfer-eligible"><input type="checkbox" checked={smartOnly||!!target||!!replacementPlayer} disabled={!!target||!!replacementPlayer||showingCoaches} onChange={e=>setSmartOnly(e.target.checked)}/><span>Yalnızca uygun oyuncular</span></label>{hasActiveFilters?<button type="button" className="fiq-transfer-reset" onClick={clearFilters}>Filtreleri temizle</button>:null}</div>
    <span className="sr-only" role="status">{resultCount} {showingCoaches?"teknik direktör":"oyuncu"} listeleniyor</span>
   </div>
 
-  <div aria-label="Transfer sonuçları" tabIndex={0} className="fiq-transfer-results relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-8 pt-1.5 touch-pan-y [-webkit-overflow-scrolling:touch]">{showingCoaches?filteredCoaches.map(c=><CoachRow key={c.id} coach={c} selected={c.id===selectedCoachId} onSelectCoach={onSelectCoach}/>):filteredPlayers.map(player=><TransferDraggable key={String(player.id)} player={player} selected={selectedSet.has(String(player.id))} assessment={transferAssessments.get(String(player.id))??{eligible:false,reason:null}} onQuickAdd={onQuickAdd} onRemovePlayer={onRemovePlayer} onPlayerClick={onPlayerClick}/>)}{!resultCount?<div className="fiq-transfer-empty grid min-h-36 place-items-center px-4 text-center text-sm">{smartOnly||target?"Kadro kurallarına uyan transfer bulunamadı.":"Bu filtrelerle eşleşen kayıt bulunamadı."}</div>:null}</div>
+  <div aria-label="Transfer sonuçları" tabIndex={0} className="fiq-transfer-results relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-8 pt-1.5 touch-pan-y [-webkit-overflow-scrolling:touch]">{showingCoaches?filteredCoaches.map(c=><CoachRow key={c.id} coach={c} selected={c.id===selectedCoachId} onSelectCoach={onSelectCoach}/>):filteredPlayers.map(player=><TransferDraggable key={String(player.id)} player={player} selected={selectedSet.has(String(player.id))} assessment={transferAssessments.get(String(player.id))??{eligible:false,reason:null}} onQuickAdd={onQuickAdd} onRemovePlayer={onRemovePlayer} onPlayerClick={onPlayerClick}/>)}{!resultCount?<div className="fiq-transfer-empty grid min-h-36 place-items-center px-4 text-center text-sm">{smartOnly||target?(selectedIds.length>=15&&!replacementPlayer?"Uygun alternatifleri görmek için değiştirilecek oyuncuyu seç.":"Kadro kurallarına uyan transfer bulunamadı."):"Bu filtrelerle eşleşen kayıt bulunamadı."}</div>:null}</div>
  </aside>
 }
 

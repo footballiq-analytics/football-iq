@@ -9,7 +9,7 @@ on:
     workflows: ["Update TFF Scout Data"]
     types: [completed]
   schedule:
-    - cron: "40 3 * * *"
+    - cron: "40 */3 * * *"
 
 permissions:
   contents: read
@@ -78,7 +78,9 @@ jobs:
           ANALYSIS_EVIDENCE_TOKEN: ${{ secrets.ANALYSIS_EVIDENCE_TOKEN }}
 
       - name: Verify analysis model and squad rules
-        run: node scripts/test-analysis.cjs
+        run: |
+          node scripts/test-analysis.cjs
+          node scripts/test-replacement.cjs
 
       - name: Verify injury warning data
         run: node scripts/test-player-injury.cjs

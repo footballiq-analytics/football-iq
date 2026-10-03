@@ -18,3 +18,16 @@ export function assessDirectTransfer(input: {
     : null;
   return { eligible: reason === null, reason };
 }
+
+
+/** Evaluate the retained squad, refunding only the selected outgoing player. */
+export function assessReplacementTransfer(input: Parameters<typeof assessDirectTransfer>[0] & {
+ outgoing?: {position:string;price:number;club:string}; candidatePosition:string;
+ candidateClub?:string;
+}):TransferAssessment {
+ const out=input.outgoing;
+ if(!out||out.position!==input.candidatePosition)return {eligible:false,reason:"AYNI MEVKİ GEREKLİ"};
+ return assessDirectTransfer({...input,squadSize:input.squadSize-1,
+ clubCount:input.clubCount-(out.club===input.candidateClub?1:0),availableSlots:1,
+ remainingBudget:Math.round((input.remainingBudget+out.price)*100)/100});
+}

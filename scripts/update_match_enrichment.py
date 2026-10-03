@@ -58,11 +58,15 @@ def parse_match(payload,m,row,observed):
     result['metrics'][field]=pair
   for pid,p in (c.get('playerStats') or {}).items():
    if str(p.get('id'))!=str(pid) or str(p.get('teamId')) not in [str(row[s]['id']) for s in ('home','away')]:continue
-   minutes=None
+   minutes=None;performance={}
    for group in p.get('stats',[]):
     for stat in group.get('stats',{}).values():
      if stat.get('key')=='minutes_played':minutes=numeric(stat.get('stat',{}).get('value'),130)
-   if minutes is not None:result['appearances'].append({'providerPlayerId':str(pid),'providerTeamId':str(p['teamId']),'minutes':minutes})
+     field={'rating_title':'rating','goals':'goals','assists':'assists'}.get(stat.get('key'))
+     if field:
+      value=numeric(stat.get('stat',{}).get('value'),10 if field=='rating' else 30)
+      if value is not None:performance[field]=value
+   if minutes is not None:result['appearances'].append({'providerPlayerId':str(pid),'providerTeamId':str(p['teamId']),'minutes':minutes,**performance})
  else:
   if g.get('finished') or g.get('started') or kickoff<=now:return result
   lineup=c.get('lineup') or {};lineup_text=[];absent_text=[]
@@ -123,7 +127,7 @@ def assemble(context,roster,catalog,league,fetch=get,now=None):
     if 'weather' in item['notes']:report['weatherMatches']+=1
    for p in item['appearances']:
     pid=mapping.get((p['providerPlayerId'],p['providerTeamId']))
-    if pid:history.setdefault(pid,[]).append({'fixtureId':mid,'kickoff':item['kickoff'],'minutes':p['minutes'],'source':item['source'],'verifiedAt':observed})
+    if pid:history.setdefault(pid,[]).append({'fixtureId':mid,'kickoff':item['kickoff'],'minutes':p['minutes'],'source':item['source'],'verifiedAt':observed,'week':m['week'],'home':m['home'],'away':m['away'],'homeGoals':m['homeGoals'],'awayGoals':m['awayGoals'],'status':'finished',**{k:p[k] for k in ('rating','goals','assists') if k in p}})
    if m['week']==target:
     for p in item['absences']:
      pid=mapping.get((p['providerPlayerId'],p['providerTeamId']))

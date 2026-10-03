@@ -63,3 +63,12 @@ html body:has(.fiq-team-page) .fiq-header nav.fiq-desktop-nav a[aria-current="pa
 html body .fiq-team-page :is(.fiq-squad-title,.fiq-transfer-heading h2){font-size:22px!important;line-height:1.3!important}
 html body .fiq-team-page .fiq-dugout-heading b{font-size:16px!important}
 @media(max-width:600px){html body .fiq-team-page :is(.fiq-squad-title,.fiq-transfer-heading h2){font-size:19px!important}html body .fiq-team-mobile-nav :is(a,button){font-size:12px!important}}
+
+.fiq-replacement-picker{margin:10px 0;padding:12px;border:1px solid #b6d2c5;border-radius:10px;background:#edf6f0;color:#173b30}
+.fiq-replacement-picker label{display:block;font-size:14px;font-weight:800;margin-bottom:6px}
+.fiq-replacement-picker select{width:100%;min-height:44px;background:white!important;color:#142b3b!important;border:1px solid #93b3a5!important;border-radius:8px;font-size:14px!important;padding:8px!important}
+.fiq-replacement-picker p{font-size:13px;line-height:1.5;margin:8px 0 0}
+.fiq-player-history{margin-top:18px;border-top:1px solid #cbd5e1;padding-top:14px;color:#142b3b}
+.fiq-player-history h3{font-size:18px;font-weight:800}.fiq-player-history p{font-size:13px;line-height:1.5;margin:8px 0}
+.fiq-player-history article{margin-top:12px;padding:12px;border:1px solid #cedcd6;border-radius:10px;background:#f4f8f6}.fiq-player-history article>strong{display:block;font-size:14px}.fiq-player-history article>small{display:block;margin-top:4px}
+.fiq-player-history dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}.fiq-player-history dt{font-size:12px}.fiq-player-history dd{font-size:17px;font-weight:800;margin:0}.fiq-player-history a{color:#145c45!important;text-decoration:underline;font-size:13px}
