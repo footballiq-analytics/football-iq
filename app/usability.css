@@ -48,3 +48,18 @@ html body .fiq-player-card>.fiq-injury-on-card{position:absolute;top:30px;left:-
 html body .fiq-transfer-player-info .fiq-injury-badge{margin-top:3px}
 
 html body .fiq-header .fiq-logo b{color:#256453!important;text-shadow:none!important}
+
+/* V12.5: solid, readable squad headings at tablet and phone widths. */
+html body:has(.fiq-team-page) .fiq-header nav.fiq-desktop-nav a[href],
+html body:has(.fiq-team-page) .mobile-drawer>a[href],
+html body .fiq-team-page :is(.fiq-squad-title,.fiq-transfer-heading h2,.fiq-dugout-heading b),
+html body .fiq-team-mobile-nav :is(a,button){
+ color:#142b3b!important;-webkit-text-fill-color:currentColor!important;
+ opacity:1!important;filter:none!important;text-shadow:none!important;
+ font-weight:800!important;letter-spacing:normal!important;
+}
+html body:has(.fiq-team-page) .fiq-header nav.fiq-desktop-nav a[href]{font-size:16px!important;line-height:1.4!important}
+html body:has(.fiq-team-page) .fiq-header nav.fiq-desktop-nav a[aria-current="page"]{color:#124b3b!important;background:#dceee5!important}
+html body .fiq-team-page :is(.fiq-squad-title,.fiq-transfer-heading h2){font-size:22px!important;line-height:1.3!important}
+html body .fiq-team-page .fiq-dugout-heading b{font-size:16px!important}
+@media(max-width:600px){html body .fiq-team-page :is(.fiq-squad-title,.fiq-transfer-heading h2){font-size:19px!important}html body .fiq-team-mobile-nav :is(a,button){font-size:12px!important}}

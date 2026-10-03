@@ -184,7 +184,7 @@ tbody tr:hover{background:#ffffff05}
       <div>
         <div class="brand-title">FUTBOL <span style="color:var(--gold)">IQ</span></div>
         <div class="brand-sub">Haftalık kadro ve maç analizi</div>
-        <!-- PRO UI V10.4 · IMPORT GUARANTEE --><span class="version-badge">Haftalık analiz · V12.4</span>
+        <!-- PRO UI V10.4 · IMPORT GUARANTEE --><span class="version-badge">Haftalık analiz · V12.5</span>
       </div>
     </div>
     <nav class="scout-page-nav" aria-label="Site menüsü"><a id="backToFantasy" class="back-home" href="./index.html">← Ana sayfa</a><a class="back-home to-squad" href="./team/">Kadrom →</a></nav>
@@ -1117,6 +1117,11 @@ el('formation').onchange=()=>runAction('Diziliş güncelleme',()=>{if(squad.leng
 if(el('healthMiniOpen'))el('healthMiniOpen').onclick=()=>runAction('Kadro sağlığı',()=>renderHealth());if(el('radarMiniOpen'))el('radarMiniOpen').onclick=()=>runAction('Fikstür radarı',()=>renderRadar());if(el('mobileMenuBtn'))el('mobileMenuBtn').onclick=()=>el('mobileMenu').classList.toggle('open');if(el('mobileMore'))el('mobileMore').onclick=()=>el('mobileMenu').classList.toggle('open');
 el('embedBtn').onclick=async()=>{const code='<iframe src="'+location.href+'" width="100%" height="900" style="border:0" loading="lazy"></iframe>';try{await navigator.clipboard.writeText(code);setStatus('iframe kodu panoya kopyalandı.')}catch{prompt('iframe kodunu kopyala:',code)}};
 
+function renderGoalOutlook(m){
+ const f=n=>n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+ const three=n=>Math.max(0,Math.min(1,1-Math.exp(-n)*(1+n+n*n/2)));
+ return '<div class="goal-outlook"><div class="goal-outlook-head"><strong>Gol beklentisi</strong><span>Toplam '+f(m.homeLambda+m.awayLambda)+'</span></div><div class="goal-teams"><div><span>'+esc(m.home)+'</span><b>'+f(m.homeLambda)+'</b><small>3+ gol atma: '+pct(three(m.homeLambda))+'</small></div><div><span>'+esc(m.away)+'</span><b>'+f(m.awayLambda)+'</b><small>3+ gol atma: '+pct(three(m.awayLambda))+'</small></div></div><div class="goal-chance"><span>Maçta en az 3 gol</span><strong>'+pct(m.over25)+'</strong></div><small>Modelin ortalama gol tahmini; kesin skor veya ölçülmüş xG değildir.</small></div>';
+}
 function recentMatchInputs(m){
  if(!matchEnrichment)return '';
  const rows=[];
@@ -1151,7 +1156,7 @@ function renderMatchForecasts(){
   const extra=analysisEvidence?.fixtures?.[m.id],valid=extra?.source&&ScoutRules.fresh(extra.verifiedAt,Date.now())&&Date.parse(extra.verifiedAt)<=Math.min(Date.now(),Date.parse(m.kickoff)||Date.now());
   const notes=valid?['lineup','absences','workload','travel','weather','pitch','tactics','coachChange','motivation'].map(k=>[({lineup:'İlk 11',absences:'Eksikler',workload:'Maç yükü',travel:'Seyahat',weather:'Hava',pitch:'Zemin',tactics:'Taktik',coachChange:'Teknik direktör',motivation:'Motivasyon'})[k],typeof extra[k]==='string'?extra[k]:'Veri eksik']):[];
   const details='<details class="forecast-explanation"><summary>Gerekçe ve veri durumu</summary><ul>'+m.reasons.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p>Model gol beklentisi: '+m.homeLambda.toFixed(2)+' / '+m.awayLambda.toFixed(2)+' (ölçülmüş xG değildir).</p><p>'+m.missing.map(esc).join(' · ')+'</p>'+recentMatchInputs(m)+(notes.length?'<dl>'+notes.map(([k,v])=>'<dt>'+k+'</dt><dd>'+esc(v)+'</dd>').join('')+'</dl><p>Bağlam kaynağı: '+esc(extra.source)+' · Bu notlar sayısal puan artışı olarak uygulanmaz.</p>':'<p>Güncel ilk 11, eksikler, maç yükü, seyahat, hava, zemin, taktik ve motivasyon verisi bağlı değil.</p>')+'</details>';
-  return '<article class="forecast"><div class="match-clubs">'+esc(m.home)+' <span>—</span> '+esc(m.away)+'</div><div class="match-score">'+(done?m.homeGoals+' – '+m.awayGoals:begun||!fresh?'—':top.home+' – '+top.away)+'</div><small>'+(done?'Maç sonucu':begun?'Maç başladı · sonuç bekleniyor':!fresh?'Güncel veri bekleniyor':'En olası skor · '+pct(top.prob)+' · güven düşük')+'</small>'+((done||begun||!fresh)?'':'<div class="score-alternatives">'+m.top.map(s=>'<span>'+s.home+'–'+s.away+' <b>'+pct(s.prob)+'</b></span>').join('')+'</div><div class="match-odds"><span>Ev '+pct(m.homeWin)+'</span><span>Ber. '+pct(m.draw)+'</span><span>Dep. '+pct(m.awayWin)+'</span></div><div class="forecast-secondary"><span>2,5 üst '+pct(m.over25)+'</span><span>İki takım gol '+pct(m.btts)+'</span><span>Ev gol yemez '+pct(m.homeCleanSheet)+'</span><span>Dep. gol yemez '+pct(m.awayCleanSheet)+'</span></div>'+details)+'</article>';
+  return '<article class="forecast"><div class="match-clubs">'+esc(m.home)+' <span>—</span> '+esc(m.away)+'</div><div class="match-score">'+(done?m.homeGoals+' – '+m.awayGoals:begun||!fresh?'—':top.home+' – '+top.away)+'</div><small>'+(done?'Maç sonucu':begun?'Maç başladı · sonuç bekleniyor':!fresh?'Güncel veri bekleniyor':'En olası skor · '+pct(top.prob)+' · güven düşük')+'</small>'+((done||begun||!fresh)?'':renderGoalOutlook(m)+'<p class="score-context">Tek bir skorun olasılığı düşüktür; alternatif sonuçlar birlikte değerlendirilir.</p><div class="score-alternatives">'+m.top.map(s=>'<span>'+s.home+'–'+s.away+' <b>'+pct(s.prob)+'</b></span>').join('')+'</div><div class="match-odds"><span>Ev '+pct(m.homeWin)+'</span><span>Ber. '+pct(m.draw)+'</span><span>Dep. '+pct(m.awayWin)+'</span></div><div class="forecast-secondary"><span>2,5 üst '+pct(m.over25)+'</span><span>İki takım gol '+pct(m.btts)+'</span><span>Ev gol yemez '+pct(m.homeCleanSheet)+'</span><span>Dep. gol yemez '+pct(m.awayCleanSheet)+'</span></div>'+details)+'</article>';
  }).join('');
  if(forecastMarkup!==forecastMarkupCache){el('matchForecasts').innerHTML=forecastMarkup;forecastMarkupCache=forecastMarkup;}
  const t=evaluationCache;
