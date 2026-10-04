@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-04T22:02:16Z",
+  "updateMethod": "editorial",
+  "records": [
+    {
+      "id": "bjk-vlahovic-20261001",
+      "club": "Beşiktaş",
+      "playerId": "bjk-dusan-vlahovic",
+      "playerName": "Dušan Vlahović",
+      "status": "individual",
+      "reportDate": "2026-10-01",
+      "source": "https://bjk.com.tr/tr/haber/95232/kocaelispor-maci-antrenman-notlari.html",
+      "publisher": "Beşiktaş · resmî kulüp",
+      "summary": "Vlahović, salonda takımdan ayrı sahaya dönüş çalışması yaptı."
+    },
+    {
+      "id": "bjk-team-20261002",
+      "club": "Beşiktaş",
+      "status": "team",
+      "reportDate": "2026-10-02",
+      "source": "https://bjk.com.tr/tr/haber/95235/kocaelispor-maci-hazirliklari-devam-ediyor.html",
+      "publisher": "Beşiktaş · resmî kulüp",
+      "summary": "Kondisyon ve taktik çalışmasının ardından U19 takımıyla antrenman maçı yapıldı. Oyuncu bazında katılım listesi açıklanmadı."
+    },
+    {
+      "id": "gs-team-20261001",
+      "club": "Galatasaray",
+      "status": "team",
+      "reportDate": "2026-10-01",
+      "source": "https://www.galatasaray.org/haber/futbol/antrenman-raporu-1-ekim-persembe/61047",
+      "publisher": "Galatasaray · resmî kulüp",
+      "summary": "Isınma ve pas çalışmasının ardından taktik antrenmanı yapıldı. Oyuncu bazında katılım veya performans ölçümü açıklanmadı."
+    },
+    {
+      "id": "fb-team-20261002",
+      "club": "Fenerbahçe",
+      "status": "team",
+      "reportDate": "2026-10-02",
+      "source": "https://www.haberturk.com/spor/fenerbahce-caykur-rizespor-maci-hazirliklarina-devam-etti-3916743",
+      "publisher": "Habertürk / İHA",
+      "summary": "Millî takım oyuncularının bulunmadığı çalışmada çabukluk, koordinasyon, pas ve taktik çalışmaları yapıldı. Haberde oyuncu isimleri belirtilmedi."
+    }
+  ]
+}

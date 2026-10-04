@@ -94,3 +94,22 @@ html body header.fiq-header .fiq-header-actions button{
 html body header.fiq-header nav.fiq-desktop-nav a[aria-current="page"]{
  color:#124b3b!important;background:#dceee5!important;
 }
+
+/* Reserve real layout space below installed iOS status-bar effects.
+   V27's padding:0 shorthand used to erase the earlier safe-area padding. */
+:root{--fiq-installed-top:0px}
+@media(display-mode:standalone){:root{--fiq-installed-top:max(48px,env(safe-area-inset-top,0px))}}
+html[data-installed="true"]{--fiq-installed-top:max(48px,env(safe-area-inset-top,0px))}
+html body header.fiq-header{
+ box-sizing:border-box!important;
+ height:calc(var(--fiq-header-h,64px) + var(--fiq-installed-top))!important;
+ min-height:calc(var(--fiq-header-h,64px) + var(--fiq-installed-top))!important;
+ padding-top:var(--fiq-installed-top)!important;padding-bottom:0!important;
+}
+.fiq-training-news{margin-top:18px;padding-top:14px;border-top:1px solid #cbd5e1;color:#142b3b}
+.fiq-training-news h3{font-size:18px;font-weight:800}
+.fiq-training-news p,.fiq-training-news small{font-size:13px;line-height:1.5}
+.fiq-training-news article{margin:10px 0;padding:12px;border:1px solid #cedcd6;border-radius:10px;background:#f4f8f6}
+.fiq-training-news strong{display:block;font-size:14px}
+.fiq-training-news a{color:#145c45!important;text-decoration:underline;font-size:13px}
+.fiq-training-news .fiq-news-age{display:block;color:#745017!important;font-weight:700}
