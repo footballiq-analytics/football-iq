@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
  return {
   id:`${base}/`,name:"FUTBOL IQ Fantasy",short_name:"FUTBOL IQ",
   description:"Kadronu kur, transferlerini yönet.",lang:"tr",start_url:`${base}/team/`,scope:`${base}/`,
-  display:"standalone",orientation:"any",background_color:"#071522",theme_color:"#071522",
+  display:"standalone",orientation:"any",background_color:"#eaf0f5",theme_color:"#eaf0f5",
   icons:[192,512].map(size=>({src:`${base}/icons/icon-${size}.png`,sizes:`${size}x${size}`,type:"image/png",purpose:"any"})),
   shortcuts:[{name:"Kadrom",url:`${base}/team/`},{name:"Ana Sayfa",url:`${base}/`}],
  };

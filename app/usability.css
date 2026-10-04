@@ -72,3 +72,25 @@ html body .fiq-team-page .fiq-dugout-heading b{font-size:16px!important}
 .fiq-player-history h3{font-size:18px;font-weight:800}.fiq-player-history p{font-size:13px;line-height:1.5;margin:8px 0}
 .fiq-player-history article{margin-top:12px;padding:12px;border:1px solid #cedcd6;border-radius:10px;background:#f4f8f6}.fiq-player-history article>strong{display:block;font-size:14px}.fiq-player-history article>small{display:block;margin-top:4px}
 .fiq-player-history dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}.fiq-player-history dt{font-size:12px}.fiq-player-history dd{font-size:17px;font-weight:800;margin:0}.fiq-player-history a{color:#145c45!important;text-decoration:underline;font-size:13px}
+
+/* Installed app and browser share the retired-dark-mode light shell.
+   Opaque header avoids translucent compositing behind navigation on tablets. */
+html[data-theme="light"]{color-scheme:only light}
+html body header.fiq-header{
+ background:#eaf0f5!important;color:#142b3b!important;
+ opacity:1!important;filter:none!important;
+ -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+html body header.fiq-header nav.fiq-desktop-nav,
+html body header.fiq-header .fiq-logo{
+ opacity:1!important;filter:none!important;text-shadow:none!important;
+}
+html body header.fiq-header nav.fiq-desktop-nav a[href],
+html body header.fiq-header .fiq-logo span,
+html body header.fiq-header .fiq-header-actions button{
+ color:#142b3b!important;-webkit-text-fill-color:currentColor!important;
+ opacity:1!important;filter:none!important;text-shadow:none!important;font-weight:800!important;
+}
+html body header.fiq-header nav.fiq-desktop-nav a[aria-current="page"]{
+ color:#124b3b!important;background:#dceee5!important;
+}

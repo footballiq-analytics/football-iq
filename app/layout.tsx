@@ -26,11 +26,11 @@ import ButtonFeedback from "@/components/interaction/ButtonFeedback";
 import { Footer, Header } from "@/components/site-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#071522" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#eaf0f5", colorScheme: "light" };
 
 export const metadata: Metadata = {
   icons: { apple: `${process.env.NEXT_PUBLIC_BASE_PATH??""}/icons/icon-180.png` },
-  appleWebApp: { capable: true, title: "FUTBOL IQ", statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: "FUTBOL IQ", statusBarStyle: "default" },
   title: { default: "FUTBOL IQ Fantasy", template: "%s | FUTBOL IQ Fantasy" },
   description: "Türkiye odaklı, mobil uyumlu fantasy football deneyimi. Kadronu kur, bütçeni yönet ve liglerde yarış.",
   openGraph: { title: "FUTBOL IQ Fantasy", description: "Kadronu kur, bütçeni yönet ve fantasy liglerinde yarış.", type: "website" },
@@ -38,6 +38,6 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const structuredData = { "@context": "https://schema.org", "@type": "WebSite", name: "FUTBOL IQ Fantasy", description: "Web tabanlı fantasy football platformu.", inLanguage: "tr-TR" };
-  return <html lang="tr" suppressHydrationWarning><body><ThemeProvider><InjuryProvider><ButtonFeedback /><Header /><PullToRefresh /><main>{children}</main><Footer /></InjuryProvider></ThemeProvider><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></body></html>;
+  return <html lang="tr" data-theme="light" suppressHydrationWarning><body><ThemeProvider><InjuryProvider><ButtonFeedback /><Header /><PullToRefresh /><main>{children}</main><Footer /></InjuryProvider></ThemeProvider><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></body></html>;
 }
 
