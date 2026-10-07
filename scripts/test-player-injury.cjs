@@ -14,3 +14,10 @@ const old=injuryIndex({players:[{...row,injuryUpdatedAt:'2026-09-20T12:00:00Z'}]
 assert(old);assert.equal(injuryIsCurrent(old,now),false);
 assert.equal(injuryIsCurrent(injuryIndex({players:[row]},now)[key],now),true);
 console.log('PASS: injury source, age, future timestamp, club identity and ambiguous-match safeguards');
+
+const {suspensionIndex}=box.exports;
+const warning={name:'Uğurcan Çakır',club:'Galatasaray',kind:'suspended',week:8,kickoff:'2026-10-03T18:00:00Z',checkedAt:'2026-10-02T10:00:00Z',source:'https://www.fotmob.com/matches/test'};
+assert(suspensionIndex({playerWarnings:[warning]},now)[key]);
+for(const change of [{kind:'injury'},{kickoff:'2026-10-01T18:00:00Z'},{checkedAt:'2026-09-01T10:00:00Z'},{checkedAt:'2026-10-04T10:00:00Z'},{source:'https://example.com'},{week:0}])
+ assert.equal(Object.keys(suspensionIndex({playerWarnings:[{...warning,...change}]},now)).length,0);
+console.log('PASS: match-specific suspension source, expiry, freshness and week validation');

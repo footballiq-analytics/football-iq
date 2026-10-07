@@ -113,3 +113,14 @@ html body header.fiq-header{
 .fiq-training-news strong{display:block;font-size:14px}
 .fiq-training-news a{color:#145c45!important;text-decoration:underline;font-size:13px}
 .fiq-training-news .fiq-news-age{display:block;color:#745017!important;font-weight:700}
+
+html body .fiq-team-page button.fiq-card-remove{display:grid!important;place-items:center!important;position:absolute!important;top:-5px!important;left:-5px!important;right:auto!important;width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;padding:0!important;border:1px solid #c34956!important;border-radius:50%!important;background:#fff0f1!important;color:#a31630!important;-webkit-text-fill-color:#a31630!important;font-size:23px!important;font-weight:700!important;line-height:1!important;z-index:125!important;touch-action:manipulation!important}
+html body .fiq-player-warnings{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+html body .fiq-player-warnings[data-on-card="true"]{position:absolute;top:30px;left:-5px;z-index:110;pointer-events:none}
+html body .fiq-injury-badge[data-kind="suspended"]{background:#fff4cc!important;color:#785000!important;border-color:#bd8b20!important}
+
+@media(max-width:767px) and (orientation:portrait){
+ html body .fiq-team-page{padding-bottom:max(16px,env(safe-area-inset-bottom))!important}
+ html body .fiq-team-page #fiq-transfer-drawer{bottom:max(8px,env(safe-area-inset-bottom))!important}
+ html body .fiq-team-page .fiq-market-backdrop{bottom:0!important}
+}

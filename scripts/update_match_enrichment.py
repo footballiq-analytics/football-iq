@@ -111,7 +111,8 @@ def assemble(context,roster,catalog,league,fetch=get,now=None):
   if raw and k not in duplicates and raw.get('fotmobId') and raw.get('fotmobTeamId'):mapping[(str(raw['fotmobId']),str(raw['fotmobTeamId']))]=str(p['id'])
  out={'schemaVersion':2,'season':context['season'],'updatedAt':observed,'players':{},'matchStats':{},'fixtures':{},'weeklyScores':None}
  report={'attempted':len(selected),'matchedFixtures':len(pairs),'expectedFixtures':len(matches),'fetched':0,'xgMatches':0,'weatherMatches':0,'failures':[],'missing':['Kesin ilk 11 / başlama olasılığı','Tüm organizasyonlarda eksiksiz oyuncu yükü','Doğrulanmış motivasyon ve taktik','Gerçek seyahat mesafesi','Oyunun haftalık fantezi puanları']}
- details={};history={}
+ details={};history={};warnings=[]
+ catalog_by_id={str(p['id']):p for p in catalog['players']}
  def retrieve(pair):
   m,r=pair
   try:return m,parse_match(fetch('https://www.fotmob.com/api/data/matchDetails?matchId='+str(r['id'])),m,r,observed),None
@@ -128,6 +129,12 @@ def assemble(context,roster,catalog,league,fetch=get,now=None):
    for p in item['appearances']:
     pid=mapping.get((p['providerPlayerId'],p['providerTeamId']))
     if pid:history.setdefault(pid,[]).append({'fixtureId':mid,'kickoff':item['kickoff'],'minutes':p['minutes'],'source':item['source'],'verifiedAt':observed,'week':m['week'],'home':m['home'],'away':m['away'],'homeGoals':m['homeGoals'],'awayGoals':m['awayGoals'],'status':'finished',**{k:p[k] for k in ('rating','goals','assists') if k in p}})
+   if m['week'] in (active,target):
+    for p in item['absences']:
+     pid=mapping.get((p['providerPlayerId'],p['providerTeamId']))
+     if pid and p['availability']=='suspended':
+      player=catalog_by_id[pid]
+      warnings.append({'name':player['name'],'club':player['club'],'kind':'suspended','week':m['week'],'kickoff':item['kickoff'],'checkedAt':observed,'source':item['source']})
    if m['week']==target:
     for p in item['absences']:
      pid=mapping.get((p['providerPlayerId'],p['providerTeamId']))
@@ -135,7 +142,7 @@ def assemble(context,roster,catalog,league,fetch=get,now=None):
  if not report['fetched']:raise ValueError('No validated match data; retain previous publication')
  for pid,e in out['players'].items():e['recentAppearances']=history.get(pid,[])
  checked=validate(out,context,catalog)
- checked.update(report=report,matchDetails=details,playerMatches=history)
+ checked.update(report=report,matchDetails=details,playerMatches=history,playerWarnings=warnings)
  report['xgMatches']=len(checked['matchStats']);report['playerMinuteRecords']=sum(map(len,history.values()));report['playersWithMinutes']=len(history);report['matchSpecificAbsences']=len(checked['players'])
  return checked
 

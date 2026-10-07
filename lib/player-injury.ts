@@ -26,3 +26,17 @@ export function injuryIsCurrent(record: InjuryRecord, now = Date.now()) {
   const age = now - Date.parse(record.checkedAt);
   return Number.isFinite(age) && age >= 0 && age <= 72 * 3600000;
 }
+
+export type SuspensionRecord = InjuryRecord & { kickoff: string; week: number };
+export function suspensionIndex(data: unknown, now = Date.now()): Record<string, SuspensionRecord> {
+ const out: Record<string, SuspensionRecord> = {};
+ if (!data || typeof data !== 'object' || !('playerWarnings' in data) || !Array.isArray(data.playerWarnings)) return out;
+ for (const row of data.playerWarnings) {
+  if (!row || row.kind !== 'suspended' || typeof row.name !== 'string' || typeof row.club !== 'string' || !row.name.trim() || !row.club.trim()) continue;
+  const checked = Date.parse(row.checkedAt), kickoff = Date.parse(row.kickoff);
+  if (!Number.isInteger(row.week) || row.week < 1 || row.week > 34 || !Number.isFinite(checked) || !Number.isFinite(kickoff) || checked > now || now-checked > 72*3600000 || kickoff <= now) continue;
+  if (typeof row.source !== 'string' || !/^https:\/\/www\.fotmob\.com\/(matches\/|match\/)/.test(row.source)) continue;
+  out[injuryKey(row.name,row.club)] = {checkedAt:row.checkedAt,source:row.source,kickoff:row.kickoff,week:row.week};
+ }
+ return out;
+}
